@@ -5,6 +5,9 @@ import { LogDoseSchema, DoseStatus } from '@hackgu/shared';
 import { AuthRequest } from '../../middlewares/auth.middleware';
 import { emitToCaregivers } from '../../lib/socket-manager';
 import { computeAdherenceScore } from '../adherence/adherence.service';
+import DoctorPatientLink from '../doctor/doctor-patient-link.model';
+import { getIO } from '../../lib/socket-manager';
+import CaregiverLink from '../caregiver/caregiver-link.model';
 
 export const logDose = async (req: AuthRequest, res: Response) => {
   try {
@@ -20,15 +23,30 @@ export const logDose = async (req: AuthRequest, res: Response) => {
 
     const log = new DoseLog({ ...parsed, userId: req.user!.id, status, delayMinutes });
     await log.save();
+    await log.populate('medicationId');
 
     // 1. Emit instant dose_logged event to caregivers
-    await emitToCaregivers(req.user!.id, 'dose_logged', {
+    const io = getIO();
+    const caregiverLinks = await CaregiverLink.find({ patientId: req.user!.id, isActive: true });
+    caregiverLinks.forEach((link: any) => {
+      io.to(`caregiver:${link.caregiverId}`).emit('dose_logged', {
         log,
         message: `Patient logged a dose: ${status}`
+      });
     });
 
-    // 2. Re-compute adherence and check if risk changed
-    // (Ideally we would compare with previous risk, but for now we emit current risk)
+    // 2. Emit real-time update to linked doctors
+    const doctorLinks = await DoctorPatientLink.find({ patientId: req.user!.id });
+    doctorLinks.forEach((link: any) => {
+      io.to(`doctor:${link.doctorId}`).emit('dose_logged', {
+        patientId: req.user!.id,
+        patientName: req.user?.name || 'Patient',
+        medication: (log.medicationId as any)?.name,
+        status
+      });
+    });
+
+    // 3. Re-compute adherence and check if risk changed
     const { score, riskLevel } = await computeAdherenceScore(req.user!.id);
     await emitToCaregivers(req.user!.id, 'risk_level_changed', {
         score,

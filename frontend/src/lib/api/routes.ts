@@ -128,3 +128,26 @@ export const listDoseLogs = async (params: any = {}) => {
   const response = await api.get('/dose-logs', { params });
   return response.data;
 };
+
+// Doctor API Endpoints
+export const linkDoctorPatient = async (data: { patientEmail: string, specialization?: string }) => {
+  const response = await api.post('/doctor/link', data);
+  return response.data;
+};
+
+export const getDoctorPatients = async () => {
+  const response = await api.get('/doctor/patients');
+  return response.data;
+};
+
+export const togglePatientFlag = async (linkId: string) => {
+  const response = await api.put(`/doctor/flag/${linkId}`);
+  return response.data;
+};
+
+export const downloadAdherencePDF = async (patientId: string) => {
+  const response = await api.get(`/doctor/adherence-pdf/${patientId}`, {
+    responseType: 'blob', // Important for file downloads
+  });
+  return response;
+};

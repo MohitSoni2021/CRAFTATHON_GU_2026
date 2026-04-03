@@ -3,7 +3,7 @@
 import React from "react"
 import Link from "next/link"
 import { useRouter, usePathname } from "next/navigation"
-import { Activity, Bell, LogOut, Pill, History, LayoutDashboard, Brain, HeartPulse } from "lucide-react"
+import { Activity, Bell, LogOut, Pill, History, LayoutDashboard, Brain, HeartPulse, Stethoscope } from "lucide-react"
 import { APP_NAME } from "@/constants"
 import NotificationPopover from "./NotificationPopover"
 
@@ -24,7 +24,14 @@ export default function Navbar({ user, riskLevel }: NavbarProps) {
     }
   }
 
-  const navLinks = [
+  const isDoctor = user?.role === 'doctor'
+  const isCaregiver = user?.role === 'caregiver'
+
+  const navLinks = isDoctor ? [
+    { name: "My Patients", href: "/doctor", icon: Stethoscope },
+    { name: "Clinical Analytics", href: "/dashboard", icon: LayoutDashboard }, // Dashboard as clinical view
+    { name: "Global Logs", href: "/history", icon: History },
+  ] : [
     { name: "Overview", href: "/dashboard", icon: LayoutDashboard },
     { name: "Medications", href: "/medications", icon: Pill },
     { name: "Adherence AI", href: "/adherence", icon: Brain },
@@ -35,11 +42,11 @@ export default function Navbar({ user, riskLevel }: NavbarProps) {
   return (
     <nav className="bg-white border-b border-gray-100 px-8 py-4 flex justify-between items-center sticky top-0 z-50 shadow-sm backdrop-blur-md bg-white/90">
       <div className="flex items-center gap-3">
-        <Link href="/dashboard" className="flex items-center gap-3 group">
+        <Link href={isDoctor ? "/doctor" : "/dashboard"} className="flex items-center gap-3 group">
           <div className="bg-[#e6fcfa] p-2 rounded-xl text-[#3bbdbf] group-hover:scale-110 transition-transform">
             <Activity size={24} />
           </div>
-          <span className="font-bold text-xl text-[#2b3654]">{APP_NAME} <span className="font-medium text-gray-400">| {user?.role === 'caregiver' ? 'Caregiver' : 'Patient'}</span></span>
+          <span className="font-bold text-xl text-[#2b3654]">{APP_NAME} <span className="font-medium text-gray-400">| {isDoctor ? 'Doctor' : isCaregiver ? 'Caregiver' : 'Patient'}</span></span>
         </Link>
       </div>
       

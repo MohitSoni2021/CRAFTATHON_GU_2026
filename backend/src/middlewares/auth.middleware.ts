@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 
 export interface AuthRequest extends Request {
-  user?: { id: string; role: string };
+  user?: { id: string; role: string; name?: string };
 }
 
 export const verifyToken = (req: AuthRequest, res: Response, next: NextFunction): void => {
@@ -22,4 +22,12 @@ export const verifyToken = (req: AuthRequest, res: Response, next: NextFunction)
   } catch {
     res.status(401).json({ success: false, message: 'Invalid or expired token' });
   }
+};
+export const authorizeRoles = (...roles: string[]) => {
+  return (req: AuthRequest, res: Response, next: NextFunction) => {
+    if (!req.user || !roles.includes(req.user.role)) {
+      return res.status(403).json({ success: false, message: 'Unauthorized role' });
+    }
+    next();
+  };
 };
