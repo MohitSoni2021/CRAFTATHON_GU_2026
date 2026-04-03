@@ -1,0 +1,9 @@
+node_modules
+.env
+dist
+.next
+.turbo
+*.log
+
+.zencoder
+.zenflow
