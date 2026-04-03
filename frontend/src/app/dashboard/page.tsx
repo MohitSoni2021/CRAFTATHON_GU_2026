@@ -79,12 +79,19 @@ export default function Dashboard() {
     }
   }
 
-  const handleMarkTaken = async (logId: string) => {
+  const handleMarkTaken = async (log: any) => {
     try {
-      const res = await markDoseAsTaken(logId)
+      const res = await markDoseAsTaken({
+        medicationId: log.medicationId?._id ?? log.medicationId,
+        scheduledAt:  log.scheduledTime ?? log.scheduledAt,
+        takenAt:      new Date().toISOString(),
+        status:       'taken',
+      })
       if (res.success) {
-        setTodayDoses(prev => prev.map(log => 
-          log._id === logId ? { ...log, status: 'taken', takenAt: new Date().toISOString() } : log
+        setTodayDoses(prev => prev.map(d =>
+          (d.medicationId === log.medicationId && d.scheduledTime === log.scheduledTime)
+            ? { ...d, status: 'taken', takenAt: new Date().toISOString() }
+            : d
         ))
         const scoreRes = await getAdherenceScore()
         if (scoreRes.success) setScore(scoreRes.data)
@@ -192,7 +199,7 @@ export default function Dashboard() {
                   </div>
                 ) : (
                   todayDoses.map((log) => (
-                    <div key={log._id} className="p-6 border-b border-gray-50 flex items-center justify-between hover:bg-gray-50 transition-colors">
+                    <div key={log.id ?? `${log.medicationId}_${log.scheduledTime}`} className="p-6 border-b border-gray-50 flex items-center justify-between hover:bg-gray-50 transition-colors">
                       <div className="flex items-center gap-4">
                         <div className={`w-14 h-14 rounded-2xl flex items-center justify-center ${
                           log.status === 'taken' ? 'bg-[#e6faeb] text-[#28a745]' : 
@@ -203,23 +210,24 @@ export default function Dashboard() {
                            <Clock size={28} />}
                         </div>
                         <div>
-                          <h4 className="font-bold text-lg text-[#2b3654]">{log.medicationId?.name} ({log.medicationId?.dosage}{log.medicationId?.unit})</h4>
+                          <h4 className="font-bold text-lg text-[#2b3654]">{log.medicationName} ({log.dosage})</h4>
                           <div className="flex items-center gap-2 mt-1 text-sm font-medium text-gray-500">
                             <Clock size={14} /> 
-                            {format(new Date(log.scheduledAt), 'hh:mm a')} — 
+                            {format(new Date(log.scheduledTime), 'hh:mm a')} — 
                             <span className={
                               log.status === 'taken' ? 'text-green-600' : 
                               log.status === 'missed' ? 'text-red-500' : 'text-blue-500'
                             }>
-                              {log.status === 'taken' ? `Taken at ${format(new Date(log.takenAt), 'hh:mm a')}` : 
-                               log.status.charAt(0).toUpperCase() + log.status.slice(1)}
+                              {log.status === 'taken' && log.takenAt
+                                ? `Taken at ${format(new Date(log.takenAt), 'hh:mm a')}`
+                                : log.status.charAt(0).toUpperCase() + log.status.slice(1)}
                             </span>
                           </div>
                         </div>
                       </div>
                       {log.status === 'pending' && (
                         <Button 
-                          onClick={() => handleMarkTaken(log._id)}
+                          onClick={() => handleMarkTaken(log)}
                           className="bg-[#4a7ae6] hover:bg-[#3965ca] text-white rounded-xl shadow-md"
                         >
                           Mark Taken

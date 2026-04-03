@@ -3,7 +3,7 @@
 import React from "react"
 import Link from "next/link"
 import { useRouter, usePathname } from "next/navigation"
-import { Activity, Bell, LogOut, Pill, History, LayoutDashboard, Brain, HeartPulse, Stethoscope } from "lucide-react"
+import { Activity, Bell, LogOut, Pill, History, LayoutDashboard, Brain, HeartPulse, Stethoscope, CalendarCheck } from "lucide-react"
 import { APP_NAME } from "@/constants"
 import NotificationPopover from "./NotificationPopover"
 
@@ -29,10 +29,11 @@ export default function Navbar({ user, riskLevel }: NavbarProps) {
 
   const navLinks = isDoctor ? [
     { name: "My Patients", href: "/doctor", icon: Stethoscope },
-    { name: "Clinical Analytics", href: "/dashboard", icon: LayoutDashboard }, // Dashboard as clinical view
+    { name: "Clinical Analytics", href: "/dashboard", icon: LayoutDashboard },
     { name: "Global Logs", href: "/history", icon: History },
   ] : [
     { name: "Overview", href: "/dashboard", icon: LayoutDashboard },
+    { name: "Today's Meds", href: "/today", icon: CalendarCheck },
     { name: "Medications", href: "/medications", icon: Pill },
     { name: "Adherence AI", href: "/adherence", icon: Brain },
     { name: "Dose Logs", href: "/history", icon: History },

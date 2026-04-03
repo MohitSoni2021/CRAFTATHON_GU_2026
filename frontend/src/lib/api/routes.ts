@@ -126,10 +126,21 @@ export const getTodayDoses = async () => {
   return response.data;
 };
 
-export const markDoseAsTaken = async (id: string, status: string = 'taken') => {
-  const response = await api.put(`/dose-logs/${id}`, { 
-    status, 
-    takenAt: new Date().toISOString() 
+/**
+ * Mark a dose as taken by POSTing to /dose-logs (upsert).
+ * This is the primary way to record a taken dose from the schedule.
+ */
+export const markDoseAsTaken = async (data: {
+  medicationId: string;
+  scheduledAt: string;
+  takenAt?: string;
+  status?: string;
+  notes?: string;
+}) => {
+  const response = await api.post('/dose-logs', {
+    ...data,
+    takenAt: data.takenAt ?? new Date().toISOString(),
+    status: data.status ?? 'taken',
   });
   return response.data;
 };
