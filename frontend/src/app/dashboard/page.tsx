@@ -39,6 +39,7 @@ export default function Dashboard() {
   const [risk, setRisk] = useState<any>(null)
   const [todayDoses, setTodayDoses] = useState<any[]>([])
   const [error, setError] = useState<string | null>(null)
+  const [takingId, setTakingId] = useState<string | null>(null)
   const { isConnected } = useSocket()
 
   useEffect(() => {
@@ -80,24 +81,38 @@ export default function Dashboard() {
   }
 
   const handleMarkTaken = async (log: any) => {
+    const uid = `${log.medicationId}_${log.scheduledTime}`
+    if (takingId === uid) return
+    setTakingId(uid)
+
+    // Optimistic update — instant visual feedback
+    setTodayDoses(prev => prev.map(d =>
+      (d.medicationId === log.medicationId && d.scheduledTime === log.scheduledTime)
+        ? { ...d, status: 'taken', takenAt: new Date().toISOString() }
+        : d
+    ))
+
     try {
       const res = await markDoseAsTaken({
-        medicationId: log.medicationId?._id ?? log.medicationId,
-        scheduledAt:  log.scheduledTime ?? log.scheduledAt,
+        medicationId: log.medicationId,
+        scheduledAt:  log.scheduledTime,
         takenAt:      new Date().toISOString(),
         status:       'taken',
       })
       if (res.success) {
-        setTodayDoses(prev => prev.map(d =>
-          (d.medicationId === log.medicationId && d.scheduledTime === log.scheduledTime)
-            ? { ...d, status: 'taken', takenAt: new Date().toISOString() }
-            : d
-        ))
         const scoreRes = await getAdherenceScore()
         if (scoreRes.success) setScore(scoreRes.data)
       }
     } catch (err) {
+      // Revert on failure
       console.error("Failed to mark dose:", err)
+      setTodayDoses(prev => prev.map(d =>
+        (d.medicationId === log.medicationId && d.scheduledTime === log.scheduledTime)
+          ? { ...d, status: 'pending', takenAt: null }
+          : d
+      ))
+    } finally {
+      setTakingId(null)
     }
   }
 
@@ -185,9 +200,14 @@ export default function Dashboard() {
            <div className="lg:col-span-2 space-y-6">
               <div className="flex items-center justify-between">
                 <h2 className="text-xl font-bold flex items-center gap-2"><CalendarDays size={20} className="text-[#3bbdbf]" /> Today's Schedule</h2>
-                <Link href="/history">
-                  <Button variant="ghost" className="text-[#3bbdbf] font-bold hover:bg-[#e6fcfa] rounded-xl transition-colors">View Detailed History</Button>
-                </Link>
+                <div className="flex items-center gap-2">
+                  <Link href="/today">
+                    <Button variant="ghost" className="text-[#3bbdbf] font-bold hover:bg-[#e6fcfa] rounded-xl transition-colors">Full View</Button>
+                  </Link>
+                  <Link href="/history">
+                    <Button variant="ghost" className="text-gray-400 font-bold hover:bg-gray-50 rounded-xl transition-colors">History</Button>
+                  </Link>
+                </div>
               </div>
 
               <div className="bg-white border border-gray-100 rounded-3xl shadow-sm overflow-hidden min-h-[200px]">
@@ -198,46 +218,95 @@ export default function Dashboard() {
                     <Link href="/medications" className="text-[#3bbdbf] text-sm font-bold mt-2 hover:underline">Add medications to your cabinet</Link>
                   </div>
                 ) : (
-                  todayDoses.map((log) => (
-                    <div key={log.id ?? `${log.medicationId}_${log.scheduledTime}`} className="p-6 border-b border-gray-50 flex items-center justify-between hover:bg-gray-50 transition-colors">
-                      <div className="flex items-center gap-4">
-                        <div className={`w-14 h-14 rounded-2xl flex items-center justify-center ${
-                          log.status === 'taken' ? 'bg-[#e6faeb] text-[#28a745]' : 
-                          log.status === 'missed' ? 'bg-[#fef1f2] text-red-500' : 'bg-[#f0f4ff] text-[#4a7ae6]'
-                        }`}>
-                          {log.status === 'taken' ? <CheckCircle2 size={28} /> : 
-                           log.status === 'missed' ? <AlertCircle size={28} /> : 
-                           <Clock size={28} />}
-                        </div>
-                        <div>
-                          <h4 className="font-bold text-lg text-[#2b3654]">{log.medicationName} ({log.dosage})</h4>
-                          <div className="flex items-center gap-2 mt-1 text-sm font-medium text-gray-500">
-                            <Clock size={14} /> 
-                            {format(new Date(log.scheduledTime), 'hh:mm a')} — 
-                            <span className={
-                              log.status === 'taken' ? 'text-green-600' : 
-                              log.status === 'missed' ? 'text-red-500' : 'text-blue-500'
-                            }>
-                              {log.status === 'taken' && log.takenAt
-                                ? `Taken at ${format(new Date(log.takenAt), 'hh:mm a')}`
-                                : log.status.charAt(0).toUpperCase() + log.status.slice(1)}
-                            </span>
+                  todayDoses.map((log) => {
+                    const uid = `${log.medicationId}_${log.scheduledTime}`
+                    const isTaken  = log.status === 'taken' || log.status === 'delayed'
+                    const isMissed = log.status === 'missed'
+                    const isLoading = takingId === uid
+
+                    return (
+                      <div
+                        key={log.id ?? uid}
+                        className={`p-5 border-b border-gray-50 flex items-center justify-between transition-all duration-300
+                          ${isTaken  ? 'bg-emerald-50/40' : ''}
+                          ${isMissed ? 'bg-red-50/30 opacity-75' : ''}
+                          ${!isTaken && !isMissed ? 'hover:bg-gray-50/80' : ''}
+                        `}
+                      >
+                        {/* Left: checkbox + info */}
+                        <div className="flex items-center gap-4">
+                          {/* Circular checkbox button */}
+                          <button
+                            id={`dash-dose-${log.medicationId}-${encodeURIComponent(log.scheduledTime)}`}
+                            onClick={() => !isTaken && !isMissed && handleMarkTaken(log)}
+                            disabled={isTaken || isMissed || isLoading}
+                            className={`relative w-11 h-11 rounded-full border-2 flex shrink-0 items-center justify-center transition-all duration-200
+                              ${isTaken  ? 'bg-emerald-500 border-emerald-500 shadow-md shadow-emerald-200 cursor-default' : ''}
+                              ${isMissed ? 'bg-red-100 border-red-300 cursor-default' : ''}
+                              ${!isTaken && !isMissed ? 'border-gray-300 hover:border-[#3bbdbf] hover:shadow-[0_0_0_4px_rgba(59,189,191,0.12)] cursor-pointer active:scale-90' : ''}
+                              ${isLoading ? 'opacity-60' : ''}
+                            `}
+                          >
+                            {isLoading ? (
+                              <Loader2 size={16} className="animate-spin text-[#3bbdbf]" />
+                            ) : isTaken ? (
+                              <CheckCircle2 size={20} className="text-white" />
+                            ) : isMissed ? (
+                              <AlertCircle size={18} className="text-red-400" />
+                            ) : (
+                              <span className="w-4 h-4 rounded-full border-2 border-gray-300" />
+                            )}
+                          </button>
+
+                          {/* Medication info */}
+                          <div>
+                            <h4 className={`font-bold text-base text-[#2b3654] transition-all
+                              ${isTaken ? 'line-through decoration-emerald-400 opacity-60' : ''}`}>
+                              {log.medicationName}
+                              <span className="font-medium text-sm text-gray-400 ml-1.5 no-underline" style={{textDecoration:'none'}}>
+                                {log.dosage}
+                              </span>
+                            </h4>
+                            <div className="flex items-center gap-2 mt-0.5 text-xs font-medium">
+                              <Clock size={11} className="text-gray-400" />
+                              <span className="text-gray-400">{format(new Date(log.scheduledTime), 'h:mm a')}</span>
+                              <span className="text-gray-200">—</span>
+                              <span className={
+                                isTaken  ? 'text-emerald-500 font-semibold' :
+                                isMissed ? 'text-red-400 font-semibold' :
+                                'text-[#4a7ae6] font-semibold'
+                              }>
+                                {isTaken && log.takenAt
+                                  ? `Taken at ${format(new Date(log.takenAt), 'h:mm a')}`
+                                  : log.status.charAt(0).toUpperCase() + log.status.slice(1)}
+                              </span>
+                            </div>
                           </div>
                         </div>
+
+                        {/* Right: action or badge */}
+                        {!isTaken && !isMissed && (
+                          <button
+                            onClick={() => handleMarkTaken(log)}
+                            disabled={isLoading}
+                            className="text-xs font-bold bg-[#4a7ae6] hover:bg-[#3965ca] text-white px-4 py-2 rounded-xl shadow-sm transition-all active:scale-95 disabled:opacity-50"
+                          >
+                            {isLoading ? 'Saving…' : 'Mark Taken'}
+                          </button>
+                        )}
+                        {isTaken && (
+                          <span className="text-xs font-bold bg-emerald-50 text-emerald-600 px-3 py-1.5 rounded-full border border-emerald-100 shrink-0">
+                            ✓ Done
+                          </span>
+                        )}
+                        {isMissed && (
+                          <span className="text-xs font-bold bg-red-50 text-red-500 px-3 py-1.5 rounded-full border border-red-100 shrink-0">
+                            Missed
+                          </span>
+                        )}
                       </div>
-                      {log.status === 'pending' && (
-                        <Button 
-                          onClick={() => handleMarkTaken(log)}
-                          className="bg-[#4a7ae6] hover:bg-[#3965ca] text-white rounded-xl shadow-md"
-                        >
-                          Mark Taken
-                        </Button>
-                      )}
-                      {log.status === 'missed' && (
-                        <span className="text-xs font-bold bg-red-50 text-red-600 px-3 py-1 rounded-full border border-red-100">Caregiver Notified</span>
-                      )}
-                    </div>
-                  ))
+                    )
+                  })
                 )}
               </div>
            </div>
