@@ -5,6 +5,7 @@ import Link from "next/link"
 import { useRouter, usePathname } from "next/navigation"
 import { Activity, Bell, LogOut, Pill, History, LayoutDashboard, Brain, HeartPulse } from "lucide-react"
 import { APP_NAME } from "@/constants"
+import NotificationPopover from "./NotificationPopover"
 
 interface NavbarProps {
   user: any;
@@ -63,10 +64,9 @@ export default function Navbar({ user, riskLevel }: NavbarProps) {
       </div>
 
       <div className="flex items-center gap-4">
-        <button className="p-2 text-gray-400 hover:text-[#2b3654] transition-colors relative">
-          <Bell size={20} />
-          <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></span>
-        </button>
+        {/* Replaced static bell with NotificationPopover component */}
+        <NotificationPopover />
+        
         <div className="flex items-center gap-3 pl-4 border-l border-gray-200">
           <div className="text-right hidden sm:block">
             <p className="text-sm font-bold leading-none text-[#2b3654]">{user?.name}</p>
