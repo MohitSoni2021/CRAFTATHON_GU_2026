@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   View,
   Text,
@@ -17,14 +17,6 @@ import { format, parseISO } from 'date-fns';
 import { getTodayDosesService, markDoseAsTakenService } from '../../services/medicationService';
 import { getAdherenceScoreService } from '../../services/adherenceService';
 import { useAuthStore } from '../../store/authStore';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withTiming,
-  withSpring,
-  runOnJS,
-} from 'react-native-reanimated';
-import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 
 const TIME_RANGES = [
   { key: 'Morning', start: 5, end: 12 },
@@ -48,94 +40,58 @@ function formatCountdown(targetTime) {
 }
 
 const DoseCard = ({ dose, isNext, onMarkTaken, onLongPress, isTaking }) => {
-  const translateX = useSharedValue(0);
-
-  const gesture = Gesture.Pan()
-    .onUpdate((event) => {
-      if (event.translationX > 0) translateX.value = event.translationX;
-    })
-    .onEnd((event) => {
-      if (event.translationX > 110 && dose.status !== 'taken') {
-        runOnJS(onMarkTaken)(dose);
-      }
-      translateX.value = withTiming(0, { duration: 200 });
-    });
-
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [
-      { translateX: translateX.value },
-      { scale: withTiming(dose.status === 'taken' ? 0.98 : 1) },
-    ],
-  }));
-
-  const badgeAnim = useSharedValue(1);
-  useEffect(() => {
-    if (isNext) {
-      badgeAnim.value = withSpring(1.2);
-      setTimeout(() => { badgeAnim.value = withSpring(1); }, 400);
-    }
-  }, [isNext]);
-
-  const badgeStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: badgeAnim.value }],
-  }));
-
   const scheduledTime = typeof dose.scheduledTime === 'string' ? parseISO(dose.scheduledTime) : new Date(dose.scheduledTime);
 
   return (
-    <GestureDetector gesture={gesture}>
-      <Animated.View style={animatedStyle} className={`mb-3 rounded-3xl border p-5 shadow-sm ${dose.status === 'taken' ? 'border-emerald-200 bg-emerald-50' : 'border-slate-100 bg-white'}`}>
-        <Pressable
-          onPress={() => !isTaking && dose.status !== 'taken' && onMarkTaken(dose)}
-          onLongPress={() => onLongPress(dose)}
-          delayLongPress={500}
-          android_ripple={{ color: '#e5e7eb' }}
-          className="flex-row items-center"
-        >
-          <Animated.View className="mr-4"
-            style={{ transform: [{ scale: dose.status === 'taken' ? 1.1 : 1 }] }}
-          >
-            <View className={`w-14 h-14 rounded-full border-2 items-center justify-center ${dose.status === 'taken' ? 'border-emerald-500 bg-emerald-100' : 'border-slate-200 bg-white'}`}>
-              {isTaking ? (
-                <ActivityIndicator size="small" color="#f59e0b" />
-              ) : (
-                <Ionicons
-                  name={dose.status === 'taken' ? 'checkmark-circle' : 'ellipse-outline'}
-                  size={28}
-                  color={dose.status === 'taken' ? '#059669' : '#64748b'}
-                />
-              )}
-            </View>
-          </Animated.View>
+    <View className={`mb-3 rounded-3xl border p-5 shadow-sm ${dose.status === 'taken' ? 'border-emerald-200 bg-emerald-50' : 'border-slate-100 bg-white'}`}>
+      <Pressable
+        onPress={() => !isTaking && dose.status !== 'taken' && onMarkTaken(dose)}
+        onLongPress={() => onLongPress(dose)}
+        delayLongPress={500}
+        android_ripple={{ color: '#e5e7eb' }}
+        className="flex-row items-center"
+      >
+        <View className="mr-4">
+          <View className={`w-14 h-14 rounded-full border-2 items-center justify-center ${dose.status === 'taken' ? 'border-emerald-500 bg-emerald-100' : 'border-slate-200 bg-white'}`}>
+            {isTaking ? (
+              <ActivityIndicator size="small" color="#f59e0b" />
+            ) : (
+              <Ionicons
+                name={dose.status === 'taken' ? 'checkmark-circle' : 'ellipse-outline'}
+                size={28}
+                color={dose.status === 'taken' ? '#059669' : '#64748b'}
+              />
+            )}
+          </View>
+        </View>
 
-          <View className="flex-1">
-            <View className="flex-row items-center justify-between">
-              <Text className={`text-lg font-bold ${dose.status === 'taken' ? 'text-slate-500 line-through decoration-slate-400' : 'text-slate-800'}`}>
-                {dose.medicationName || 'Medication'}
-              </Text>
-              {isNext && (
-                <Animated.View style={badgeStyle} className="bg-amber-100 px-3 py-1 rounded-full">
-                  <Text className="text-amber-800 font-bold text-xs">Next Dose</Text>
-                </Animated.View>
-              )}
-            </View>
-
-            <Text className={`text-sm ${dose.status === 'taken' ? 'text-slate-500 line-through' : 'text-slate-400'}`}>
-              {dose.dosage} • {format(scheduledTime, 'h:mm a')}
+        <View className="flex-1">
+          <View className="flex-row items-center justify-between">
+            <Text className={`text-lg font-bold ${dose.status === 'taken' ? 'text-slate-500 line-through decoration-slate-400' : 'text-slate-800'}`}>
+              {dose.medicationName || 'Medication'}
             </Text>
-            {dose.note ? (
-              <Text className="text-xs text-slate-400 mt-1">Note: {dose.note}</Text>
-            ) : null}
+            {isNext && (
+              <View className="bg-amber-100 px-3 py-1 rounded-full">
+                <Text className="text-amber-800 font-bold text-xs">Next Dose</Text>
+              </View>
+            )}
           </View>
 
-          {isNext && (
-            <View className="items-end">
-              <Text className="text-xs font-semibold text-cyan-700">{dose.status === 'pending' ? 'Upcoming' : 'Next'}</Text>
-            </View>
-          )}
-        </Pressable>
-      </Animated.View>
-    </GestureDetector>
+          <Text className={`text-sm ${dose.status === 'taken' ? 'text-slate-500 line-through' : 'text-slate-400'}`}>
+            {dose.dosage} • {format(scheduledTime, 'h:mm a')}
+          </Text>
+          {dose.note ? (
+            <Text className="text-xs text-slate-400 mt-1">Note: {dose.note}</Text>
+          ) : null}
+        </View>
+
+        {isNext && (
+          <View className="items-end">
+            <Text className="text-xs font-semibold text-cyan-700">{dose.status === 'pending' ? 'Upcoming' : 'Next'}</Text>
+          </View>
+        )}
+      </Pressable>
+    </View>
   );
 };
 
@@ -150,8 +106,6 @@ export default function TodayMedsScreen({ navigation }) {
   const [noteText, setNoteText] = useState('');
   const [activeDose, setActiveDose] = useState(null);
   const [countdownText, setCountdownText] = useState('');
-  const prevStreak = useRef(scoreData.currentStreak);
-  const streakPulse = useSharedValue(1);
 
   const fetchData = async () => {
     try {
@@ -175,14 +129,6 @@ export default function TodayMedsScreen({ navigation }) {
     fetchData();
   }, []);
 
-  useEffect(() => {
-    if (scoreData.currentStreak > prevStreak.current) {
-      streakPulse.value = withSpring(1.4, undefined, () => {
-        streakPulse.value = withSpring(1);
-      });
-    }
-    prevStreak.current = scoreData.currentStreak;
-  }, [scoreData.currentStreak]);
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
@@ -286,9 +232,6 @@ export default function TodayMedsScreen({ navigation }) {
     return Object.entries(groups).filter(([, list]) => list.length > 0);
   }, [todayDoses]);
 
-  const streakStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: streakPulse.value }],
-  }));
 
   if (loading && !refreshing) {
     return (
@@ -311,10 +254,10 @@ export default function TodayMedsScreen({ navigation }) {
             <Text className="text-slate-400 text-lg font-medium">{format(new Date(), 'EEEE, MMMM d')}</Text>
           </View>
           <View className="flex-row items-center gap-3">
-            <Animated.View style={streakStyle} className="flex-row items-center bg-yellow-50 px-3 py-2 rounded-full border border-yellow-100">
+            <View className="flex-row items-center bg-yellow-50 px-3 py-2 rounded-full border border-yellow-100">
               <Ionicons name="flame" size={18} color="#f59e0b" />
               <Text className="text-amber-600 font-bold ml-1">{Math.max(0, scoreData.currentStreak)}d streak</Text>
-            </Animated.View>
+            </View>
             <TouchableOpacity onPress={onRefresh}>
               <Ionicons name="refresh" size={24} color="#94a3b8" />
             </TouchableOpacity>
