@@ -6,6 +6,8 @@ import { useAuthStore } from '../store/authStore';
 import LoginScreen from '../screens/auth/LoginScreen';
 import SignupScreen from '../screens/auth/SignupScreen';
 import HomeScreen from '../screens/home/HomeScreen';
+import MedicationsScreen from '../screens/home/MedicationsScreen';
+import TodayMedsScreen from '../screens/home/TodayMedsScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -23,7 +25,11 @@ const AppNavigator = () => {
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false, animation: 'fade' }}>
         {isAuthenticated ? (
-          <Stack.Screen name="Main" component={HomeScreen} />
+          <>
+            <Stack.Screen name="TodayMeds" component={TodayMedsScreen} />
+            <Stack.Screen name="Home" component={HomeScreen} />
+            <Stack.Screen name="Medications" component={MedicationsScreen} />
+          </>
         ) : (
           <Stack.Screen name="Auth" component={AuthNavigator} />
         )}
