@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken';
 import User from './auth.model';
 import { OAuth2Client } from 'google-auth-library';
 import { UserRole } from '@hackgu/shared';
+import { AuthRequest } from '../../middlewares/auth.middleware';
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
@@ -19,22 +20,19 @@ export const login = async (req: Request, res: Response) => {
   try {
     const user = await User.findOne({ email }).select('+password');
     if (!user || !user.password) {
-      console.error(`[Auth] User not found or no password for email: ${email}`);
       return res.status(401).json({ success: false, message: 'Invalid email or password' });
     }
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      console.error(`[Auth] Password mismatch for email: ${email}`);
       return res.status(401).json({ success: false, message: 'Invalid email or password' });
     }
     const token = signToken(user._id.toString(), user.role);
     res.json({
       success: true,
       token,
-      user: { id: user._id, email: user.email, name: user.name, role: user.role, timezone: user.timezone },
+      user: { id: user._id, email: user.email, name: user.name, role: user.role, phone: user.phone, timezone: user.timezone },
     });
   } catch (error) {
-    console.error('[Auth] Login error:', error);
     res.status(500).json({ success: false, message: 'Internal server error' });
   }
 };
@@ -53,10 +51,9 @@ export const register = async (req: Request, res: Response) => {
     res.status(201).json({
       success: true,
       token,
-      user: { id: user._id, email: user.email, name: user.name, role: user.role, timezone: user.timezone },
+      user: { id: user._id, email: user.email, name: user.name, role: user.role, phone: user.phone, timezone: user.timezone },
     });
   } catch (error) {
-    console.error('[Auth] Register error:', error);
     res.status(500).json({ success: false, message: 'Internal server error' });
   }
 };
@@ -70,26 +67,53 @@ export const googleLogin = async (req: Request, res: Response) => {
     });
     const payload = ticket.getPayload();
     if (!payload || !payload.email) {
-      console.error('[Auth] Google payload invalid:', payload);
       return res.status(400).json({ success: false, message: 'Invalid Google token' });
     }
     let user = await User.findOne({ email: payload.email });
     if (!user) {
-      user = new User({
-        name: payload.name || 'User',
-        email: payload.email,
-        role: UserRole.PATIENT,
-      });
+      user = new User({ name: payload.name || 'User', email: payload.email, role: UserRole.PATIENT });
       await user.save();
     }
     const token = signToken(user._id.toString(), user.role);
     res.json({
       success: true,
       token,
-      user: { id: user._id, email: user.email, name: user.name, role: user.role, timezone: user.timezone },
+      user: { id: user._id, email: user.email, name: user.name, role: user.role, phone: user.phone, timezone: user.timezone },
     });
   } catch (error) {
-    console.error('[Auth] Google Login error:', error);
     res.status(401).json({ success: false, message: 'Google authentication failed' });
+  }
+};
+
+// GET /auth/me — fetch own profile
+export const getMe = async (req: AuthRequest, res: Response) => {
+  try {
+    const user = await User.findById(req.user!.id).select('-password');
+    if (!user) return res.status(404).json({ success: false, message: 'User not found' });
+    res.json({ success: true, data: user });
+  } catch {
+    res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};
+
+// PATCH /auth/me — update name / phone / timezone
+export const updateMe = async (req: AuthRequest, res: Response) => {
+  try {
+    const { name, phone, timezone } = req.body;
+    const updates: any = {};
+    if (name !== undefined)     updates.name     = name;
+    if (phone !== undefined)    updates.phone    = phone;
+    if (timezone !== undefined) updates.timezone = timezone;
+
+    const user = await User.findByIdAndUpdate(
+      req.user!.id,
+      updates,
+      { new: true, runValidators: true }
+    ).select('-password');
+
+    if (!user) return res.status(404).json({ success: false, message: 'User not found' });
+    res.json({ success: true, data: user });
+  } catch (e: any) {
+    res.status(400).json({ success: false, message: e.message });
   }
 };
