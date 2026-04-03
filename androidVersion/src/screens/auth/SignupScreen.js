@@ -1,14 +1,12 @@
 import React, { useState } from 'react';
 import { View, Text, ScrollView, Alert, TouchableOpacity } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
 import { COLORS, SPACING } from '../../constants';
 import { signupService } from '../../services/authService';
 import { Ionicons } from '@expo/vector-icons';
 import Input from '../../components/Input';
 import Button from '../../components/Button';
 
-export default function SignupScreen() {
-  const navigation = useNavigation();
+export default function SignupScreen({ navigation }) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');

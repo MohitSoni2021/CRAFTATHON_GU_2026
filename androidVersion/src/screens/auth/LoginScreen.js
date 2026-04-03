@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { View, Text, ScrollView, ActivityIndicator, Alert } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
 import { COLORS, SPACING, GOOGLE_CLIENT_ID } from '../../constants';
 import { loginService, googleLoginService } from '../../services/authService';
 import { useAuthStore } from '../../store/authStore';
@@ -13,8 +12,7 @@ import { TouchableOpacity } from 'react-native';
 
 WebBrowser.maybeCompleteAuthSession();
 
-export default function LoginScreen() {
-  const navigation = useNavigation();
+export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -58,7 +56,7 @@ export default function LoginScreen() {
     <ScrollView className="flex-1 bg-black p-6 pt-20">
       <View className="mb-12">
         <View className="w-16 h-16 bg-yellow-400 rounded-3xl items-center justify-center mb-6">
-            <Ionicons name="activity" size={32} color="black" />
+            <Ionicons name="pulse" size={32} color="black" />
         </View>
         <Text className="text-4xl font-extrabold text-white tracking-tight text-left">Welcome back</Text>
         <Text className="text-zinc-500 text-lg mt-2 font-medium">Log in to track your progress</Text>

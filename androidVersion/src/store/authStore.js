@@ -22,7 +22,7 @@ export const useAuthStore = create((set, get) => ({
       const token = await AsyncStorage.getItem('token');
       if (token) {
         const userData = await getMeService();
-        set({ user: userData, isAuthenticated: true, isLoading: false });
+        set({ user: userData.user, isAuthenticated: true, isLoading: false });
       } else {
         set({ isLoading: false, isAuthenticated: false, user: null });
       }
@@ -34,7 +34,7 @@ export const useAuthStore = create((set, get) => ({
   },
 
   login: (userData, token) => {
-    AsyncStorage.setItem('token', token);
+    if (token) AsyncStorage.setItem('token', token);
     set({ user: userData, isAuthenticated: true, error: null });
   },
 

@@ -4,6 +4,7 @@ import React, { useEffect } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
+import { NavigationContainer } from '@react-navigation/native';
 import AppNavigator from './src/navigation/AppNavigator';
 import { useAuthStore } from './src/store/authStore';
 
@@ -17,8 +18,10 @@ export default function App() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
-        <StatusBar style="light" />
-        <AppNavigator />
+        <NavigationContainer>
+          <StatusBar style="light" />
+          <AppNavigator />
+        </NavigationContainer>
       </SafeAreaProvider>
     </GestureHandlerRootView>
   );

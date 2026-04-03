@@ -209,21 +209,6 @@ export default function TodayMedsScreen({ navigation }) {
         <View className="h-20" />
       </ScrollView>
 
-      {/* Floating Action / Bottom Nav Simulation */}
-      <View className="absolute bottom-8 left-6 right-6">
-         <TouchableOpacity 
-           onPress={() => navigation.navigate('Medications')}
-           className="bg-slate-800 rounded-3xl p-6 flex-row items-center justify-between shadow-2xl"
-         >
-            <View className="flex-row items-center">
-              <View className="bg-slate-700 p-2 rounded-xl mr-3">
-                 <Ionicons name="flask" size={20} color="white" />
-              </View>
-              <Text className="text-white font-bold text-lg">Medicine Cabinet</Text>
-            </View>
-            <Ionicons name="add" size={24} color="white" />
-         </TouchableOpacity>
-      </View>
     </View>
   );
 }
