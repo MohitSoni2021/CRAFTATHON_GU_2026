@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import { decryptData } from "@/lib/crypto"
 import { Button } from "@/components/ui/button"
 import Navbar from "@/components/Navbar"
-import { getProfile, updateProfile, getRiskLevel } from "@/lib/api/routes"
+import { getProfile, updateProfile, getRiskLevel, getPatientDoctors } from "@/lib/api/routes"
 import { 
   subscribeToPushNotifications,
   unsubscribeFromPushNotifications,
@@ -45,6 +45,7 @@ export default function ProfilePage() {
   const router = useRouter()
   const [user, setUser] = useState<any>(null)
   const [risk, setRisk] = useState<any>(null)
+  const [doctors, setDoctors] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
@@ -89,9 +90,10 @@ export default function ProfilePage() {
   const fetchProfile = async () => {
     try {
       setLoading(true)
-      const [profileRes, riskRes] = await Promise.all([
+      const [profileRes, riskRes, docsRes] = await Promise.all([
         getProfile(),
-        getRiskLevel()
+        getRiskLevel(),
+        getPatientDoctors()
       ])
       
       if (profileRes.success) {
@@ -104,6 +106,7 @@ export default function ProfilePage() {
         })
       }
       if (riskRes.success) setRisk(riskRes.data)
+      if (docsRes?.success) setDoctors(docsRes.data)
     } catch (err) {
       console.error("Profile fetch error:", err)
       setStatus({ type: 'error', message: "Failed to load profile data" })
@@ -382,6 +385,34 @@ export default function ProfilePage() {
                       <p className="text-xs font-mono text-gray-300 uppercase tracking-widest">{user?.id || 'LOCAL-SYNC-001'}</p>
                    </div>
                 </div>
+             </div>
+
+             {/* ── Your Care Team ── */}
+             <div className="bg-white rounded-4xl p-10 shadow-xl shadow-gray-200/30 border border-gray-50">
+                <h3 className="text-2xl font-black mb-6 flex items-center gap-3 text-[#2b3654]">
+                   <span className="w-1.5 h-10 bg-emerald-400 rounded-full"></span>
+                   Connected Doctors
+                </h3>
+                {doctors.length === 0 ? (
+                  <p className="text-sm text-gray-400 font-medium">No doctors connected yet.</p>
+                ) : (
+                  <div className="grid gap-6 sm:grid-cols-2">
+                     {doctors.map((doc) => (
+                       <div key={doc._id} className="p-5 rounded-3xl bg-gray-50 border border-gray-100 flex flex-col gap-2 transition-all hover:shadow-md">
+                         <div className="flex justify-between items-start">
+                           <div>
+                             <h4 className="font-bold text-[#2b3654]">Dr. {doc.name}</h4>
+                             <p className="text-xs text-gray-500 font-medium">{doc.specialization || "General Physician"}</p>
+                           </div>
+                           <span className={`text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest ${doc.status === 'ACTIVE' ? 'bg-emerald-100 text-emerald-600' : 'bg-gray-200 text-gray-500'}`}>
+                             {doc.status}
+                           </span>
+                         </div>
+                         <p className="text-sm font-medium text-gray-400 truncate mt-1 break-all">{doc.email}</p>
+                       </div>
+                     ))}
+                  </div>
+                )}
              </div>
 
             {/* ── Push Notification Settings ── */}

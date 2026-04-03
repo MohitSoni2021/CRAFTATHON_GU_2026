@@ -10,6 +10,7 @@ import adherenceRoutes    from './modules/adherence/adherence.route';
 import caregiverRoutes    from './modules/caregiver/caregiver.route';
 import notificationRoutes from './modules/notifications/notification.route';
 import doctorRoutes       from './modules/doctor/doctor.route';
+import patientRoutes      from './modules/patient/patient.route';
 import pushRoutes         from './modules/push/push.route';
 
 const app: Express = express();
@@ -29,6 +30,7 @@ app.use('/api/adherence',     adherenceRoutes);
 app.use('/api/caregiver',     caregiverRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/doctor',        doctorRoutes);
+app.use('/api/patient',       patientRoutes);
 app.use('/api/push',          pushRoutes);
 
 // Global Error Handler

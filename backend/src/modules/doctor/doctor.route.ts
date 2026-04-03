@@ -8,7 +8,7 @@ const router = Router();
 router.use(verifyToken);
 router.use(authorizeRoles(UserRole.DOCTOR));
 
-router.post('/link',                ctrl.linkPatient);
+router.post('/add-patient',        ctrl.addPatient);
 router.get('/patients',            ctrl.getLinkedPatients);
 router.put('/flag/:linkId',        ctrl.toggleFlagPatient);
 router.get('/adherence-pdf/:patientId', ctrl.generateAdherencePDF);

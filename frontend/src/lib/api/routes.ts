@@ -165,9 +165,15 @@ export const listDoseLogs = async (params: any = {}) => {
   return response.data;
 };
 
+// Patient API Endpoints
+export const getPatientDoctors = async () => {
+  const response = await api.get('/patient/doctors');
+  return response.data;
+};
+
 // Doctor API Endpoints
 export const linkDoctorPatient = async (data: { patientEmail: string, specialization?: string }) => {
-  const response = await api.post('/doctor/link', data);
+  const response = await api.post('/doctor/add-patient', data);
   return response.data;
 };
 

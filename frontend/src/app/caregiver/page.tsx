@@ -5,22 +5,22 @@ import { useRouter } from "next/navigation"
 import { decryptData } from "@/lib/crypto"
 import { Button } from "@/components/ui/button"
 import Navbar from "@/components/Navbar"
-import { 
-  inviteCaregiver, 
+import {
+  inviteCaregiver,
   respondCaregiverInvite,
   getCaregiverInvites,
-  getMyPatientsList, 
+  getMyPatientsList,
   getMyCaregivers,
-  unlinkCaregiver 
+  unlinkCaregiver
 } from "@/lib/api/routes"
-import { 
-  Users, 
-  UserPlus, 
-  ShieldCheck, 
-  Heart, 
-  Mail, 
-  Trash2, 
-  Loader2, 
+import {
+  Users,
+  UserPlus,
+  ShieldCheck,
+  Heart,
+  Mail,
+  Trash2,
+  Loader2,
   Search,
   Activity,
   ChevronRight,
@@ -32,11 +32,11 @@ import {
 } from "lucide-react"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogHeader, 
-  DialogTitle, 
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
   DialogTrigger,
   DialogDescription,
   DialogFooter
@@ -77,36 +77,45 @@ export default function CaregiverPage() {
     if (!socket) return;
 
     const handleDoseLogged = (data: any) => {
-        console.log("Real-time Dose Logged:", data);
-        // Refresh the list to get updated counts/status
-        fetchData(true);
+      console.log("Real-time Dose Logged:", data);
+      fetchData(!isPatient);
     };
 
     const handleRiskLevelChanged = (data: any) => {
-        console.log("Real-time Risk Level Changed:", data);
-        setPatients(prev => prev.map(p => {
-          if (p.patient._id === data.patientId) {
-              return { 
-                ...p, 
-                adherence: { 
-                    ...p.adherence, 
-                    score: data.score, 
-                    riskLevel: data.riskLevel 
-                } 
-              };
-          }
-          return p;
-        }));
+      console.log("Real-time Risk Level Changed:", data);
+      fetchData(!isPatient);
+    };
+
+    const handleInviteSent = (data: any) => {
+      console.log("Real-time Invite Sent:", data);
+      fetchData(true); // Refetch caregiver side
+    };
+
+    const handleInviteResponse = (data: any) => {
+      console.log("Real-time Invite Response:", data);
+      fetchData(false); // Refetch patient side
+    };
+
+    const handleBoardReload = () => {
+      fetchData(isPatient ? false : true);
     };
 
     socket.on('dose_logged', handleDoseLogged);
     socket.on('risk_level_changed', handleRiskLevelChanged);
+    socket.on('INVITE_SENT', handleInviteSent);
+    socket.on('INVITE_ACCEPTED', handleInviteResponse);
+    socket.on('INVITE_REJECTED', handleInviteResponse);
+    window.addEventListener('reloadCaregiverBoard', handleBoardReload);
 
     return () => {
       socket.off('dose_logged', handleDoseLogged);
       socket.off('risk_level_changed', handleRiskLevelChanged);
+      socket.off('INVITE_SENT', handleInviteSent);
+      socket.off('INVITE_ACCEPTED', handleInviteResponse);
+      socket.off('INVITE_REJECTED', handleInviteResponse);
+      window.removeEventListener('reloadCaregiverBoard', handleBoardReload);
     };
-  }, [socket]);
+  }, [socket, isPatient]);
 
   const fetchData = async (isCaregiver: boolean) => {
     try {
@@ -147,12 +156,12 @@ export default function CaregiverPage() {
 
   const handleRespondInvite = async (inviteId: string, status: 'ACCEPTED' | 'REJECTED') => {
     try {
-       const res = await respondCaregiverInvite({ inviteId, status })
-       if (res.success) {
-          fetchData(true)
-       }
+      const res = await respondCaregiverInvite({ inviteId, status })
+      if (res.success) {
+        fetchData(true)
+      }
     } catch (err: any) {
-       alert(err.response?.data?.message || "Failed to respond")
+      alert(err.response?.data?.message || "Failed to respond")
     }
   }
 
@@ -187,16 +196,16 @@ export default function CaregiverPage() {
           <div className="flex flex-col md:flex-row justify-between items-center gap-8">
             <div className="space-y-4">
               <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-md rounded-full border border-white/20 text-sm font-bold uppercase tracking-widest">
-                 <ShieldCheck size={16} className="text-[#e6fcfa]" />
-                 Trusted Care Network
+                <ShieldCheck size={16} className="text-[#e6fcfa]" />
+                Trusted Care Network
               </div>
               <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight">
                 {isPatient ? "My Caregivers" : "Patient Monitoring"}
               </h1>
               <p className="text-white/80 text-lg font-medium max-w-xl">
-                 {isPatient 
-                   ? "Manage who has access to your adherence data and receives critical health alerts."
-                   : "Real-time oversight of patient compliance, adherence scores, and clinical risks."}
+                {isPatient
+                  ? "Manage who has access to your adherence data and receives critical health alerts."
+                  : "Real-time oversight of patient compliance, adherence scores, and clinical risks."}
               </p>
             </div>
 
@@ -211,8 +220,8 @@ export default function CaregiverPage() {
                 <DialogContent className="sm:max-w-[425px] rounded-[2rem] p-8">
                   <DialogHeader className="space-y-3">
                     <DialogTitle className="text-2xl font-bold flex items-center gap-2">
-                       <Heart size={24} className="text-[#5a4ae6]" />
-                       Link Trusted Caregiver
+                      <Heart size={24} className="text-[#5a4ae6]" />
+                      Link Trusted Caregiver
                     </DialogTitle>
                     <DialogDescription className="text-gray-500 font-medium">
                       Invite a family member or professional to monitor your adherence.
@@ -223,8 +232,8 @@ export default function CaregiverPage() {
                       <label className="text-sm font-bold text-gray-500 uppercase tracking-widest flex items-center gap-2">
                         <Mail size={14} /> Email Address
                       </label>
-                      <Input 
-                        placeholder="caregiver@email.com" 
+                      <Input
+                        placeholder="caregiver@email.com"
                         value={inviteEmail}
                         onChange={(e) => setInviteEmail(e.target.value)}
                         className="rounded-xl border-gray-100 py-6"
@@ -234,8 +243,8 @@ export default function CaregiverPage() {
                       <label className="text-sm font-bold text-gray-500 uppercase tracking-widest flex items-center gap-2">
                         <Users size={14} /> Relationship
                       </label>
-                      <Input 
-                        placeholder="e.g. Son, Daughter, Nurse" 
+                      <Input
+                        placeholder="e.g. Son, Daughter, Nurse"
                         value={relationship}
                         onChange={(e) => setRelationship(e.target.value)}
                         className="rounded-xl border-gray-100 py-6"
@@ -243,7 +252,7 @@ export default function CaregiverPage() {
                     </div>
                   </div>
                   <DialogFooter>
-                    <Button 
+                    <Button
                       onClick={handleLink}
                       disabled={isLinking || !inviteEmail || !relationship}
                       className="w-full bg-[#5a4ae6] hover:bg-[#4939d4] text-white py-8 rounded-2xl font-bold text-lg"
@@ -259,192 +268,189 @@ export default function CaregiverPage() {
       </div>
 
       <div className="w-full mx-auto p-6 md:p-10">
-         
-         {!isPatient ? (
-           <div className="space-y-8">
-              {/* Invitations Section */}
-              {invites.length > 0 && (
-                <div className="space-y-6 mb-12">
-                   <h2 className="text-xl font-bold flex items-center gap-2 text-[#2b3654]">
-                      <Mail size={24} className="text-amber-500" />
-                      Pending Invitations
-                   </h2>
-                   <div className="grid gap-4 md:grid-cols-2">
-                     {invites.map(inv => (
-                       <Card key={inv._id} className="bg-white border-amber-100 shadow-sm rounded-2xl overflow-hidden">
-                         <div className="p-6 flex items-center justify-between">
-                            <div>
-                               <p className="font-bold text-[#2b3654]">{inv.patientId?.name || 'Unknown Patient'}</p>
-                               <p className="text-sm text-gray-500">{inv.patientId?.email}</p>
-                               <p className="text-xs text-amber-600 mt-1 uppercase font-bold tracking-widest">Wants to add you as: {inv.relationship}</p>
-                            </div>
-                            <div className="flex items-center gap-2">
-                               <Button onClick={() => handleRespondInvite(inv._id, 'ACCEPTED')} size="sm" className="bg-green-50 text-green-600 hover:bg-green-100 font-bold rounded-xl px-4">
-                                  Accept
-                               </Button>
-                               <Button onClick={() => handleRespondInvite(inv._id, 'REJECTED')} size="sm" variant="ghost" className="text-gray-400 hover:text-red-500 rounded-xl px-4">
-                                  Decline
-                               </Button>
-                            </div>
-                         </div>
-                       </Card>
-                     ))}
-                   </div>
-                </div>
-              )}
 
-              <div className="flex items-center justify-between">
-                 <h2 className="text-2xl font-bold flex items-center gap-2">
-                    <Users size={24} className="text-[#5a4ae6]" />
-                    Monitored Patients 
-                    <span className="text-sm font-bold bg-gray-100 px-3 py-1 rounded-full text-gray-400 ml-2">{patients.length}</span>
-                 </h2>
-                  <div className="flex items-center gap-4">
-                     <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest ${isConnected ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'}`}>
-                        <div className={`w-1.5 h-1.5 rounded-full ${isConnected ? 'bg-green-500' : 'bg-red-500 blink'}`}></div>
-                        {isConnected ? 'Live' : 'Offline'}
-                     </div>
-                     <Button variant="ghost" onClick={() => fetchData(true)} className="text-[#5a4ae6] font-bold">Refresh All</Button>
-                  </div>
+        {!isPatient ? (
+          <div className="space-y-8">
+            {/* Invitations Section */}
+            {invites.length > 0 && (
+              <div className="space-y-6 mb-12">
+                <h2 className="text-xl font-bold flex items-center gap-2 text-[#2b3654]">
+                  <Mail size={24} className="text-amber-500" />
+                  Pending Invitations
+                </h2>
+                <div className="grid gap-4 md:grid-cols-2">
+                  {invites.map(inv => (
+                    <Card key={inv._id} className="bg-white border-amber-100 shadow-sm rounded-2xl overflow-hidden">
+                      <div className="p-6 flex items-center justify-between">
+                        <div>
+                          <p className="font-bold text-[#2b3654]">{inv.patientId?.name || 'Unknown Patient'}</p>
+                          <p className="text-sm text-gray-500">{inv.patientId?.email}</p>
+                          <p className="text-xs text-amber-600 mt-1 uppercase font-bold tracking-widest">Wants to add you as: {inv.relationship}</p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Button onClick={() => handleRespondInvite(inv._id, 'ACCEPTED')} size="sm" className="bg-green-50 text-green-600 hover:bg-green-100 font-bold rounded-xl px-4">
+                            Accept
+                          </Button>
+                          <Button onClick={() => handleRespondInvite(inv._id, 'REJECTED')} size="sm" variant="ghost" className="text-gray-400 hover:text-red-500 rounded-xl px-4">
+                            Decline
+                          </Button>
+                        </div>
+                      </div>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="flex items-center justify-between">
+              <h2 className="text-2xl font-bold flex items-center gap-2">
+                <Users size={24} className="text-[#5a4ae6]" />
+                Monitored Patients
+                <span className="text-sm font-bold bg-gray-100 px-3 py-1 rounded-full text-gray-400 ml-2">{patients.length}</span>
+              </h2>
+              <div className="flex items-center gap-4">
+                <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest ${isConnected ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'}`}>
+                  <div className={`w-1.5 h-1.5 rounded-full ${isConnected ? 'bg-green-500' : 'bg-red-500 blink'}`}></div>
+                  {isConnected ? 'Live' : 'Offline'}
+                </div>
+                <Button variant="ghost" onClick={() => fetchData(true)} className="text-[#5a4ae6] font-bold">Refresh All</Button>
+              </div>
+            </div>
+
+            {patients.length === 0 ? (
+              <div className="py-32 bg-white border border-dashed border-gray-200 rounded-[3rem] flex flex-col items-center justify-center text-center px-10">
+                <div className="w-24 h-24 bg-gray-50 rounded-full flex items-center justify-center mb-6">
+                  <Users size={40} className="text-gray-200" />
+                </div>
+                <h3 className="text-xl font-bold text-[#2b3654] mb-2">No patients linked yet</h3>
+                <p className="text-gray-400 max-w-sm">Patients must invite you using your email address before their data will appear here.</p>
+              </div>
+            ) : (
+              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                {/* Sort by high risk first */}
+                {[...patients].sort((a, b) => {
+                  if (a.adherence.riskLevel === 'HIGH') return -1;
+                  if (b.adherence.riskLevel === 'HIGH') return 1;
+                  return 0;
+                }).map((p) => (
+                  <Card key={p.link} className="bg-white border-gray-100 shadow-sm rounded-[2rem] overflow-hidden group hover:shadow-xl hover:shadow-[#5a4ae6]/5 transition-all">
+                    <div className="p-8">
+                      <div className="flex justify-between items-start mb-6">
+                        <img
+                          src={`https://api.dicebear.com/7.x/initials/svg?seed=${p.patient.name}`}
+                          className="w-16 h-16 rounded-2xl shadow-inner border-2 border-white"
+                          alt=""
+                        />
+                        <div className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest ${p.adherence.riskLevel === 'LOW' ? 'bg-green-50 text-green-600' : (p.adherence.riskLevel === 'HIGH' ? 'bg-red-50 text-red-600' : 'bg-amber-50 text-amber-600')
+                          }`}>
+                          {p.adherence.riskLevel} Risk
+                        </div>
+                      </div>
+                      <h4 className="text-2xl font-bold text-[#2b3654] mb-1">{p.patient.name}</h4>
+                      <p className="text-sm font-medium text-gray-400 mb-6 flex items-center gap-1.5 lowercase">
+                        <Mail size={14} /> {p.patient.email}
+                      </p>
+
+                      <div className="grid grid-cols-2 gap-4 pt-6 border-t border-gray-50 mb-8">
+                        <div>
+                          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Adherence</p>
+                          <p className="text-2xl font-black text-[#2b3654]">{p.adherence.score}%</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Missed</p>
+                          <p className="text-2xl font-black text-red-500">{p.adherence.missed}</p>
+                        </div>
+                      </div>
+
+                      <Button
+                        onClick={() => router.push(`/dashboard?viewAs=${p.patient._id}`)}
+                        className="w-full bg-[#f8faff] text-[#5a4ae6] hover:bg-[#5a4ae6] hover:text-white py-6 rounded-2xl font-bold shadow-none transition-all group-hover:shadow-lg"
+                      >
+                        Full Diagnostics
+                        <ChevronRight size={18} className="ml-1" />
+                      </Button>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </div>
+        ) : (
+          /* Patient View: Manage who watches me */
+          <div className="w-full mx-auto space-y-8">
+            <div className="flex items-center justify-between">
+              <h2 className="text-2xl font-bold flex items-center gap-2">
+                <ShieldCheck size={24} className="text-green-500" />
+                Active Supervision & Invites
+              </h2>
+            </div>
+
+            <div className="bg-white border border-gray-100 rounded-[2.5rem] shadow-sm overflow-hidden">
+              <div className="p-8 border-b border-gray-50 flex items-center justify-between">
+                <div>
+                  <h3 className="font-bold flex items-center gap-2">Caregiver Connections</h3>
+                  <p className="text-xs text-gray-400 font-medium font-poppins">Manage people who receive your adherence updates.</p>
+                </div>
               </div>
 
-              {patients.length === 0 ? (
-                <div className="py-32 bg-white border border-dashed border-gray-200 rounded-[3rem] flex flex-col items-center justify-center text-center px-10">
-                   <div className="w-24 h-24 bg-gray-50 rounded-full flex items-center justify-center mb-6">
-                      <Users size={40} className="text-gray-200" />
-                   </div>
-                   <h3 className="text-xl font-bold text-[#2b3654] mb-2">No patients linked yet</h3>
-                   <p className="text-gray-400 max-w-sm">Patients must invite you using your email address before their data will appear here.</p>
+              {caregivers.length === 0 ? (
+                <div className="p-20 flex flex-col items-center justify-center text-center opacity-40">
+                  <UserCheck size={48} className="mb-4 text-gray-300" />
+                  <p className="font-bold text-gray-400">No caregivers linked. Invite a family member to help you stay on track.</p>
                 </div>
               ) : (
-                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                   {/* Sort by high risk first */}
-                   {[...patients].sort((a,b) => {
-                      if(a.adherence.riskLevel === 'HIGH') return -1;
-                      if(b.adherence.riskLevel === 'HIGH') return 1;
-                      return 0;
-                   }).map((p) => (
-                      <Card key={p.link} className="bg-white border-gray-100 shadow-sm rounded-[2rem] overflow-hidden group hover:shadow-xl hover:shadow-[#5a4ae6]/5 transition-all">
-                        <div className="p-8">
-                           <div className="flex justify-between items-start mb-6">
-                              <img 
-                                src={`https://api.dicebear.com/7.x/initials/svg?seed=${p.patient.name}`} 
-                                className="w-16 h-16 rounded-2xl shadow-inner border-2 border-white" 
-                                alt="" 
-                              />
-                              <div className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest ${
-                                p.adherence.riskLevel === 'LOW' ? 'bg-green-50 text-green-600' : (p.adherence.riskLevel === 'HIGH' ? 'bg-red-50 text-red-600' : 'bg-amber-50 text-amber-600')
-                              }`}>
-                                {p.adherence.riskLevel} Risk
-                              </div>
-                           </div>
-                           <h4 className="text-2xl font-bold text-[#2b3654] mb-1">{p.patient.name}</h4>
-                           <p className="text-sm font-medium text-gray-400 mb-6 flex items-center gap-1.5 lowercase">
-                             <Mail size={14} /> {p.patient.email}
-                           </p>
-
-                           <div className="grid grid-cols-2 gap-4 pt-6 border-t border-gray-50 mb-8">
-                              <div>
-                                 <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Adherence</p>
-                                 <p className="text-2xl font-black text-[#2b3654]">{p.adherence.score}%</p>
-                              </div>
-                              <div className="text-right">
-                                 <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Missed</p>
-                                 <p className="text-2xl font-black text-red-500">{p.adherence.missed}</p>
-                              </div>
-                           </div>
-
-                           <Button 
-                             onClick={() => router.push(`/dashboard?viewAs=${p.patient._id}`)}
-                             className="w-full bg-[#f8faff] text-[#5a4ae6] hover:bg-[#5a4ae6] hover:text-white py-6 rounded-2xl font-bold shadow-none transition-all group-hover:shadow-lg"
-                           >
-                              Full Diagnostics
-                              <ChevronRight size={18} className="ml-1" />
-                           </Button>
+                <div className="divide-y divide-gray-50">
+                  {caregivers.map((cg: any) => (
+                    <div key={cg._id} className="p-6 md:p-8 flex items-center justify-between group hover:bg-gray-50 transition-colors">
+                      <div className="flex items-center gap-4">
+                        <div className={`w-12 h-12 rounded-full flex items-center justify-center ${cg.status === 'ACCEPTED' ? 'bg-green-50 text-green-500' :
+                            cg.status === 'PENDING' ? 'bg-amber-50 text-amber-500' : 'bg-red-50 text-red-500'
+                          }`}>
+                          {cg.status === 'ACCEPTED' ? <CheckCircle /> : cg.status === 'PENDING' ? <Clock /> : <XCircle />}
                         </div>
-                      </Card>
-                   ))}
+                        <div>
+                          <p className="font-bold text-[#2b3654] text-lg">
+                            {cg.caregiverId?.name || cg.caregiverEmail}
+                          </p>
+                          <div className="flex items-center gap-3 mt-1">
+                            <p className="text-sm text-gray-500 font-medium">{cg.relationship}</p>
+                            <span className="w-1 h-1 rounded-full bg-gray-300"></span>
+                            <p className={`text-xs font-bold uppercase tracking-widest ${cg.status === 'ACCEPTED' ? 'text-green-600' :
+                                cg.status === 'PENDING' ? 'text-amber-600' : 'text-red-500'
+                              }`}>
+                              {cg.status === 'PENDING' ? 'Waiting for response' : cg.status === 'ACCEPTED' ? 'Connected ✅' : 'Declined ❌'}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-full"
+                        onClick={() => handleUnlink(cg._id)}
+                      >
+                        <Trash2 size={18} />
+                      </Button>
+                    </div>
+                  ))}
                 </div>
               )}
-           </div>
-         ) : (
-           /* Patient View: Manage who watches me */
-           <div className="w-full mx-auto space-y-8">
-              <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-bold flex items-center gap-2">
-                   <ShieldCheck size={24} className="text-green-500" />
-                   Active Supervision & Invites
-                </h2>
-              </div>
+            </div>
 
-              <div className="bg-white border border-gray-100 rounded-[2.5rem] shadow-sm overflow-hidden">
-                 <div className="p-8 border-b border-gray-50 flex items-center justify-between">
-                    <div>
-                      <h3 className="font-bold flex items-center gap-2">Caregiver Connections</h3>
-                      <p className="text-xs text-gray-400 font-medium font-poppins">Manage people who receive your adherence updates.</p>
-                    </div>
-                 </div>
-                 
-                 {caregivers.length === 0 ? (
-                    <div className="p-20 flex flex-col items-center justify-center text-center opacity-40">
-                       <UserCheck size={48} className="mb-4 text-gray-300" />
-                       <p className="font-bold text-gray-400">No caregivers linked. Invite a family member to help you stay on track.</p>
-                    </div>
-                 ) : (
-                    <div className="divide-y divide-gray-50">
-                       {caregivers.map((cg: any) => (
-                          <div key={cg._id} className="p-6 md:p-8 flex items-center justify-between group hover:bg-gray-50 transition-colors">
-                             <div className="flex items-center gap-4">
-                                <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
-                                  cg.status === 'ACCEPTED' ? 'bg-green-50 text-green-500' :
-                                  cg.status === 'PENDING' ? 'bg-amber-50 text-amber-500' : 'bg-red-50 text-red-500'
-                                }`}>
-                                   {cg.status === 'ACCEPTED' ? <CheckCircle /> : cg.status === 'PENDING' ? <Clock /> : <XCircle />}
-                                </div>
-                                <div>
-                                   <p className="font-bold text-[#2b3654] text-lg">
-                                      {cg.caregiverId?.name || cg.caregiverEmail}
-                                   </p>
-                                   <div className="flex items-center gap-3 mt-1">
-                                      <p className="text-sm text-gray-500 font-medium">{cg.relationship}</p>
-                                      <span className="w-1 h-1 rounded-full bg-gray-300"></span>
-                                      <p className={`text-xs font-bold uppercase tracking-widest ${
-                                         cg.status === 'ACCEPTED' ? 'text-green-600' : 
-                                         cg.status === 'PENDING' ? 'text-amber-600' : 'text-red-500'
-                                      }`}>
-                                         {cg.status}
-                                      </p>
-                                   </div>
-                                </div>
-                             </div>
-                             <Button
-                                variant="ghost"
-                                size="icon"
-                                className="text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-full"
-                                onClick={() => handleUnlink(cg._id)}
-                             >
-                                <Trash2 size={18} />
-                             </Button>
-                          </div>
-                       ))}
-                    </div>
-                 )}
+            {/* Safety Banner */}
+            <div className="bg-amber-50 border border-amber-100 rounded-3xl p-8 flex gap-6 mt-8">
+              <div className="bg-white p-3 rounded-2xl text-amber-500 shadow-sm border border-amber-100 shrink-0 h-min">
+                <ShieldAlert size={24} />
               </div>
-
-              {/* Safety Banner */}
-              <div className="bg-amber-50 border border-amber-100 rounded-3xl p-8 flex gap-6 mt-8">
-                 <div className="bg-white p-3 rounded-2xl text-amber-500 shadow-sm border border-amber-100 shrink-0 h-min">
-                    <ShieldAlert size={24} />
-                 </div>
-                 <div>
-                    <h4 className="font-bold text-amber-900 mb-1">Supervision Notice</h4>
-                    <p className="text-sm text-amber-800/80 leading-relaxed">
-                       Adding a caregiver allows them to receive SMS or Email alerts if you miss critical doses. They will see your medication list and adherence score. You can revoke access at any time by removing them from this list.
-                    </p>
-                 </div>
+              <div>
+                <h4 className="font-bold text-amber-900 mb-1">Supervision Notice</h4>
+                <p className="text-sm text-amber-800/80 leading-relaxed">
+                  Adding a caregiver allows them to receive SMS or Email alerts if you miss critical doses. They will see your medication list and adherence score. You can revoke access at any time by removing them from this list.
+                </p>
               </div>
-           </div>
-         )}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )

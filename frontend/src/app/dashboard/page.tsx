@@ -11,7 +11,8 @@ import {
   getAdherenceScore, 
   getRiskLevel, 
   getTodayDoses, 
-  markDoseAsTaken 
+  markDoseAsTaken,
+  getPatientDoctors
 } from "@/lib/api/routes"
 import { 
   Activity, 
@@ -40,7 +41,28 @@ export default function Dashboard() {
   const [todayDoses, setTodayDoses] = useState<any[]>([])
   const [error, setError] = useState<string | null>(null)
   const [takingId, setTakingId] = useState<string | null>(null)
-  const { isConnected } = useSocket()
+  const { isConnected, socket } = useSocket()
+  const [doctors, setDoctors] = useState<any[]>([])
+  const [toastMessage, setToastMessage] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (socket) {
+      const handleDoctorLinked = (data: any) => {
+        console.log("Doctor linked event:", data)
+        setToastMessage(`You have been added by doctor: ${data.doctorName}`)
+        setTimeout(() => setToastMessage(null), 5000)
+        
+        // Option 1: Refetch all dashboard data, or at least doctors
+        fetchDashboardData()
+      }
+      
+      socket.on("DOCTOR_LINKED", handleDoctorLinked)
+      
+      return () => {
+        socket.off("DOCTOR_LINKED", handleDoctorLinked)
+      }
+    }
+  }, [socket])
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -63,15 +85,17 @@ export default function Dashboard() {
   const fetchDashboardData = async () => {
     try {
       setLoading(true)
-      const [scoreRes, riskRes, dosesRes] = await Promise.all([
+      const [scoreRes, riskRes, dosesRes, doctorsRes] = await Promise.all([
         getAdherenceScore(),
         getRiskLevel(),
-        getTodayDoses()
+        getTodayDoses(),
+        getPatientDoctors()
       ])
 
       if (scoreRes.success) setScore(scoreRes.data)
       if (riskRes.success) setRisk(riskRes.data)
       if (dosesRes.success) setTodayDoses(dosesRes.data)
+      if (doctorsRes.success) setDoctors(doctorsRes.data)
     } catch (err: any) {
       console.error("Dashboard fetch error:", err)
       setError("Failed to fetch real-time data")
@@ -356,9 +380,45 @@ export default function Dashboard() {
                    Taking your medications at the same time every day helps maintain a consistent level of the drug in your body.
                  </p>
               </div>
+
+              {/* Care Team Section (Doctors) */}
+              <div className="bg-white border border-gray-100 rounded-3xl shadow-sm p-6">
+                 <h3 className="font-bold flex items-center gap-2 mb-4 text-[#2b3654]">
+                   <ShieldCheck size={18} className="text-emerald-500" />
+                   Your Care Team
+                 </h3>
+                 {doctors.length === 0 ? (
+                   <p className="text-sm text-gray-400">No doctors linked yet.</p>
+                 ) : (
+                   <div className="space-y-3">
+                     {doctors.map((doc) => (
+                       <div key={doc._id} className="flex flex-col gap-1 p-3 rounded-xl bg-gray-50 border border-gray-100">
+                         <div className="flex justify-between items-start">
+                           <div>
+                             <h4 className="font-semibold text-sm text-[#2b3654]">Dr. {doc.name}</h4>
+                             <p className="text-xs text-gray-500">{doc.specialization || "General Physician"}</p>
+                           </div>
+                           <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${doc.status === 'ACTIVE' ? 'bg-emerald-100 text-emerald-600' : 'bg-gray-200 text-gray-500'}`}>
+                             {doc.status}
+                           </span>
+                         </div>
+                         <p className="text-xs text-gray-400 mt-1">{doc.email}</p>
+                       </div>
+                     ))}
+                   </div>
+                 )}
+              </div>
            </div>
         </div>
       </div>
+      
+      {/* Toast Notification */}
+      {toastMessage && (
+        <div className="fixed bottom-6 right-6 bg-[#2b3654] text-white px-6 py-4 rounded-xl shadow-2xl z-50 flex items-center gap-3 animate-in slide-in-from-bottom-5">
+          <CheckCircle2 size={24} className="text-[#3bbdbf]" />
+          <p className="font-medium">{toastMessage}</p>
+        </div>
+      )}
     </div>
   )
 }

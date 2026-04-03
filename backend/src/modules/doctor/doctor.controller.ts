@@ -7,10 +7,14 @@ import DoseLog from '../dose-log/dose-log.model';
 import { computeAdherenceScore } from '../adherence/adherence.service';
 import { UserRole } from '@hackgu/shared';
 
+import { getIO } from '../../lib/socket-manager';
+
 // Doc-Patient Link: Use email to link
-export const linkPatient = async (req: AuthRequest, res: Response) => {
+export const addPatient = async (req: AuthRequest, res: Response) => {
   try {
     const { patientEmail, specialization } = req.body;
+    if (!patientEmail) return res.status(400).json({ success: false, message: 'patientEmail is required' });
+
     const patient = await User.findOne({ email: patientEmail, role: UserRole.PATIENT });
     if (!patient) return res.status(404).json({ success: false, message: 'Patient not found' });
 
@@ -20,8 +24,23 @@ export const linkPatient = async (req: AuthRequest, res: Response) => {
     const link = await DoctorPatientLink.create({
       doctorId: req.user!.id,
       patientId: patient._id,
+      patientEmail: patient.email,
+      status: 'ACTIVE',
       specialization
     });
+
+    console.log("Doctor linked to patient:", req.user!.id, patient._id);
+
+    // Emit socket event to patient
+    const io = getIO();
+    if (io) {
+      const doctor = await User.findById(req.user!.id);
+      io.to("user:" + patient._id.toString()).emit("DOCTOR_LINKED", {
+        doctorId: doctor!._id,
+        doctorName: doctor!.name,
+        doctorEmail: doctor!.email
+      });
+    }
 
     res.json({ success: true, data: link });
   } catch (e: any) {

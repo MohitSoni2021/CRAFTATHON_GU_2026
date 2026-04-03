@@ -3,6 +3,8 @@ import mongoose, { Schema, Document } from 'mongoose';
 export interface IDoctorPatientLink extends Document {
   doctorId: mongoose.Types.ObjectId;
   patientId: mongoose.Types.ObjectId;
+  patientEmail: string;
+  status: 'ACTIVE' | 'PENDING';
   specialization: string;
   isFlagged: boolean; // Flagged for high-risk monitoring
   linkedAt: Date;
@@ -11,6 +13,8 @@ export interface IDoctorPatientLink extends Document {
 const DoctorPatientLinkSchema: Schema = new Schema({
   doctorId: { type: Schema.Types.ObjectId, ref: 'User', required: true, index: true },
   patientId: { type: Schema.Types.ObjectId, ref: 'User', required: true, index: true },
+  patientEmail: { type: String, required: true },
+  status: { type: String, default: 'ACTIVE', enum: ['ACTIVE', 'PENDING'] },
   specialization: { type: String, default: 'General Physician' },
   isFlagged: { type: Boolean, default: false },
   linkedAt: { type: Date, default: Date.now },
