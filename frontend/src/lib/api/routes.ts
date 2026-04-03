@@ -71,8 +71,18 @@ export const getAdherencePatterns = async () => {
   return response.data;
 };
 
-export const linkCaregiver = async (data: { caregiverEmail: string, relationship: string }) => {
-  const response = await api.post('/caregiver/link', data);
+export const inviteCaregiver = async (data: { caregiverEmail: string, relationship: string }) => {
+  const response = await api.post('/caregiver/invite', data);
+  return response.data;
+};
+
+export const respondCaregiverInvite = async (data: { inviteId: string, status: 'ACCEPTED' | 'REJECTED' }) => {
+  const response = await api.post('/caregiver/respond', data);
+  return response.data;
+};
+
+export const getCaregiverInvites = async () => {
+  const response = await api.get('/caregiver/invites');
   return response.data;
 };
 
@@ -88,6 +98,11 @@ export const getPatientAdherenceCaregiver = async (patientId: string) => {
 
 export const unlinkCaregiver = async (linkId: string) => {
   const response = await api.delete(`/caregiver/link/${linkId}`);
+  return response.data;
+};
+
+export const getMyCaregivers = async () => {
+  const response = await api.get('/caregiver/my-caregivers');
   return response.data;
 };
 

@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState, useEffect } from "react"
-import { Bell, Check, CheckAll, Loader2, Clock, Info, AlertTriangle, X } from "lucide-react"
+import { Bell, Check, Loader2, Clock, Info, AlertTriangle, X } from "lucide-react"
 import { 
   getUnreadNotifications, 
   markNotificationRead, 

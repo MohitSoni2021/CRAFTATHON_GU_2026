@@ -78,13 +78,15 @@ export async function emitToCaregivers(patientId: string, event: string, data: a
   // to avoid circular dependencies if we use this in many places.
   try {
     const CaregiverLink = (await import('../modules/caregiver/caregiver-link.model')).default;
-    const links = await CaregiverLink.find({ patientId, isActive: true });
+    const links = await CaregiverLink.find({ patientId, status: 'ACCEPTED' });
     
     links.forEach(link => {
-      io.to(`caregiver:${link.caregiverId.toString()}`).emit(event, {
-        patientId,
-        ...data
-      });
+      if (link.caregiverId) {
+        io.to(`caregiver:${link.caregiverId.toString()}`).emit(event, {
+          patientId,
+          ...data
+        });
+      }
     });
   } catch (error) {
     console.error('Error emitting to caregivers:', error);

@@ -60,21 +60,23 @@ export const startMissedDoseJob = () => {
 
         // Alert caregivers real-time
         const { emitToCaregivers } = await import('../lib/socket-manager');
-        await emitToCaregivers(log.userId.toString(), 'dose_missed', {
+        await emitToCaregivers(log.userId.toString(), 'DOSE_MISSED', {
           medicationName: (log.medicationId as any).name,
           message: `Your patient missed a dose of ${(log.medicationId as any).name}`
         });
 
-        const links = await CaregiverLink.find({ patientId: log.userId, isActive: true });
+        const links = await CaregiverLink.find({ patientId: log.userId, status: 'ACCEPTED' });
         for (const link of links) {
-          await Notification.create({
-            userId: link.caregiverId,
-            type: NotifType.CAREGIVER_ALERT,
-            medicationId: (log.medicationId as any)._id,
-            message: `Your patient missed a dose of ${(log.medicationId as any).name}`,
-            isRead: false,
-            scheduledAt: now,
-          });
+          if (link.caregiverId) {
+            await Notification.create({
+              userId: link.caregiverId,
+              type: NotifType.CAREGIVER_ALERT,
+              medicationId: (log.medicationId as any)._id,
+              message: `Your patient missed a dose of ${(log.medicationId as any).name}`,
+              isRead: false,
+              scheduledAt: now,
+            });
+          }
         }
       }
     } catch (e) {

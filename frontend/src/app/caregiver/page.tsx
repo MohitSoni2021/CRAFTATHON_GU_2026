@@ -6,8 +6,11 @@ import { decryptData } from "@/lib/crypto"
 import { Button } from "@/components/ui/button"
 import Navbar from "@/components/Navbar"
 import { 
-  linkCaregiver, 
+  inviteCaregiver, 
+  respondCaregiverInvite,
+  getCaregiverInvites,
   getMyPatientsList, 
+  getMyCaregivers,
   unlinkCaregiver 
 } from "@/lib/api/routes"
 import { 
@@ -23,7 +26,9 @@ import {
   ChevronRight,
   ShieldAlert,
   Clock,
-  UserCheck
+  UserCheck,
+  CheckCircle,
+  XCircle
 } from "lucide-react"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -44,6 +49,8 @@ export default function CaregiverPage() {
   const [user, setUser] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [patients, setPatients] = useState<any[]>([])
+  const [caregivers, setCaregivers] = useState<any[]>([])
+  const [invites, setInvites] = useState<any[]>([])
   const [isPatient, setIsPatient] = useState(true)
   const [inviteEmail, setInviteEmail] = useState("")
   const [relationship, setRelationship] = useState("")
@@ -107,8 +114,12 @@ export default function CaregiverPage() {
       if (isCaregiver) {
         const res = await getMyPatientsList()
         if (res.success) setPatients(res.data)
+        const invRes = await getCaregiverInvites()
+        if (invRes.success) setInvites(invRes.data)
+      } else {
+        const res = await getMyCaregivers()
+        if (res.success) setCaregivers(res.data)
       }
-      // For patients, we might list who is watching them - in a real app
     } catch (err) {
       console.error("Caregiver fetch error:", err)
     } finally {
@@ -120,12 +131,12 @@ export default function CaregiverPage() {
     if (!inviteEmail || !relationship) return
     try {
       setIsLinking(true)
-      const res = await linkCaregiver({ caregiverEmail: inviteEmail, relationship })
+      const res = await inviteCaregiver({ caregiverEmail: inviteEmail, relationship })
       if (res.success) {
         setOpen(false)
         setInviteEmail("")
         setRelationship("")
-        // Refresh or show success
+        fetchData(false)
       }
     } catch (err: any) {
       alert(err.response?.data?.message || "Failed to link")
@@ -134,12 +145,23 @@ export default function CaregiverPage() {
     }
   }
 
-  const handleUnlink = async (id: string) => {
+  const handleRespondInvite = async (inviteId: string, status: 'ACCEPTED' | 'REJECTED') => {
+    try {
+       const res = await respondCaregiverInvite({ inviteId, status })
+       if (res.success) {
+          fetchData(true)
+       }
+    } catch (err: any) {
+       alert(err.response?.data?.message || "Failed to respond")
+    }
+  }
+
+  const handleUnlink = async (id: string, isPatientAction: boolean = true) => {
     if (!confirm("Are you sure you want to remove this connection?")) return
     try {
       const res = await unlinkCaregiver(id)
       if (res.success) {
-        setPatients(patients.filter(p => p.link !== id))
+        fetchData(!isPatientAction)
       }
     } catch (err) {
       console.error("Unlink error:", err)
@@ -240,6 +262,37 @@ export default function CaregiverPage() {
          
          {!isPatient ? (
            <div className="space-y-8">
+              {/* Invitations Section */}
+              {invites.length > 0 && (
+                <div className="space-y-6 mb-12">
+                   <h2 className="text-xl font-bold flex items-center gap-2 text-[#2b3654]">
+                      <Mail size={24} className="text-amber-500" />
+                      Pending Invitations
+                   </h2>
+                   <div className="grid gap-4 md:grid-cols-2">
+                     {invites.map(inv => (
+                       <Card key={inv._id} className="bg-white border-amber-100 shadow-sm rounded-2xl overflow-hidden">
+                         <div className="p-6 flex items-center justify-between">
+                            <div>
+                               <p className="font-bold text-[#2b3654]">{inv.patientId?.name || 'Unknown Patient'}</p>
+                               <p className="text-sm text-gray-500">{inv.patientId?.email}</p>
+                               <p className="text-xs text-amber-600 mt-1 uppercase font-bold tracking-widest">Wants to add you as: {inv.relationship}</p>
+                            </div>
+                            <div className="flex items-center gap-2">
+                               <Button onClick={() => handleRespondInvite(inv._id, 'ACCEPTED')} size="sm" className="bg-green-50 text-green-600 hover:bg-green-100 font-bold rounded-xl px-4">
+                                  Accept
+                               </Button>
+                               <Button onClick={() => handleRespondInvite(inv._id, 'REJECTED')} size="sm" variant="ghost" className="text-gray-400 hover:text-red-500 rounded-xl px-4">
+                                  Decline
+                               </Button>
+                            </div>
+                         </div>
+                       </Card>
+                     ))}
+                   </div>
+                </div>
+              )}
+
               <div className="flex items-center justify-between">
                  <h2 className="text-2xl font-bold flex items-center gap-2">
                     <Users size={24} className="text-[#5a4ae6]" />
@@ -265,7 +318,12 @@ export default function CaregiverPage() {
                 </div>
               ) : (
                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                   {patients.map((p) => (
+                   {/* Sort by high risk first */}
+                   {[...patients].sort((a,b) => {
+                      if(a.adherence.riskLevel === 'HIGH') return -1;
+                      if(b.adherence.riskLevel === 'HIGH') return 1;
+                      return 0;
+                   }).map((p) => (
                       <Card key={p.link} className="bg-white border-gray-100 shadow-sm rounded-[2rem] overflow-hidden group hover:shadow-xl hover:shadow-[#5a4ae6]/5 transition-all">
                         <div className="p-8">
                            <div className="flex justify-between items-start mb-6">
@@ -275,7 +333,7 @@ export default function CaregiverPage() {
                                 alt="" 
                               />
                               <div className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest ${
-                                p.adherence.riskLevel === 'LOW' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'
+                                p.adherence.riskLevel === 'LOW' ? 'bg-green-50 text-green-600' : (p.adherence.riskLevel === 'HIGH' ? 'bg-red-50 text-red-600' : 'bg-amber-50 text-amber-600')
                               }`}>
                                 {p.adherence.riskLevel} Risk
                               </div>
@@ -315,34 +373,73 @@ export default function CaregiverPage() {
               <div className="flex items-center justify-between">
                 <h2 className="text-2xl font-bold flex items-center gap-2">
                    <ShieldCheck size={24} className="text-green-500" />
-                   Active Supervision
+                   Active Supervision & Invites
                 </h2>
               </div>
 
               <div className="bg-white border border-gray-100 rounded-[2.5rem] shadow-sm overflow-hidden">
                  <div className="p-8 border-b border-gray-50 flex items-center justify-between">
                     <div>
-                      <h3 className="font-bold flex items-center gap-2">Caregiver Hierarchy</h3>
-                      <p className="text-xs text-gray-400 font-medium font-poppins">Manage connections that can see your health metrics.</p>
+                      <h3 className="font-bold flex items-center gap-2">Caregiver Connections</h3>
+                      <p className="text-xs text-gray-400 font-medium font-poppins">Manage people who receive your adherence updates.</p>
                     </div>
                  </div>
                  
-                 {/* Logic to list linked caregivers for patient - in full app we'd fetch these */}
-                 <div className="p-20 flex flex-col items-center justify-center text-center opacity-40">
-                    <UserCheck size={48} className="mb-4 text-gray-300" />
-                    <p className="font-bold text-gray-400">Security Check: All data sharing is encrypted end-to-end.</p>
-                 </div>
+                 {caregivers.length === 0 ? (
+                    <div className="p-20 flex flex-col items-center justify-center text-center opacity-40">
+                       <UserCheck size={48} className="mb-4 text-gray-300" />
+                       <p className="font-bold text-gray-400">No caregivers linked. Invite a family member to help you stay on track.</p>
+                    </div>
+                 ) : (
+                    <div className="divide-y divide-gray-50">
+                       {caregivers.map((cg: any) => (
+                          <div key={cg._id} className="p-6 md:p-8 flex items-center justify-between group hover:bg-gray-50 transition-colors">
+                             <div className="flex items-center gap-4">
+                                <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
+                                  cg.status === 'ACCEPTED' ? 'bg-green-50 text-green-500' :
+                                  cg.status === 'PENDING' ? 'bg-amber-50 text-amber-500' : 'bg-red-50 text-red-500'
+                                }`}>
+                                   {cg.status === 'ACCEPTED' ? <CheckCircle /> : cg.status === 'PENDING' ? <Clock /> : <XCircle />}
+                                </div>
+                                <div>
+                                   <p className="font-bold text-[#2b3654] text-lg">
+                                      {cg.caregiverId?.name || cg.caregiverEmail}
+                                   </p>
+                                   <div className="flex items-center gap-3 mt-1">
+                                      <p className="text-sm text-gray-500 font-medium">{cg.relationship}</p>
+                                      <span className="w-1 h-1 rounded-full bg-gray-300"></span>
+                                      <p className={`text-xs font-bold uppercase tracking-widest ${
+                                         cg.status === 'ACCEPTED' ? 'text-green-600' : 
+                                         cg.status === 'PENDING' ? 'text-amber-600' : 'text-red-500'
+                                      }`}>
+                                         {cg.status}
+                                      </p>
+                                   </div>
+                                </div>
+                             </div>
+                             <Button
+                                variant="ghost"
+                                size="icon"
+                                className="text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-full"
+                                onClick={() => handleUnlink(cg._id)}
+                             >
+                                <Trash2 size={18} />
+                             </Button>
+                          </div>
+                       ))}
+                    </div>
+                 )}
               </div>
 
               {/* Safety Banner */}
-              <div className="bg-amber-50 border border-amber-100 rounded-3xl p-8 flex gap-6">
-                 <div className="bg-white p-3 rounded-2xl text-amber-500 shadow-sm border border-amber-100 shrink-0">
+              <div className="bg-amber-50 border border-amber-100 rounded-3xl p-8 flex gap-6 mt-8">
+                 <div className="bg-white p-3 rounded-2xl text-amber-500 shadow-sm border border-amber-100 shrink-0 h-min">
                     <ShieldAlert size={24} />
                  </div>
                  <div>
                     <h4 className="font-bold text-amber-900 mb-1">Supervision Notice</h4>
                     <p className="text-sm text-amber-800/80 leading-relaxed">
-                       Adding a caregiver allows them to receive SMS or Email alerts if you miss more than 2 critical doses in a row. You can revoke access at any time.
+                       Adding a caregiver allows them to receive SMS or Email alerts if you miss critical doses. They will see your medication list and adherence score. You can revoke access at any time by removing them from this list.
                     </p>
                  </div>
               </div>

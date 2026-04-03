@@ -31,3 +31,31 @@ export const authorizeRoles = (...roles: string[]) => {
     next();
   };
 };
+
+export const checkCaregiverAccess = async (req: AuthRequest, res: Response, next: NextFunction) => {
+  try {
+    const patientId = req.params.patientId || req.params.id; // Usually in route params
+    if (!patientId) return res.status(400).json({ success: false, message: 'Patient ID missing' });
+
+    // We dynamically import to prevent circular dependency
+    const CaregiverLink = (await import('../modules/caregiver/caregiver-link.model')).default;
+    
+    // Check if the current user (caregiver) has an ACCEPTED link with the patient
+    const link = await CaregiverLink.findOne({
+      caregiverId: req.user!.id,
+      patientId: patientId,
+      status: 'ACCEPTED'
+    });
+
+    if (!link) {
+      return res.status(403).json({ success: false, message: 'Not authorized to access this patient\'s data' });
+    }
+
+    // Optionally add the link to the request if needed downstream
+    (req as any).caregiverLink = link;
+
+    next();
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Internal server error while checking access' });
+  }
+};
