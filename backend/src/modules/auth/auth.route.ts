@@ -9,5 +9,4 @@ router.post('/login', validate(LoginSchema), authController.login);
 router.post('/register', validate(RegisterSchema), authController.register);
 router.post('/google', authController.googleLogin);
 
-
 export default router;

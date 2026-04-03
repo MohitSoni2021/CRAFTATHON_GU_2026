@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import path from 'path';
 import app from './app';
+import { startAllJobs } from './jobs/reminder.job';
 
 dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 
@@ -15,9 +16,11 @@ if (!mongoUri) {
 
 mongoose.connect(mongoUri)
   .then(() => {
-    console.log('Connected to MongoDB');
+    console.log('✅ Connected to MongoDB');
+    startAllJobs();
     app.listen(port, () => {
-      console.log(`Server is running on port ${port}`);
+      console.log(`✅ Server running on port ${port}`);
+      console.log(`📖 Swagger docs at http://localhost:${port}/api-docs`);
     });
   })
   .catch((err) => {
