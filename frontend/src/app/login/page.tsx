@@ -9,15 +9,11 @@ import { encryptData } from "@/lib/crypto"
 import { loginUser, googleLogin } from "@/lib/api/routes"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
 import { APP_NAME } from "@/constants"
+import { Plus_Jakarta_Sans } from "next/font/google"
+import { Activity } from "lucide-react"
+
+const jakarta = Plus_Jakarta_Sans({ subsets: ['latin'] })
 
 export default function LoginPage() {
   const router = useRouter()
@@ -40,15 +36,13 @@ export default function LoginPage() {
       }
 
       const response = await loginUser({ email, password })
-      console.log("Logged in:", response)
       
-      // Encrypt and save user to localStorage
       if (typeof window !== "undefined") {
         const encryptedUser = encryptData(response.user)
         localStorage.setItem("user", encryptedUser)
       }
       
-      router.push("/")
+      router.push("/dashboard")
     } catch (err: any) {
       setError(err.response?.data?.message || "Invalid email or password.")
     } finally {
@@ -65,7 +59,7 @@ export default function LoginPage() {
         const encryptedUser = encryptData(response.user)
         localStorage.setItem("user", encryptedUser)
       }
-      router.push("/")
+      router.push("/dashboard")
     } catch (err: any) {
       setError(err.response?.data?.message || "Google login failed.")
     } finally {
@@ -78,124 +72,120 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="container relative h-screen flex-col items-center justify-center grid lg:max-w-none lg:grid-cols-2 lg:px-0">
-      <div className="relative hidden h-full flex-col bg-muted p-10 text-white dark:border-r lg:flex">
-        <div className="absolute inset-0 bg-zinc-900" />
-        <div className="relative z-20 flex items-center text-lg font-medium">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="mr-2 h-6 w-6"
-          >
-            <path d="M15 6v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3V6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3" />
-          </svg>
+    <div className={`min-h-screen flex text-[#2b3654] ${jakarta.className}`}>
+      {/* Left pane - Visual Theme */}
+      <div className="hidden lg:flex flex-col relative w-1/2 p-12 overflow-hidden justify-between" style={{ background: 'linear-gradient(135deg, #2b7a8c 0%, #3bbdbf 100%)' }}>
+        {/* Subtle background overlay */}
+        <div className="absolute inset-0 opacity-10 mix-blend-overlay" style={{ backgroundImage: 'url("https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&w=2000&q=80")', backgroundSize: 'cover', backgroundPosition: 'center' }}></div>
+        
+        <div className="relative z-10 flex items-center gap-2 text-white font-bold text-2xl">
+          <Activity size={32} />
           {APP_NAME}
         </div>
-        <div className="relative z-20 mt-auto">
-          <blockquote className="space-y-2">
-            <p className="text-lg">
-              &ldquo;This template has saved me countless hours of work and helped me deliver stunning projects to my
-              clients faster than ever before.&rdquo;
-            </p>
-            <footer className="text-sm">Sofia Davis</footer>
-          </blockquote>
+        
+        <div className="relative z-10">
+          <div className="bg-white/20 backdrop-blur-xl border border-white/30 p-8 rounded-3xl text-white shadow-2xl">
+             <h2 className="text-3xl font-bold mb-4 leading-tight">Welcome back to better adherence.</h2>
+             <p className="text-lg opacity-90">Login to your dashboard to monitor tracking, view proactive alerts, and manage your health safely.</p>
+          </div>
         </div>
       </div>
-      <div className="lg:p-8">
-        <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
-          <div className="flex flex-col space-y-2 text-center">
-            <h1 className="text-2xl font-semibold tracking-tight">Login to your account</h1>
-            <p className="text-sm text-muted-foreground">Enter your email below to login to your account</p>
+
+      {/* Right pane - Login Form */}
+      <div className="flex-1 flex flex-col justify-center items-center p-8 bg-[#fcfdfd]">
+        <div className="w-full max-w-md space-y-8">
+          
+          {/* Mobile Logo */}
+          <div className="lg:hidden flex justify-center items-center gap-2 text-[#3bbdbf] font-bold text-2xl mb-8">
+            <Activity size={32} />
+            {APP_NAME}
           </div>
-          <div className="grid gap-6">
-            <form onSubmit={handleSubmit}>
-              <div className="grid gap-4">
-                {error && (
-                  <div className="p-3 text-xs font-medium text-destructive bg-destructive/10 rounded-md border border-destructive/20">
-                    {error}
-                  </div>
-                )}
-                <div className="grid gap-2">
-                  <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70" htmlFor="email">
-                    Email
-                  </label>
-                  <Input
-                    id="email"
-                    placeholder="name@example.com"
-                    type="email"
-                    autoCapitalize="none"
-                    autoComplete="email"
-                    autoCorrect="off"
-                    disabled={loading}
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70" htmlFor="password">
-                    Password
-                  </label>
-                  <Input
-                    id="password"
-                    placeholder="••••••••"
-                    type="password"
-                    disabled={loading}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                  />
-                </div>
-                <Button disabled={loading}>
-                  {loading && (
-                    <svg className="mr-2 h-4 w-4 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                  )}
-                  Sign In with Email
-                </Button>
+
+          <div className="text-center space-y-2">
+            <h1 className="text-3xl font-bold tracking-tight text-[#2b3654]">Welcome back</h1>
+            <p className="text-[#7b8ea6]">Enter your email and password to access your account</p>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-5 mt-8">
+            {error && (
+              <div className="p-3 text-sm font-medium text-red-600 bg-red-50 rounded-lg border border-red-100 flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                {error}
               </div>
-            </form>
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t" />
+            )}
+            
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <label className="text-sm font-semibold text-[#2b3654]" htmlFor="email">Email</label>
+                <Input
+                  id="email"
+                  placeholder="name@example.com"
+                  type="email"
+                  autoCapitalize="none"
+                  autoComplete="email"
+                  disabled={loading}
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  className="rounded-xl border-gray-200 focus:border-[#3bbdbf] focus:ring-[#3bbdbf] py-6"
+                />
               </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-background px-2 text-muted-foreground">Or continue with</span>
+              <div className="space-y-2">
+                <label className="text-sm font-semibold text-[#2b3654]" htmlFor="password">Password</label>
+                <Input
+                  id="password"
+                  placeholder="••••••••"
+                  type="password"
+                  disabled={loading}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  className="rounded-xl border-gray-200 focus:border-[#3bbdbf] focus:ring-[#3bbdbf] py-6"
+                />
               </div>
             </div>
-            <div className="flex justify-center">
-              <GoogleLogin
-                onSuccess={handleGoogleSuccess}
-                onError={handleGoogleError}
-                useOneTap
-                text="continue_with"
-                width="320"
-              />
+
+            <Button 
+              disabled={loading} 
+              className="w-full bg-[#3bbdbf] hover:bg-[#2b7a8c] text-white py-6 rounded-xl font-bold text-md shadow-lg shadow-[#3bbdbf]/20 transition-all hover:-translate-y-0.5"
+            >
+              {loading && (
+                <svg className="mr-2 h-4 w-4 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+              )}
+              Sign In
+            </Button>
+          </form>
+
+          <div className="relative my-8">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t border-gray-200" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase font-bold">
+              <span className="bg-[#fcfdfd] px-4 text-[#7b8ea6]">Or continue with</span>
             </div>
           </div>
-          <p className="px-8 text-center text-sm text-muted-foreground mt-4">
+
+          <div className="flex justify-center">
+            <GoogleLogin
+              onSuccess={handleGoogleSuccess}
+              onError={handleGoogleError}
+              useOneTap
+              text="continue_with"
+              context="signin"
+              shape="pill"
+              size="large"
+              width="100%"
+            />
+          </div>
+
+          <p className="text-center text-sm font-medium text-[#7b8ea6] mt-8">
             Don&apos;t have an account?{" "}
-            <Link href="/signup" className="underline underline-offset-4 hover:text-primary">
+            <Link href="/signup" className="text-[#3bbdbf] font-bold hover:underline underline-offset-4">
               Create an account
             </Link>
-          </p>
-          <p className="px-8 text-center text-sm text-muted-foreground mt-4">
-            By clicking continue, you agree to our{" "}
-            <Link href="/terms" className="underline underline-offset-4 hover:text-primary">
-              Terms of Service
-            </Link>{" "}
-            and{" "}
-            <Link href="/privacy" className="underline underline-offset-4 hover:text-primary">
-              Privacy Policy
-            </Link>
-            .
           </p>
         </div>
       </div>
