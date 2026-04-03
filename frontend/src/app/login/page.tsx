@@ -10,10 +10,10 @@ import { loginUser, googleLogin } from "@/lib/api/routes"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { APP_NAME } from "@/constants"
-import { Plus_Jakarta_Sans } from "next/font/google"
-import { Activity } from "lucide-react"
+import { Outfit } from "next/font/google"
+import { Activity, ShieldCheck, Zap, ArrowRight, Github } from "lucide-react"
 
-const jakarta = Plus_Jakarta_Sans({ subsets: ['latin'] })
+const outfit = Outfit({ subsets: ['latin'] })
 
 export default function LoginPage() {
   const router = useRouter()
@@ -40,9 +40,14 @@ export default function LoginPage() {
       if (typeof window !== "undefined") {
         const encryptedUser = encryptData(response.user)
         localStorage.setItem("user", encryptedUser)
+        localStorage.setItem("token", response.token)
       }
       
-      router.push("/dashboard")
+      if (response.user.role === 'doctor') {
+        router.push("/doctor")
+      } else {
+        router.push("/dashboard")
+      }
     } catch (err: any) {
       setError(err.response?.data?.message || "Invalid email or password.")
     } finally {
@@ -58,8 +63,13 @@ export default function LoginPage() {
       if (typeof window !== "undefined") {
         const encryptedUser = encryptData(response.user)
         localStorage.setItem("user", encryptedUser)
+        localStorage.setItem("token", response.token)
       }
-      router.push("/dashboard")
+      if (response.user.role === 'doctor') {
+        router.push("/doctor")
+      } else {
+        router.push("/dashboard")
+      }
     } catch (err: any) {
       setError(err.response?.data?.message || "Google login failed.")
     } finally {
@@ -72,66 +82,109 @@ export default function LoginPage() {
   }
 
   return (
-    <div className={`min-h-screen flex text-[#2b3654] ${jakarta.className}`}>
-      {/* Left pane - Visual Theme */}
-      <div className="hidden lg:flex flex-col relative w-1/2 p-12 overflow-hidden justify-between" style={{ background: 'linear-gradient(135deg, #2b7a8c 0%, #3bbdbf 100%)' }}>
-        {/* Subtle background overlay */}
-        <div className="absolute inset-0 opacity-10 mix-blend-overlay" style={{ backgroundImage: 'url("https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&w=2000&q=80")', backgroundSize: 'cover', backgroundPosition: 'center' }}></div>
-        
-        <div className="relative z-10 flex items-center gap-2 text-white font-bold text-2xl">
-          <Activity size={32} />
-          {APP_NAME}
+    <div className={`min-h-screen flex flex-col lg:flex-row bg-[#000000] text-white ${outfit.className}`}>
+      {/* Left Decoration / Info Section (Hidden on mobile) */}
+      <div className="hidden lg:flex lg:w-[45%] xl:w-[50%] p-12 flex-col justify-between relative overflow-hidden border-r border-white/5">
+        {/* Abstract Background Elements */}
+        <div className="absolute top-0 left-0 w-full h-full">
+            <div className="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] bg-yellow-500/10 blur-[120px] rounded-full"></div>
+            <div className="absolute bottom-[-10%] left-[-10%] w-[400px] h-[400px] bg-yellow-600/5 blur-[100px] rounded-full"></div>
         </div>
-        
-        <div className="relative z-10">
-          <div className="bg-white/20 backdrop-blur-xl border border-white/30 p-8 rounded-3xl text-white shadow-2xl">
-             <h2 className="text-3xl font-bold mb-4 leading-tight">Welcome back to better adherence.</h2>
-             <p className="text-lg opacity-90">Login to your dashboard to monitor tracking, view proactive alerts, and manage your health safely.</p>
+
+        <div className="relative z-10 flex items-center gap-3">
+          <div className="p-2.5 bg-yellow-400 rounded-2xl shadow-[0_0_20px_rgba(250,204,21,0.3)]">
+            <Activity className="text-black" size={28} />
           </div>
+          <span className="text-2xl font-bold tracking-tight text-white uppercase">{APP_NAME}</span>
+        </div>
+
+        <div className="relative z-10 space-y-8">
+          <div className="space-y-4">
+            <h1 className="text-5xl xl:text-6xl font-extrabold leading-[1.1] tracking-tight text-white">
+                Master your <br/>
+                <span className="text-yellow-400">Medication</span> Journey.
+            </h1>
+            <p className="text-zinc-400 text-lg max-w-md">
+              The premium companion for health tracking and real-time adherence monitoring.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 gap-4 pt-4 max-w-sm">
+            <div className="flex items-center gap-4 p-4 rounded-2xl bg-white/[0.03] border border-white/5 backdrop-blur-sm transition-all hover:bg-white/[0.05]">
+                <div className="w-10 h-10 rounded-xl bg-yellow-400/10 flex items-center justify-center">
+                    <ShieldCheck className="text-yellow-400" size={20} />
+                </div>
+                <div>
+                    <h3 className="text-sm font-semibold text-white">Secure Monitoring</h3>
+                    <p className="text-xs text-zinc-500">End-to-end encrypted health data</p>
+                </div>
+            </div>
+            <div className="flex items-center gap-4 p-4 rounded-2xl bg-white/[0.03] border border-white/5 backdrop-blur-sm transition-all hover:bg-white/[0.05]">
+                <div className="w-10 h-10 rounded-xl bg-yellow-400/10 flex items-center justify-center">
+                    <Zap className="text-yellow-400" size={20} />
+                </div>
+                <div>
+                    <h3 className="text-sm font-semibold text-white">Real-time Insights</h3>
+                    <p className="text-xs text-zinc-500">Live adherence score & risk analysis</p>
+                </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="relative z-10 text-zinc-600 text-sm">
+            &copy; 2026 {APP_NAME} Adherence System. Optimized for Gujarat Hackathon.
         </div>
       </div>
 
-      {/* Right pane - Login Form */}
-      <div className="flex-1 flex flex-col justify-center items-center p-8 bg-[#fcfdfd]">
-        <div className="w-full max-w-md space-y-8">
-          
-          {/* Mobile Logo */}
-          <div className="lg:hidden flex justify-center items-center gap-2 text-[#3bbdbf] font-bold text-2xl mb-8">
-            <Activity size={32} />
-            {APP_NAME}
+      {/* Right Form Section */}
+      <div className="flex-1 flex flex-col justify-center items-center p-6 lg:p-12 relative overflow-hidden">
+        {/* Mobile Logo */}
+        <div className="lg:hidden absolute top-8 left-8 flex items-center gap-3">
+          <div className="p-2 bg-yellow-400 rounded-xl">
+            <Activity className="text-black" size={20} />
+          </div>
+          <span className="text-xl font-bold tracking-tight text-white uppercase">{APP_NAME}</span>
+        </div>
+
+        <div className="w-full max-w-md space-y-10 z-10">
+          <div className="space-y-3">
+            <h2 className="text-4xl font-bold text-white tracking-tight">Welcome back</h2>
+            <p className="text-zinc-400 text-lg">Enter your details to track your health.</p>
           </div>
 
-          <div className="text-center space-y-2">
-            <h1 className="text-3xl font-bold tracking-tight text-[#2b3654]">Welcome back</h1>
-            <p className="text-[#7b8ea6]">Enter your email and password to access your account</p>
-          </div>
-
-          <form onSubmit={handleSubmit} className="space-y-5 mt-8">
+          <form onSubmit={handleSubmit} className="space-y-6">
             {error && (
-              <div className="p-3 text-sm font-medium text-red-600 bg-red-50 rounded-lg border border-red-100 flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              <div className="p-4 text-sm font-medium text-red-500 bg-red-400/10 rounded-2xl border border-red-500/20 flex items-center gap-3 animate-in fade-in slide-in-from-top-2 duration-300">
+                <div className="w-5 h-5 rounded-full bg-red-500/10 flex items-center justify-center shrink-0">
+                  <div className="w-1.5 h-1.5 rounded-full bg-red-500"></div>
+                </div>
                 {error}
               </div>
             )}
             
             <div className="space-y-4">
               <div className="space-y-2">
-                <label className="text-sm font-semibold text-[#2b3654]" htmlFor="email">Email</label>
-                <Input
-                  id="email"
-                  placeholder="name@example.com"
-                  type="email"
-                  autoCapitalize="none"
-                  autoComplete="email"
-                  disabled={loading}
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  className="rounded-xl border-gray-200 focus:border-[#3bbdbf] focus:ring-[#3bbdbf] py-6"
-                />
+                <label className="text-sm font-medium text-zinc-400 pl-1" htmlFor="email">Email address</label>
+                <div className="relative group">
+                    <Input
+                        id="email"
+                        placeholder="john@example.com"
+                        type="email"
+                        autoCapitalize="none"
+                        autoComplete="email"
+                        disabled={loading}
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
+                        className="bg-white/[0.03] border-white/10 hover:border-white/20 focus:border-yellow-400/50 focus:ring-0 rounded-2xl h-14 text-white placeholder:text-zinc-600 transition-all pl-4"
+                    />
+                </div>
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-semibold text-[#2b3654]" htmlFor="password">Password</label>
+                <div className="flex justify-between items-center px-1">
+                    <label className="text-sm font-medium text-zinc-400" htmlFor="password">Password</label>
+                    <Link href="#" className="text-xs text-yellow-400 hover:text-yellow-300 transition-colors font-medium">Forgot password?</Link>
+                </div>
                 <Input
                   id="password"
                   placeholder="••••••••"
@@ -140,50 +193,63 @@ export default function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="rounded-xl border-gray-200 focus:border-[#3bbdbf] focus:ring-[#3bbdbf] py-6"
+                  className="bg-white/[0.03] border-white/10 hover:border-white/20 focus:border-yellow-400/50 focus:ring-0 rounded-2xl h-14 text-white placeholder:text-zinc-600 transition-all pl-4"
                 />
               </div>
             </div>
 
             <Button 
-              disabled={loading} 
-              className="w-full bg-[#3bbdbf] hover:bg-[#2b7a8c] text-white py-6 rounded-xl font-bold text-md shadow-lg shadow-[#3bbdbf]/20 transition-all hover:-translate-y-0.5"
+                disabled={loading} 
+                className="w-full bg-yellow-400 hover:bg-yellow-300 text-black h-14 rounded-2xl font-bold text-lg shadow-[0_10px_30px_rgba(250,204,21,0.15)] transition-all active:scale-[0.98] disabled:opacity-50"
             >
-              {loading && (
-                <svg className="mr-2 h-4 w-4 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
+              {loading ? (
+                <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin"></div>
+                    <span>Processing...</span>
+                </div>
+              ) : (
+                <div className="flex items-center justify-center gap-2">
+                    <span>Account Sign in</span>
+                    <ArrowRight size={20} />
+                </div>
               )}
-              Sign In
             </Button>
           </form>
 
-          <div className="relative my-8">
+          <div className="relative">
             <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t border-gray-200" />
+              <span className="w-full border-t border-white/5" />
             </div>
-            <div className="relative flex justify-center text-xs uppercase font-bold">
-              <span className="bg-[#fcfdfd] px-4 text-[#7b8ea6]">Or continue with</span>
+            <div className="relative flex justify-center text-[10px] uppercase font-bold tracking-widest text-zinc-700">
+              <span className="bg-[#000000] px-4">Social integration</span>
             </div>
           </div>
 
-          <div className="flex justify-center">
-            <GoogleLogin
-              onSuccess={handleGoogleSuccess}
-              onError={handleGoogleError}
-              text="continue_with"
-              context="signin"
-              shape="pill"
-              size="large"
-              width="100%"
-            />
+          <div className="grid grid-cols-1 gap-4">
+            <div className="flex justify-center w-full">
+              <div 
+                className="w-full overflow-hidden rounded-2xl border border-white/10 transition-all hover:bg-white/[0.02]"
+                style={{ 
+                  filter: 'invert(1) hue-rotate(180deg) brightness(1.5)',
+                  opacity: 0.9
+                }}
+              >
+                  <GoogleLogin
+                    onSuccess={handleGoogleSuccess}
+                    onError={handleGoogleError}
+                    theme="outline"
+                    shape="square"
+                    size="large"
+                    width="100%"
+                  />
+              </div>
+            </div>
           </div>
 
-          <p className="text-center text-sm font-medium text-[#7b8ea6] mt-8">
-            Don&apos;t have an account?{" "}
-            <Link href="/signup" className="text-[#3bbdbf] font-bold hover:underline underline-offset-4">
-              Create an account
+          <p className="text-center text-zinc-500 font-medium">
+            New to the system?{" "}
+            <Link href="/signup" className="text-white hover:text-yellow-400 font-bold transition-colors underline-offset-4 decoration-yellow-400/30 hover:decoration-yellow-400 underline">
+                Create new account
             </Link>
           </p>
         </div>
