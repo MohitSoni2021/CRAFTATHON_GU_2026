@@ -4,11 +4,12 @@ from typing import Optional, Tuple
 import pandas as pd
 
 try:
+    from pythonBackend.db import db
+    from pythonBackend.models import DatasetRowSchema, PerUserSummarySchema, OverallSummarySchema
+except ImportError:
+    # fallback when running module directly from pythonBackend folder
     from .db import db
     from .models import DatasetRowSchema, PerUserSummarySchema, OverallSummarySchema
-except ImportError:
-    from db import db
-    from models import DatasetRowSchema, PerUserSummarySchema, OverallSummarySchema
 
 
 def _parse_date_filter(date_str: Optional[str]) -> Optional[datetime]:
