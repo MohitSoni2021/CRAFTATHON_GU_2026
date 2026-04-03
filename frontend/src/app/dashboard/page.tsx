@@ -29,6 +29,8 @@ import { format } from "date-fns"
 
 const jakarta = Plus_Jakarta_Sans({ subsets: ['latin'] })
 
+import { useSocket } from "@/context/SocketContext"
+
 export default function Dashboard() {
   const router = useRouter()
   const [user, setUser] = useState<any>(null)
@@ -37,6 +39,7 @@ export default function Dashboard() {
   const [risk, setRisk] = useState<any>(null)
   const [todayDoses, setTodayDoses] = useState<any[]>([])
   const [error, setError] = useState<string | null>(null)
+  const { isConnected } = useSocket()
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -244,9 +247,9 @@ export default function Dashboard() {
                  </p>
                  <div className="space-y-4 text-white">
                    <div className="flex items-center justify-between text-sm">
-                     <span className="text-gray-400">REST API</span>
-                     <span className="text-green-400 font-bold flex items-center gap-1">
-                       <div className="w-2 h-2 rounded-full bg-green-400"></div> Connected
+                     <span className="text-gray-400">WebSocket</span>
+                     <span className={`${isConnected ? 'text-green-400' : 'text-red-400'} font-bold flex items-center gap-1`}>
+                       <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-400' : 'bg-red-400 blink'}`}></div> {isConnected ? 'Real-time Active' : 'Connecting...'}
                      </span>
                    </div>
                    <div className="flex items-center justify-between text-sm">

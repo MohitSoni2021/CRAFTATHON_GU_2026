@@ -3,6 +3,8 @@ import mongoose from 'mongoose';
 import DoseLog from './dose-log.model';
 import { LogDoseSchema, DoseStatus } from '@hackgu/shared';
 import { AuthRequest } from '../../middlewares/auth.middleware';
+import { emitToCaregivers } from '../../lib/socket-manager';
+import { computeAdherenceScore } from '../adherence/adherence.service';
 
 export const logDose = async (req: AuthRequest, res: Response) => {
   try {
@@ -18,6 +20,22 @@ export const logDose = async (req: AuthRequest, res: Response) => {
 
     const log = new DoseLog({ ...parsed, userId: req.user!.id, status, delayMinutes });
     await log.save();
+
+    // 1. Emit instant dose_logged event to caregivers
+    await emitToCaregivers(req.user!.id, 'dose_logged', {
+        log,
+        message: `Patient logged a dose: ${status}`
+    });
+
+    // 2. Re-compute adherence and check if risk changed
+    // (Ideally we would compare with previous risk, but for now we emit current risk)
+    const { score, riskLevel } = await computeAdherenceScore(req.user!.id);
+    await emitToCaregivers(req.user!.id, 'risk_level_changed', {
+        score,
+        riskLevel,
+        message: `Current risk level: ${riskLevel} (${score}%)`
+    });
+
     res.status(201).json({ success: true, data: log });
   } catch (e: any) {
     res.status(400).json({ success: false, message: e.message });

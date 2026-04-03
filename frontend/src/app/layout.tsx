@@ -3,6 +3,7 @@ import { Poppins } from "next/font/google";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import "./globals.css";
 import { APP_NAME } from "@/constants";
+import { SocketProvider } from "@/context/SocketContext";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -27,7 +28,9 @@ export default function RootLayout({
     >
       <body className={`${poppins.className} min-h-full flex flex-col antialiased`}>
         <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || "1013424979439-rqq4uvrgp5bve5hah28gq5ava13cb1cn.apps.googleusercontent.com"}>
-          {children}
+          <SocketProvider>
+            {children}
+          </SocketProvider>
         </GoogleOAuthProvider>
       </body>
     </html>

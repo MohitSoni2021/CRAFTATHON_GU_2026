@@ -37,6 +37,8 @@ import {
   DialogFooter
 } from "@/components/ui/dialog"
 
+import { useSocket } from "@/context/SocketContext"
+
 export default function CaregiverPage() {
   const router = useRouter()
   const [user, setUser] = useState<any>(null)
@@ -47,6 +49,7 @@ export default function CaregiverPage() {
   const [relationship, setRelationship] = useState("")
   const [isLinking, setIsLinking] = useState(false)
   const [open, setOpen] = useState(false)
+  const { socket, isConnected } = useSocket()
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -61,6 +64,42 @@ export default function CaregiverPage() {
       }
     }
   }, [router])
+
+  // Real-time updates
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleDoseLogged = (data: any) => {
+        console.log("Real-time Dose Logged:", data);
+        // Refresh the list to get updated counts/status
+        fetchData(true);
+    };
+
+    const handleRiskLevelChanged = (data: any) => {
+        console.log("Real-time Risk Level Changed:", data);
+        setPatients(prev => prev.map(p => {
+          if (p.patient._id === data.patientId) {
+              return { 
+                ...p, 
+                adherence: { 
+                    ...p.adherence, 
+                    score: data.score, 
+                    riskLevel: data.riskLevel 
+                } 
+              };
+          }
+          return p;
+        }));
+    };
+
+    socket.on('dose_logged', handleDoseLogged);
+    socket.on('risk_level_changed', handleRiskLevelChanged);
+
+    return () => {
+      socket.off('dose_logged', handleDoseLogged);
+      socket.off('risk_level_changed', handleRiskLevelChanged);
+    };
+  }, [socket]);
 
   const fetchData = async (isCaregiver: boolean) => {
     try {
@@ -207,7 +246,13 @@ export default function CaregiverPage() {
                     Monitored Patients 
                     <span className="text-sm font-bold bg-gray-100 px-3 py-1 rounded-full text-gray-400 ml-2">{patients.length}</span>
                  </h2>
-                 <Button variant="ghost" className="text-[#5a4ae6] font-bold">Refresh All</Button>
+                  <div className="flex items-center gap-4">
+                     <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest ${isConnected ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'}`}>
+                        <div className={`w-1.5 h-1.5 rounded-full ${isConnected ? 'bg-green-500' : 'bg-red-500 blink'}`}></div>
+                        {isConnected ? 'Live' : 'Offline'}
+                     </div>
+                     <Button variant="ghost" onClick={() => fetchData(true)} className="text-[#5a4ae6] font-bold">Refresh All</Button>
+                  </div>
               </div>
 
               {patients.length === 0 ? (
