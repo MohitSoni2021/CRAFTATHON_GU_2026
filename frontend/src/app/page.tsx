@@ -1,146 +1,198 @@
 "use client"
+import { Plus_Jakarta_Sans, Inter } from "next/font/google";
+import Link from 'next/link';
+import { Pill, Activity, ShieldCheck, ArrowRight, ActivitySquare, AlertCircle, HeartPulse, User, Clock, CheckCircle2 } from "lucide-react";
+import styles from './page.module.css';
 
-import React, { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
-import { decryptData } from "@/lib/crypto"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { APP_NAME } from "@/constants"
+const jakarta = Plus_Jakarta_Sans({ subsets: ['latin'] });
+const inter = Inter({ subsets: ['latin'] });
 
-export default function Dashboard() {
-  const router = useRouter()
-  const [user, setUser] = useState<any>(null)
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    // Only run on client
-    if (typeof window !== "undefined") {
-      const encryptedUser = localStorage.getItem("user")
-      console.log("Encrypted user on dashboard:", encryptedUser)
-      
-      if (!encryptedUser) {
-        router.push("/login")
-      } else {
-        const decryptedUser = decryptData(encryptedUser)
-        if (!decryptedUser) {
-          console.error("Failed to decrypt user data")
-          localStorage.removeItem("user")
-          router.push("/login")
-        } else {
-          setUser(decryptedUser)
-          setLoading(false)
-        }
-      }
-    }
-  }, [router])
-
-  const handleLogout = () => {
-    if (typeof window !== "undefined") {
-      localStorage.removeItem("user")
-      router.push("/login")
-    }
-  }
-
-  if (loading) {
-    return (
-      <div className="flex h-screen items-center justify-center bg-white">
-        <div className="flex flex-col items-center gap-2">
-          <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-          <p className="text-zinc-500 font-medium animate-pulse">Loading your dashboard...</p>
-        </div>
-      </div>
-    )
-  }
-
+export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-zinc-50 text-zinc-900 p-6 md:p-12">
-      <div className="max-w-5xl mx-auto space-y-10">
-        {/* Header */}
-        <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b pb-8 border-zinc-200">
-          <div>
-            <h1 className="text-4xl font-extrabold tracking-tight text-zinc-900">{APP_NAME}</h1>
-            <p className="text-zinc-500 mt-1 text-lg">
-              Welcome back, <span className="text-zinc-900 font-semibold">{user?.name || "User"}</span>
-            </p>
+    <div className={`${styles.container} ${jakarta.className}`}>
+      
+      {/* Navigation */}
+      <nav className={styles.nav}>
+        <div className={styles.logo}>
+          <Activity size={28} color="#fff" />
+          MedTrack
+        </div>
+        <div className={styles.navLinks}>
+          <a className={styles.navLink}>Home</a>
+          <a href="#solutions" className={styles.navLink}>Solutions</a>
+          <a href="#features" className={styles.navLink}>Features</a>
+          <a className={styles.navLink}>Resources</a>
+        </div>
+        <Link href="/login" className={styles.navButton}>
+          Login / Register
+        </Link>
+      </nav>
+
+      {/* Hero Section */}
+      <header className={styles.hero}>
+        <div className={styles.heroContent}>
+          <div className={styles.heroTag}>
+            <User size={16} className={styles.heroTagIcon} />
+            <span>Built for Gujarat Hackathon 2026</span>
           </div>
-          <div className="flex items-center gap-3">
-            <Button variant="outline" className="border-zinc-300 hover:bg-zinc-100" onClick={handleLogout}>
-              Logout
-            </Button>
-            <Button className="bg-zinc-900 text-white hover:bg-zinc-800">
-              Settings
-            </Button>
-          </div>
-        </header>
-
-        {/* Info Cards */}
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          <Card className="bg-white border-zinc-200 shadow-sm transition-all hover:shadow-md">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-zinc-500 text-xs font-bold uppercase tracking-wider">Account ID</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-sm font-mono bg-zinc-100 p-2 rounded border border-zinc-200 text-zinc-700 break-all">
-                {user?.id || "N/A"}
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-white border-zinc-200 shadow-sm transition-all hover:shadow-md">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-zinc-500 text-xs font-bold uppercase tracking-wider">Full Name</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-zinc-900">{user?.name || "Guest User"}</div>
-              <p className="text-xs text-green-600 font-medium mt-1">Verified Member</p>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-white border-zinc-200 shadow-sm transition-all hover:shadow-md">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-zinc-500 text-xs font-bold uppercase tracking-wider">Email Address</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-xl font-semibold text-zinc-800 truncate">{user?.email || "not@available.com"}</div>
-              <p className="text-xs text-zinc-400 mt-1">Primary Login Email</p>
-            </CardContent>
-          </Card>
+          <h1 className={styles.heroTitle}>
+            Your Real-Time Medication Monitor
+          </h1>
+          <p className={styles.heroDescription}>
+            MedTrack ensures patients take the right dose, at the right time. We empower caregivers with proactive alerts and personalized adherence scoring to prevent health crises.
+          </p>
+          <Link href="/login" className={styles.heroAction}>
+            Get Started For Free
+            <div className={styles.heroActionIcon}>
+              <ArrowRight size={18} />
+            </div>
+          </Link>
         </div>
 
-        {/* Main Content Card */}
-        <Card className="bg-white border-zinc-200 shadow-lg overflow-hidden">
-          <div className="bg-zinc-900 h-2" />
-          <CardHeader className="p-8 pb-4">
-            <CardTitle className="text-2xl font-bold">System Status</CardTitle>
-            <CardDescription className="text-zinc-500">
-              Overview of your current account status and system connectivity.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="p-8 pt-0 space-y-6">
-            <div className="grid gap-4 md:grid-cols-2">
-              <div className="space-y-1">
-                <h4 className="text-sm font-semibold text-zinc-900 line-clamp-1">Database Connectivity</h4>
-                <div className="flex items-center gap-2">
-                  <div className="h-2 w-2 rounded-full bg-green-500" />
-                  <span className="text-sm text-zinc-600">Successfully connected to Hackathon Cluster</span>
-                </div>
-              </div>
-              <div className="space-y-1">
-                <h4 className="text-sm font-semibold text-zinc-900 line-clamp-1">Authentication Service</h4>
-                <div className="flex items-center gap-2">
-                  <div className="h-2 w-2 rounded-full bg-green-500" />
-                  <span className="text-sm text-zinc-600">Zod Validation Layer Active</span>
-                </div>
-              </div>
+        {/* Glass Card Floating on Hero */}
+        <div className={styles.heroGlassCard}>
+          <div className={styles.glassAvatars}>
+            <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=100&q=80" alt="User 1" />
+            <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=100&q=80" alt="User 2" />
+            <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=100&q=80" alt="User 3" />
+            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80" alt="User 4" />
+          </div>
+          <h2 className={styles.glassTitle}>
+            30% <span>Improvement in Adherence</span>
+          </h2>
+          <div className={styles.glassTags}>
+            <span className={styles.glassTag}>
+              <span className={styles.glassTagIcon}><Activity size={12} /></span>
+              Intelligent Scoring
+            </span>
+            <span className={styles.glassTag}>
+               <span className={styles.glassTagIcon}><AlertCircle size={12} /></span>
+               Caregiver Alerts
+            </span>
+            <span className={styles.glassTag}>
+               <span className={styles.glassTagIcon}><Clock size={12} /></span>
+               Smart Scheduling
+            </span>
+            <span className={styles.glassTag}>
+               <span className={styles.glassTagIcon}><ShieldCheck size={12} /></span>
+               Pattern Detection
+            </span>
+          </div>
+        </div>
+      </header>
+
+      {/* Inline Text Statement Section */}
+      <section className={styles.statementSection} id="solutions">
+        <h2 className={styles.statementText}>
+          Our platform 
+          <span className={styles.inlinePill}>
+            <Pill size={32} />
+          </span> 
+          reduces preventable hospitalizations 
+          <span className={`${styles.inlinePill} ${styles.purple}`}>
+            <HeartPulse size={32} />
+          </span> 
+          by ensuring real-time dose transparency 
+          <div className={styles.inlineAvatars}>
+            <img src="https://images.unsplash.com/photo-1582750433449-348eb71d2bcf?auto=format&fit=crop&w=100&q=80" alt="Caregiver 1" />
+            <img src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&w=100&q=80" alt="Caregiver 2" />
+            <img src="https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?auto=format&fit=crop&w=100&q=80" alt="Caregiver 3" />
+          </div> 
+          between patients and proactive caregivers.
+        </h2>
+      </section>
+
+      {/* Features Grid */}
+      <section className={styles.featuresSection} id="features">
+        <div className={styles.featuresHeader}>
+          <div>
+            <div className={styles.featuresSub}>
+              <ActivitySquare size={16} /> Our Benefits
             </div>
+            <h2 className={styles.featuresTitle}>The Smart Way To Monitor Adherence</h2>
+          </div>
+          <Link href="/login" className={styles.seeHowBtn}>
+            See How It Works
+            <div className={styles.seeHowBtnIcon}>
+              <ArrowRight size={16} />
+            </div>
+          </Link>
+        </div>
+
+        <div className={styles.grid}>
+          {/* Card 1 */}
+          <div className={styles.card}>
+            <h3 className={styles.cardTitle}>
+              <span className={styles.cardIcon}><ActivitySquare size={24} /></span>
+              Intelligent Adherence Scoring
+            </h3>
+            <p className={styles.cardDesc}>
+              MedTrack automatically calculates rolling adherence scores and classifies users into risk levels based on their logging streaks.
+            </p>
             
-            <div className="pt-4 border-t border-zinc-100 flex flex-wrap gap-3">
-              <Button size="sm" className="bg-zinc-900 text-zinc-50">View Documentation</Button>
-              <Button size="sm" variant="outline" className="border-zinc-300">Contact Support</Button>
+            <div className={styles.mockupContainer}>
+              <div className={styles.calendarCard}>
+                <div className={styles.calendarHeader}>
+                  <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=100&q=80" alt="Patient" className={styles.calAvatar} />
+                  <div className={styles.calInfo}>
+                    <span>Patient</span>
+                    <strong>Ravi Kumar</strong>
+                  </div>
+                  <span className={styles.calBadge}>+ Add Dose</span>
+                </div>
+                <div className={styles.calRow}>
+                  <span className={styles.calTime}>08:00 AM</span>
+                  <span className={styles.calMed}>Metformin / 500mg</span>
+                  <CheckCircle2 color="#28a745" size={20} />
+                </div>
+                <div className={styles.calRow}>
+                  <span className={styles.calTime}>10:00 AM</span>
+                  <span className={styles.calMed}>Amlodipine / 5mg</span>
+                  <AlertCircle color="#ff8a4c" size={20} />
+                </div>
+              </div>
             </div>
-          </CardContent>
-        </Card>
-      </div>
+          </div>
+
+          {/* Card 2 */}
+          <div className={styles.card}>
+            <h3 className={styles.cardTitle}>
+              <span className={styles.cardIcon}><ShieldCheck size={24} /></span>
+              Proactive Caregiver Alerts
+            </h3>
+            <p className={styles.cardDesc}>
+              When doses are consistently missed, caregivers receive immediate escalations to intervene before a health crisis occurs.
+            </p>
+            
+            <div className={styles.mockupContainer}>
+               <div className={styles.centralIcon}>
+                 <Activity size={48} />
+               </div>
+               
+               {/* Alert Nodes to mimic the circular design from Image 3 */}
+               <div className={`${styles.alertNode} ${styles.alertNode1}`}>
+                 <div className={`${styles.alertIcon} ${styles.success}`}>
+                   <CheckCircle2 size={16} />
+                 </div>
+                 <div className={styles.alertText}>
+                   <strong>Great job</strong>
+                   <span>90% of doses taken this week</span>
+                 </div>
+               </div>
+
+               <div className={`${styles.alertNode} ${styles.alertNode2}`}>
+                 <div className={`${styles.alertIcon} ${styles.warning}`}>
+                   <AlertCircle size={16} />
+                 </div>
+                 <div className={styles.alertText}>
+                   <strong>Missed Dose</strong>
+                   <span>Morning dose of Metformin</span>
+                 </div>
+               </div>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
-  )
+  );
 }
