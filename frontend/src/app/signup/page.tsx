@@ -180,7 +180,6 @@ export default function SignupPage() {
             <GoogleLogin
               onSuccess={handleGoogleSuccess}
               onError={handleGoogleError}
-              useOneTap
               text="signup_with"
               context="signup"
               shape="pill"
