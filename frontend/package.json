@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@hackgu/shared": "workspace:*",
+    "@radix-ui/react-dialog": "^1.1.15",
     "@react-oauth/google": "^0.13.4",
     "axios": "^1.7.0",
     "clsx": "^2.1.1",

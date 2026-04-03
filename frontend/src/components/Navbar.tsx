@@ -3,7 +3,7 @@
 import React from "react"
 import Link from "next/link"
 import { useRouter, usePathname } from "next/navigation"
-import { Activity, Bell, LogOut } from "lucide-react"
+import { Activity, Bell, LogOut, Pill, History, LayoutDashboard, Brain, HeartPulse } from "lucide-react"
 import { APP_NAME } from "@/constants"
 
 interface NavbarProps {
@@ -23,31 +23,43 @@ export default function Navbar({ user, riskLevel }: NavbarProps) {
     }
   }
 
+  const navLinks = [
+    { name: "Overview", href: "/dashboard", icon: LayoutDashboard },
+    { name: "Medications", href: "/medications", icon: Pill },
+    { name: "Adherence AI", href: "/adherence", icon: Brain },
+    { name: "Dose Logs", href: "/history", icon: History },
+    { name: "Care Network", href: "/caregiver", icon: HeartPulse },
+  ]
+
   return (
-    <nav className="bg-white border-b border-gray-100 px-8 py-4 flex justify-between items-center sticky top-0 z-50 shadow-sm">
+    <nav className="bg-white border-b border-gray-100 px-8 py-4 flex justify-between items-center sticky top-0 z-50 shadow-sm backdrop-blur-md bg-white/90">
       <div className="flex items-center gap-3">
-        <Link href="/dashboard" className="flex items-center gap-3">
-          <div className="bg-[#e6fcfa] p-2 rounded-xl text-[#3bbdbf]">
+        <Link href="/dashboard" className="flex items-center gap-3 group">
+          <div className="bg-[#e6fcfa] p-2 rounded-xl text-[#3bbdbf] group-hover:scale-110 transition-transform">
             <Activity size={24} />
           </div>
-          <span className="font-bold text-xl text-[#2b3654]">{APP_NAME} <span className="font-medium text-gray-400">| Patient</span></span>
+          <span className="font-bold text-xl text-[#2b3654]">{APP_NAME} <span className="font-medium text-gray-400">| {user?.role === 'caregiver' ? 'Caregiver' : 'Patient'}</span></span>
         </Link>
       </div>
       
-      <div className="hidden md:flex items-center gap-6 mx-auto">
-        <Link 
-          href="/dashboard" 
-          className={`font-semibold transition-colors ${pathname === '/dashboard' ? 'text-[#3bbdbf] border-b-2 border-[#3bbdbf] pb-1' : 'text-gray-500 hover:text-[#3bbdbf]'}`}
-        >
-          Overview
-        </Link>
-        <Link 
-          href="/medications" 
-          className={`font-semibold transition-colors ${pathname === '/medications' ? 'text-[#3bbdbf] border-b-2 border-[#3bbdbf] pb-1' : 'text-gray-500 hover:text-[#3bbdbf]'}`}
-        >
-          Medicine Cabinet
-        </Link>
-        <Link href="#" className="text-gray-500 hover:text-[#3bbdbf] font-semibold transition-colors">Reports</Link>
+      <div className="hidden lg:flex items-center gap-2 mx-auto">
+        {navLinks.map((link) => {
+          const isActive = pathname === link.href
+          return (
+            <Link 
+              key={link.href}
+              href={link.href}
+              className={`flex items-center gap-2 px-6 py-2 rounded-xl font-bold transition-all duration-200 ${
+                isActive 
+                  ? 'bg-[#f0f9fa] text-[#3bbdbf]' 
+                  : 'text-gray-500 hover:bg-gray-50 hover:text-[#2b3654]'
+              }`}
+            >
+              <link.icon size={18} />
+              {link.name}
+            </Link>
+          )
+        })}
       </div>
 
       <div className="flex items-center gap-4">
@@ -58,16 +70,26 @@ export default function Navbar({ user, riskLevel }: NavbarProps) {
         <div className="flex items-center gap-3 pl-4 border-l border-gray-200">
           <div className="text-right hidden sm:block">
             <p className="text-sm font-bold leading-none text-[#2b3654]">{user?.name}</p>
-            {riskLevel && <p className="text-xs text-gray-500 mt-1">Status: {riskLevel.toUpperCase()}</p>}
+            {riskLevel && (
+              <p className={`text-[10px] font-bold mt-1 uppercase tracking-wider px-2 py-0.5 rounded-full border inline-block ${
+                (riskLevel === 'low' || riskLevel === 'safe' || riskLevel === 'LOW') 
+                  ? 'bg-green-50 text-green-600 border-green-100' 
+                  : (riskLevel === 'medium' || riskLevel === 'MEDIUM') 
+                    ? 'bg-amber-50 text-amber-600 border-amber-100' 
+                    : 'bg-red-50 text-red-600 border-red-100'
+              }`}>
+                {riskLevel} Risk
+              </p>
+            )}
           </div>
           <img 
             src={`https://api.dicebear.com/7.x/initials/svg?seed=${user?.name || 'User'}`} 
             alt="Avatar" 
-            className="w-10 h-10 rounded-full border-2 border-[#e6fcfa] object-cover" 
+            className="w-10 h-10 rounded-full border-2 border-[#e6fcfa] object-cover shadow-sm" 
           />
           <button 
             onClick={handleLogout}
-            className="p-2 text-gray-400 hover:text-red-500 transition-colors"
+            className="p-2 ml-1 text-gray-400 hover:text-red-500 transition-colors"
             title="Logout"
           >
             <LogOut size={18} />

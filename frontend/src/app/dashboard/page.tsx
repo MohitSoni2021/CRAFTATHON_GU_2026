@@ -107,7 +107,7 @@ export default function Dashboard() {
       
       <Navbar user={user} riskLevel={risk?.riskLevel} />
 
-      <div className="max-w-6xl mx-auto p-6 md:p-10 space-y-8">
+      <div className="w-full mx-auto p-6 md:p-10 space-y-8">
         
         {/* Welcome Banner */}
         <div className="bg-linear-to-r from-[#2b7a8c] to-[#3bbdbf] rounded-3xl p-8 md:p-10 text-white shadow-xl flex flex-col md:flex-row justify-between items-center overflow-hidden relative">
@@ -175,7 +175,9 @@ export default function Dashboard() {
            <div className="lg:col-span-2 space-y-6">
               <div className="flex items-center justify-between">
                 <h2 className="text-xl font-bold flex items-center gap-2"><CalendarDays size={20} className="text-[#3bbdbf]" /> Today's Schedule</h2>
-                <Button variant="ghost" className="text-[#3bbdbf] font-bold">View History</Button>
+                <Link href="/history">
+                  <Button variant="ghost" className="text-[#3bbdbf] font-bold hover:bg-[#e6fcfa] rounded-xl transition-colors">View Detailed History</Button>
+                </Link>
               </div>
 
               <div className="bg-white border border-gray-100 rounded-3xl shadow-sm overflow-hidden min-h-[200px]">

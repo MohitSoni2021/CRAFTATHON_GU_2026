@@ -56,15 +56,60 @@ export const getRiskLevel = async () => {
   return response.data;
 };
 
+export const getDailyAdherence = async () => {
+  const response = await api.get('/adherence/daily');
+  return response.data;
+};
+
+export const getWeeklyTrend = async () => {
+  const response = await api.get('/adherence/weekly');
+  return response.data;
+};
+
+export const getAdherencePatterns = async () => {
+  const response = await api.get('/adherence/patterns');
+  return response.data;
+};
+
+export const linkCaregiver = async (data: { caregiverEmail: string, relationship: string }) => {
+  const response = await api.post('/caregiver/link', data);
+  return response.data;
+};
+
+export const getMyPatientsList = async () => {
+  const response = await api.get('/caregiver/patients');
+  return response.data;
+};
+
+export const getPatientAdherenceCaregiver = async (patientId: string) => {
+  const response = await api.get(`/caregiver/patients/${patientId}/adherence`);
+  return response.data;
+};
+
+export const unlinkCaregiver = async (linkId: string) => {
+  const response = await api.delete(`/caregiver/link/${linkId}`);
+  return response.data;
+};
+
 export const getTodayDoses = async () => {
   const response = await api.get('/dose-logs/today');
   return response.data;
 };
 
-export const markDoseAsTaken = async (id: string) => {
+export const markDoseAsTaken = async (id: string, status: string = 'taken') => {
   const response = await api.put(`/dose-logs/${id}`, { 
-    status: 'taken', 
+    status, 
     takenAt: new Date().toISOString() 
   });
+  return response.data;
+};
+
+export const logDoseManual = async (data: any) => {
+  const response = await api.post('/dose-logs', data);
+  return response.data;
+};
+
+export const listDoseLogs = async (params: any = {}) => {
+  const response = await api.get('/dose-logs', { params });
   return response.data;
 };

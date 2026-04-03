@@ -171,7 +171,7 @@ export default function MedicationsPage() {
       
       <Navbar user={user} riskLevel={risk?.riskLevel} />
 
-      <div className="max-w-6xl mx-auto p-6 md:p-10 space-y-8">
+      <div className="w-full mx-auto p-6 md:p-10 space-y-8">
         
         {/* Header Section */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -222,7 +222,7 @@ export default function MedicationsPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {medications.map((med) => (
               <Card 
-                key={med.id} 
+                key={`med-card-${med.id || med.name}`} 
                 className={`bg-white border-gray-100 shadow-sm rounded-3xl group hover:shadow-md transition-all duration-300 ${!med.isActive ? 'opacity-60 grayscale' : ''}`}
               >
                 <CardHeader>
@@ -250,7 +250,7 @@ export default function MedicationsPage() {
                 <CardContent className="space-y-4">
                   <div className="flex flex-wrap gap-2">
                     {med.scheduleTimes.map((time, i) => (
-                      <div key={i} className="flex items-center gap-1.5 bg-gray-50 border border-gray-100 text-gray-600 text-xs font-bold px-3 py-1.5 rounded-full">
+                      <div key={`${med.id}-time-${i}`} className="flex items-center gap-1.5 bg-gray-50 border border-gray-100 text-gray-600 text-xs font-bold px-3 py-1.5 rounded-full">
                         <Clock size={12} className="text-[#3bbdbf]" />
                         {time}
                       </div>
@@ -339,7 +339,7 @@ export default function MedicationsPage() {
                   <div className="space-y-3">
                     <label className="text-sm font-bold text-[#2b3654]">Schedule Times</label>
                     {formData.scheduleTimes?.map((time, idx) => (
-                      <div key={idx} className="flex gap-2 animate-in slide-in-from-left-2">
+                      <div key={`form-time-slot-${idx}`} className="flex gap-2 animate-in slide-in-from-left-2">
                         <Input 
                           type="time"
                           className="rounded-xl border-gray-100"
