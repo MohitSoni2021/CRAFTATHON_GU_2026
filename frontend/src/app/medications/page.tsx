@@ -336,39 +336,59 @@ export default function MedicationsPage() {
                     </div>
                   </div>
 
+                  <div className="grid grid-cols-1 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-sm font-bold text-[#2b3654]">Frequency</label>
+                      <select 
+                        required
+                        className="w-full h-12 rounded-xl border-gray-100 bg-[#f8faff] px-4 text-sm font-medium focus:ring-2 focus:ring-[#3bbdbf] focus:outline-none appearance-none"
+                        value={formData.frequency}
+                        onChange={e => setFormData({...formData, frequency: e.target.value as FrequencyType})}
+                      >
+                        <option value={FrequencyType.DAILY}>Daily</option>
+                        <option value={FrequencyType.WEEKLY}>Weekly</option>
+                        <option value={FrequencyType.MONTHLY}>Monthly</option>
+                        <option value={FrequencyType.CUSTOM}>Custom / As Needed</option>
+                      </select>
+                    </div>
+                  </div>
+
                   <div className="space-y-3">
                     <label className="text-sm font-bold text-[#2b3654]">Schedule Times</label>
-                    {formData.scheduleTimes?.map((time, idx) => (
-                      <div key={`form-time-slot-${idx}`} className="flex gap-2 animate-in slide-in-from-left-2">
-                        <Input 
-                          type="time"
-                          className="rounded-xl border-gray-100"
-                          value={time}
-                          onChange={e => {
-                            const newTimes = [...(formData.scheduleTimes || [])];
-                            newTimes[idx] = e.target.value;
-                            setFormData({...formData, scheduleTimes: newTimes});
-                          }}
-                        />
-                        {idx > 0 && (
-                          <Button 
-                            variant="ghost" 
-                            size="icon" 
-                            onClick={() => setFormData({...formData, scheduleTimes: formData.scheduleTimes?.filter((_, i) => i !== idx)})}
-                            className="text-red-400 hover:bg-red-50 rounded-xl"
-                          >
-                            <Trash2 size={20} />
-                          </Button>
-                        )}
-                      </div>
-                    ))}
+                    <div className="grid grid-cols-1 gap-3">
+                      {formData.scheduleTimes?.map((time, idx) => (
+                        <div key={`form-time-slot-${idx}`} className="flex gap-2 animate-in slide-in-from-left-2">
+                          <Input 
+                            type="time"
+                            className="rounded-xl border-gray-100 py-6"
+                            value={time}
+                            onChange={e => {
+                              const newTimes = [...(formData.scheduleTimes || [])];
+                              newTimes[idx] = e.target.value;
+                              setFormData({...formData, scheduleTimes: newTimes});
+                            }}
+                          />
+                          {idx > 0 && (
+                            <Button 
+                              variant="ghost" 
+                              size="icon" 
+                              onClick={() => setFormData({...formData, scheduleTimes: formData.scheduleTimes?.filter((_, i) => i !== idx)})}
+                              className="text-red-400 hover:bg-red-50 rounded-xl h-12 w-12"
+                              type="button"
+                            >
+                              <Trash2 size={20} />
+                            </Button>
+                          )}
+                        </div>
+                      ))}
+                    </div>
                     <Button 
                       variant="ghost" 
                       onClick={() => setFormData({...formData, scheduleTimes: [...(formData.scheduleTimes || []), '08:00']})}
                       type="button"
-                      className="w-full border-2 border-dashed border-gray-100 rounded-xl text-[#3bbdbf] font-bold py-6"
+                      className="w-full border-2 border-dashed border-gray-100 rounded-xl text-[#3bbdbf] font-bold py-6 hover:bg-cyan-50/50"
                     >
-                      + Add another slot
+                      + Add another time slot
                     </Button>
                   </div>
 
