@@ -10,14 +10,17 @@
   },
   "dependencies": {
     "@hackgu/shared": "workspace:*",
+    "@radix-ui/react-dialog": "^1.1.15",
     "@react-oauth/google": "^0.13.4",
     "axios": "^1.7.0",
     "clsx": "^2.1.1",
     "crypto-js": "^4.2.0",
+    "date-fns": "^4.1.0",
     "lucide-react": "^0.400.0",
     "next": "15.1.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "socket.io-client": "^4.8.3",
     "tailwind-merge": "^2.3.0",
     "zod": "^3.23.0"
   },

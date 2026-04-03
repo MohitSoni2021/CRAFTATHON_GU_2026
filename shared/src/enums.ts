@@ -1,6 +1,6 @@
 export enum UserRole       { PATIENT = 'patient', CAREGIVER = 'caregiver', DOCTOR = 'doctor' }
 export enum DoseStatus     { TAKEN = 'taken', MISSED = 'missed', DELAYED = 'delayed', PENDING = 'pending' }
-export enum FrequencyType  { DAILY = 'daily', CUSTOM = 'custom' }
+export enum FrequencyType  { DAILY = 'daily', WEEKLY = 'weekly', MONTHLY = 'monthly', CUSTOM = 'custom' }
 export enum RiskLevel      { LOW = 'low', MEDIUM = 'medium', HIGH = 'high' }
 export enum NotifType      { REMINDER = 'reminder', MISSED_DOSE = 'missed_dose', CAREGIVER_ALERT = 'caregiver_alert' }
 

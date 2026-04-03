@@ -40,9 +40,14 @@ export default function LoginPage() {
       if (typeof window !== "undefined") {
         const encryptedUser = encryptData(response.user)
         localStorage.setItem("user", encryptedUser)
+        localStorage.setItem("token", response.token)
       }
       
-      router.push("/dashboard")
+      if (response.user.role === 'doctor') {
+        router.push("/doctor")
+      } else {
+        router.push("/dashboard")
+      }
     } catch (err: any) {
       setError(err.response?.data?.message || "Invalid email or password.")
     } finally {
@@ -58,8 +63,13 @@ export default function LoginPage() {
       if (typeof window !== "undefined") {
         const encryptedUser = encryptData(response.user)
         localStorage.setItem("user", encryptedUser)
+        localStorage.setItem("token", response.token)
       }
-      router.push("/dashboard")
+      if (response.user.role === 'doctor') {
+        router.push("/doctor")
+      } else {
+        router.push("/dashboard")
+      }
     } catch (err: any) {
       setError(err.response?.data?.message || "Google login failed.")
     } finally {

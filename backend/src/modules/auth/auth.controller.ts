@@ -19,10 +19,12 @@ export const login = async (req: Request, res: Response) => {
   try {
     const user = await User.findOne({ email }).select('+password');
     if (!user || !user.password) {
+      console.error(`[Auth] User not found or no password for email: ${email}`);
       return res.status(401).json({ success: false, message: 'Invalid email or password' });
     }
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
+      console.error(`[Auth] Password mismatch for email: ${email}`);
       return res.status(401).json({ success: false, message: 'Invalid email or password' });
     }
     const token = signToken(user._id.toString(), user.role);
@@ -31,7 +33,8 @@ export const login = async (req: Request, res: Response) => {
       token,
       user: { id: user._id, email: user.email, name: user.name, role: user.role, timezone: user.timezone },
     });
-  } catch {
+  } catch (error) {
+    console.error('[Auth] Login error:', error);
     res.status(500).json({ success: false, message: 'Internal server error' });
   }
 };
@@ -52,7 +55,8 @@ export const register = async (req: Request, res: Response) => {
       token,
       user: { id: user._id, email: user.email, name: user.name, role: user.role, timezone: user.timezone },
     });
-  } catch {
+  } catch (error) {
+    console.error('[Auth] Register error:', error);
     res.status(500).json({ success: false, message: 'Internal server error' });
   }
 };
@@ -66,6 +70,7 @@ export const googleLogin = async (req: Request, res: Response) => {
     });
     const payload = ticket.getPayload();
     if (!payload || !payload.email) {
+      console.error('[Auth] Google payload invalid:', payload);
       return res.status(400).json({ success: false, message: 'Invalid Google token' });
     }
     let user = await User.findOne({ email: payload.email });
@@ -83,7 +88,8 @@ export const googleLogin = async (req: Request, res: Response) => {
       token,
       user: { id: user._id, email: user.email, name: user.name, role: user.role, timezone: user.timezone },
     });
-  } catch {
+  } catch (error) {
+    console.error('[Auth] Google Login error:', error);
     res.status(401).json({ success: false, message: 'Google authentication failed' });
   }
 };

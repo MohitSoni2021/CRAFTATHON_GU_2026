@@ -9,6 +9,7 @@ import doseLogRoutes      from './modules/dose-log/dose-log.route';
 import adherenceRoutes    from './modules/adherence/adherence.route';
 import caregiverRoutes    from './modules/caregiver/caregiver.route';
 import notificationRoutes from './modules/notifications/notification.route';
+import doctorRoutes       from './modules/doctor/doctor.route';
 
 const app: Express = express();
 
@@ -26,6 +27,7 @@ app.use('/api/dose-logs',     doseLogRoutes);
 app.use('/api/adherence',     adherenceRoutes);
 app.use('/api/caregiver',     caregiverRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/doctor',        doctorRoutes);
 
 // Global Error Handler
 app.use((err: any, req: Request, res: Response, _next: NextFunction) => {
