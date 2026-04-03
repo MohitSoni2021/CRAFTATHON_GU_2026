@@ -11,7 +11,7 @@ import {
   StatusBar,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { linkCaregiverService, getPatientsService, getPatientAdherenceService, unlinkCaregiverService } from '../../services/caregiverService';
+import { linkCaregiverService, getPatientsService, getPatientAdherenceService, getMyCaregiversService, unlinkCaregiverService } from '../../services/caregiverService';
 import { useAuthStore } from '../../store/authStore';
 
 export default function CaregiverScreen() {
@@ -20,15 +20,21 @@ export default function CaregiverScreen() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [patients, setPatients] = useState([]);
+  const [caregivers, setCaregivers] = useState([]);
   const [emailToLink, setEmailToLink] = useState('');
   const [isLinking, setIsLinking] = useState(false);
 
   const fetchData = async () => {
-    if (!isCaregiver) return setLoading(false);
     try {
       if (!refreshing) setLoading(true);
-      const res = await getPatientsService();
-      if (res.success) setPatients(res.data);
+
+      if (isCaregiver) {
+        const res = await getPatientsService();
+        if (res.success) setPatients(res.data);
+      } else {
+        const res = await getMyCaregiversService();
+        if (res.success) setCaregivers(res.data);
+      }
     } catch (e) {
       console.error(e);
     } finally {
@@ -95,30 +101,60 @@ export default function CaregiverScreen() {
         <Text className="text-3xl font-black text-slate-800 mb-8">{isCaregiver ? 'Patients' : 'Caregivers'}</Text>
 
         {!isCaregiver ? (
-          <View className="bg-white rounded-[40px] p-8 border border-slate-100 shadow-sm mb-6 items-center">
-             <View className="w-20 h-20 bg-amber-100 rounded-3xl items-center justify-center mb-6">
+          <>
+            <View className="bg-white rounded-[40px] p-8 border border-slate-100 shadow-sm mb-6 items-center">
+              <View className="w-20 h-20 bg-amber-100 rounded-3xl items-center justify-center mb-6">
                 <Ionicons name="people" size={40} color="#f59e0b" />
-             </View>
-             <Text className="text-slate-800 font-black text-xl mb-2">Connect a Caregiver</Text>
-             <Text className="text-slate-400 text-center font-medium leading-6 mb-8 px-4">
-               Link your profile with a family member or doctor for remote adherence tracking.
-             </Text>
-             <TextInput 
+              </View>
+              <Text className="text-slate-800 font-black text-xl mb-2">Connect a Caregiver</Text>
+              <Text className="text-slate-400 text-center font-medium leading-6 mb-8 px-4">
+                Link your profile with a family member or doctor for remote adherence tracking.
+              </Text>
+              <TextInput 
                 placeholder="Caregiver's Email"
                 className="w-full bg-slate-50 p-5 rounded-2xl border border-slate-100 font-bold mb-4"
                 value={emailToLink}
                 onChangeText={setEmailToLink}
                 autoCapitalize="none"
                 keyboardType="email-address"
-             />
-             <TouchableOpacity 
-               onPress={handleLink}
-               disabled={isLinking}
-               className="bg-amber-400 w-full p-6 rounded-2xl items-center shadow-lg"
-             >
+              />
+              <TouchableOpacity 
+                onPress={handleLink}
+                disabled={isLinking}
+                className="bg-amber-400 w-full p-6 rounded-2xl items-center shadow-lg"
+              >
                 <Text className="text-black font-black text-lg">{isLinking ? 'Sending...' : 'Send Invitation'}</Text>
-             </TouchableOpacity>
-          </View>
+              </TouchableOpacity>
+            </View>
+
+            <View className="bg-white rounded-[40px] p-6 border border-slate-100 shadow-sm">
+              <Text className="text-slate-900 font-black text-xl mb-4">Connected Caregivers</Text>
+              {caregivers.length === 0 ? (
+                <View className="items-center justify-center py-10 px-4 border-2 border-dashed border-slate-200 rounded-[30px]">
+                  <Ionicons name="people" size={46} color="#94a3b8" style={{ marginBottom: 12 }} />
+                  <Text className="text-slate-400 font-black text-center leading-6">No caregivers connected yet. Send an invitation, and they will appear here once accepted.</Text>
+                </View>
+              ) : (
+                caregivers.map((cg) => (
+                  <View key={cg._id} className="bg-slate-50 p-4 rounded-3xl mb-3 border border-slate-100">
+                    <View className="flex-row items-center justify-between">
+                      <View>
+                        <Text className="text-slate-800 font-black text-base">{cg.caregiverId?.name || cg.caregiverEmail}</Text>
+                        <Text className="text-slate-500 text-sm">{cg.caregiverId?.email || cg.caregiverEmail}</Text>
+                      </View>
+                      <Text className="text-xs font-bold uppercase tracking-widest text-amber-600">{cg.status || 'PENDING'}</Text>
+                    </View>
+                    <View className="flex-row items-center justify-between mt-3">
+                      <Text className="text-slate-500 text-xs">Relationship: {cg.relationship || 'N/A'}</Text>
+                      <TouchableOpacity onPress={() => handleUnlink(cg._id)} className="px-3 py-1 rounded-full border border-red-200">
+                        <Text className="text-red-500 font-bold text-xs">Unlink</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                ))
+              )}
+            </View>
+          </>
         ) : (
           <View className="gap-4 mb-20">
              {patients.length === 0 ? (

@@ -15,6 +15,11 @@ export const getPatientAdherenceService = async (id) => {
   return response.data;
 };
 
+export const getMyCaregiversService = async () => {
+  const response = await api.get('/caregiver/my-caregivers');
+  return response.data;
+};
+
 export const unlinkCaregiverService = async (id) => {
   const response = await api.delete(`/caregiver/link/${id}`);
   return response.data;
