@@ -51,6 +51,16 @@ export const getAdherenceScore = async () => {
   return response.data;
 };
 
+export const getProfile = async () => {
+  const response = await api.get('/auth/me');
+  return response.data;
+};
+
+export const updateProfile = async (data: any) => {
+  const response = await api.patch('/auth/me', data);
+  return response.data;
+};
+
 export const getRiskLevel = async () => {
   const response = await api.get('/adherence/risk');
   return response.data;

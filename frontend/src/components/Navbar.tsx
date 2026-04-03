@@ -1,9 +1,23 @@
 "use client"
 
-import React from "react"
+import React, { useState, useRef, useEffect } from "react"
 import Link from "next/link"
 import { useRouter, usePathname } from "next/navigation"
-import { Activity, Bell, LogOut, Pill, History, LayoutDashboard, Brain, HeartPulse, Stethoscope, CalendarCheck } from "lucide-react"
+import { 
+  Activity, 
+  Bell, 
+  LogOut, 
+  Pill, 
+  History, 
+  LayoutDashboard, 
+  Brain, 
+  HeartPulse, 
+  Stethoscope, 
+  CalendarCheck,
+  User,
+  Settings,
+  ChevronDown
+} from "lucide-react"
 import { APP_NAME } from "@/constants"
 import NotificationPopover from "./NotificationPopover"
 
@@ -15,6 +29,18 @@ interface NavbarProps {
 export default function Navbar({ user, riskLevel }: NavbarProps) {
   const router = useRouter()
   const pathname = usePathname()
+  const [showDropdown, setShowDropdown] = useState(false)
+  const dropdownRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowDropdown(false)
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => document.removeEventListener("mousedown", handleClickOutside)
+  }, [])
 
   const handleLogout = () => {
     if (typeof window !== "undefined") {
@@ -72,10 +98,9 @@ export default function Navbar({ user, riskLevel }: NavbarProps) {
       </div>
 
       <div className="flex items-center gap-4">
-        {/* Replaced static bell with NotificationPopover component */}
         <NotificationPopover />
         
-        <div className="flex items-center gap-3 pl-4 border-l border-gray-200">
+        <div className="flex items-center gap-3 pl-4 border-l border-gray-200 relative" ref={dropdownRef}>
           <div className="text-right hidden sm:block">
             <p className="text-sm font-bold leading-none text-[#2b3654]">{user?.name}</p>
             {riskLevel && (
@@ -90,18 +115,58 @@ export default function Navbar({ user, riskLevel }: NavbarProps) {
               </p>
             )}
           </div>
-          <img 
-            src={`https://api.dicebear.com/7.x/initials/svg?seed=${user?.name || 'User'}`} 
-            alt="Avatar" 
-            className="w-10 h-10 rounded-full border-2 border-[#e6fcfa] object-cover shadow-sm" 
-          />
+          
           <button 
-            onClick={handleLogout}
-            className="p-2 ml-1 text-gray-400 hover:text-red-500 transition-colors"
-            title="Logout"
+            onClick={() => setShowDropdown(!showDropdown)}
+            className="flex items-center gap-1 focus:outline-none"
           >
-            <LogOut size={18} />
+            <img 
+              src={`https://api.dicebear.com/7.x/initials/svg?seed=${user?.name || 'User'}`} 
+              alt="Avatar" 
+              className={`w-10 h-10 rounded-full border-2 object-cover shadow-sm transition-all duration-200 ${
+                showDropdown ? 'border-[#3bbdbf] scale-105' : 'border-[#e6fcfa]'
+              }`} 
+            />
+            <ChevronDown size={14} className={`text-gray-400 transition-transform duration-200 ${showDropdown ? 'rotate-180' : ''}`} />
           </button>
+
+          {showDropdown && (
+            <div className="absolute right-0 top-full mt-2 w-56 bg-white rounded-2xl shadow-xl border border-gray-100 py-2 animate-in fade-in slide-in-from-top-2 duration-200 z-60">
+               <div className="px-4 py-3 border-b border-gray-50">
+                 <p className="text-sm font-bold text-[#2b3654] truncate">{user?.name}</p>
+                 <p className="text-[10px] uppercase font-bold text-gray-400 mt-0.5 tracking-widest">{user?.role}</p>
+               </div>
+               
+               <div className="p-1">
+                 <Link 
+                   href="/profile" 
+                   onClick={() => setShowDropdown(false)}
+                   className="flex items-center gap-3 px-3 py-2.5 text-sm font-bold text-gray-600 hover:bg-[#f0f9fa] hover:text-[#3bbdbf] rounded-xl transition-all"
+                 >
+                   <User size={18} />
+                   My Profile
+                 </Link>
+                 <Link 
+                   href="/dashboard" 
+                   onClick={() => setShowDropdown(false)}
+                   className="flex items-center gap-3 px-3 py-2.5 text-sm font-bold text-gray-600 hover:bg-gray-50 rounded-xl transition-all"
+                 >
+                   <Settings size={18} />
+                   Account Settings
+                 </Link>
+               </div>
+
+               <div className="p-1 mt-1 pt-1 border-t border-gray-50">
+                 <button 
+                   onClick={handleLogout}
+                   className="flex items-center gap-3 w-full text-left px-3 py-2.5 text-sm font-bold text-red-500 hover:bg-red-50 rounded-xl transition-all"
+                 >
+                   <LogOut size={18} />
+                   Sign Out
+                 </button>
+               </div>
+            </div>
+          )}
         </div>
       </div>
     </nav>
