@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
+import Link from "next/link"
 import { decryptData } from "@/lib/crypto"
 import { Button } from "@/components/ui/button"
 import { APP_NAME } from "@/constants"
@@ -64,6 +65,11 @@ export default function Dashboard() {
           </div>
           <span className="font-bold text-xl">{APP_NAME} <span className="font-medium text-gray-400">| Patient</span></span>
         </div>
+        <div className="hidden md:flex items-center gap-6 mx-auto">
+          <Link href="/dashboard" className="text-[#3bbdbf] font-bold border-b-2 border-[#3bbdbf] pb-1">Overview</Link>
+          <Link href="/medications" className="text-gray-500 hover:text-[#3bbdbf] font-semibold transition-colors">Medicine Cabinet</Link>
+          <Link href="#" className="text-gray-500 hover:text-[#3bbdbf] font-semibold transition-colors">Reports</Link>
+        </div>
         <div className="flex items-center gap-4">
           <button className="p-2 text-gray-400 hover:text-[#2b3654] transition-colors relative">
             <Bell size={20} />
@@ -92,9 +98,11 @@ export default function Dashboard() {
           </div>
           
           <div className="relative z-10 mt-6 md:mt-0 flex gap-3">
-             <Button className="bg-white text-[#2b7a8c] hover:bg-gray-50 rounded-full px-6 font-bold shadow-lg">
-               Log Next Dose
-             </Button>
+             <Link href="/medications">
+               <Button className="bg-white text-[#2b7a8c] hover:bg-gray-50 rounded-full px-6 font-bold shadow-lg">
+                 Manage My Cabinet
+               </Button>
+             </Link>
           </div>
         </div>
 
