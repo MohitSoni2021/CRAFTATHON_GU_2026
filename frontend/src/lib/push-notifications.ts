@@ -7,7 +7,7 @@ const VAPID_PUBLIC_KEY = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || '';
  */
 function urlBase64ToUint8Array(base64String: string): Uint8Array {
   const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
-  const base64  = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
   const rawData = atob(base64);
   const outputArray = new Uint8Array(rawData.length);
   for (let i = 0; i < rawData.length; i++) {
@@ -69,7 +69,7 @@ export async function subscribeToPushNotifications(): Promise<{
 
     // 3. Subscribe to push manager
     const subscription = await registration.pushManager.subscribe({
-      userVisibleOnly:      true,
+      userVisibleOnly: true,
       applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY).buffer.slice(0) as ArrayBuffer,
     });
 
@@ -80,7 +80,7 @@ export async function subscribeToPushNotifications(): Promise<{
       endpoint: subJson.endpoint,
       keys: {
         p256dh: subJson.keys?.p256dh,
-        auth:   subJson.keys?.auth,
+        auth: subJson.keys?.auth,
       },
     });
 

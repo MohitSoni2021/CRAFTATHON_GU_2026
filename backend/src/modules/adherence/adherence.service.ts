@@ -23,7 +23,25 @@ export async function computeAdherenceScore(userId: string, days = 30) {
     score >= 50 ? RiskLevel.MEDIUM :
     RiskLevel.HIGH;
 
-  return { score, total, taken, missed, delayed, riskLevel };
+  // Track exact streaks of perfectly matched days (no missed doses)
+  const byDay: Record<string, 'taken' | 'missed' | 'empty'> = {};
+  for (const log of logs) {
+    const day = log.scheduledAt.toISOString().split('T')[0];
+    if (log.status === DoseStatus.MISSED) {
+      byDay[day] = 'missed';
+    } else if (log.status === DoseStatus.TAKEN || log.status === DoseStatus.DELAYED) {
+      if (byDay[day] !== 'missed') byDay[day] = 'taken';
+    }
+  }
+
+  let currentStreak = 0;
+  const sortedDays = Object.keys(byDay).sort((a,b) => b.localeCompare(a));
+  for (const day of sortedDays) {
+    if (byDay[day] === 'taken') currentStreak++;
+    else break; // any 'missed' ends the streak
+  }
+
+  return { score, total, taken, missed, delayed, riskLevel, currentStreak };
 }
 
 export async function getDailyBreakdown(userId: string, days = 30) {
