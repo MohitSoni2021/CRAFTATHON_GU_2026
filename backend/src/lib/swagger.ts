@@ -68,6 +68,12 @@ registry.registerPath({ method: 'get', path: '/api/notifications',           tag
 registry.registerPath({ method: 'put', path: '/api/notifications/{id}/read', tags: ['Notifications'], summary: 'Mark one read',            responses: { 200: { description: 'OK' } } });
 registry.registerPath({ method: 'put', path: '/api/notifications/read-all',  tags: ['Notifications'], summary: 'Mark all read',            responses: { 200: { description: 'OK' } } });
 
+// ─── Push Notification Routes ─────────────────────────────────────
+registry.registerPath({ method: 'get',  path: '/api/push/status',      tags: ['Push Notifications'], summary: 'Get push subscription status', responses: { 200: { description: 'OK' } } });
+registry.registerPath({ method: 'post', path: '/api/push/subscribe',   tags: ['Push Notifications'], summary: 'Save push subscription',      request: { body: { content: { 'application/json': { schema: { type: 'object', properties: { endpoint: { type: 'string' }, keys: { type: 'object', properties: { p256dh: { type: 'string' }, auth: { type: 'string' } } } } } as any } } } }, responses: { 200: { description: 'Subscribed' } } });
+registry.registerPath({ method: 'post', path: '/api/push/unsubscribe', tags: ['Push Notifications'], summary: 'Remove push subscription',     responses: { 200: { description: 'Unsubscribed' } } });
+registry.registerPath({ method: 'post', path: '/api/push/test',        tags: ['Push Notifications'], summary: 'Send test push notification',  responses: { 200: { description: 'Sent' }, 404: { description: 'No subscription' } } });
+
 // ─── Security Scheme ──────────────────────────────────────────────
 registry.registerComponent('securitySchemes', 'bearerAuth', {
   type: 'http',

@@ -124,9 +124,98 @@ export const startDailyScheduleJob = () => {
   });
 };
 
+/**
+ * Job 4 (every minute): Push notification reminder at exact medication schedule times.
+ * Uses ReminderLog for deduplication — each (user + med + HH:MM + date) fires at most once.
+ */
+export const startPushReminderJob = () => {
+  cron.schedule('* * * * *', async () => {
+    try {
+      const PushSubscription = (await import('../modules/push/push-subscription.model')).default;
+      const ReminderLog      = (await import('../modules/push/reminder-log.model')).default;
+      const User             = (await import('../modules/auth/auth.model')).default;
+      const { sendPushNotification } = await import('../lib/push.service');
+
+      // Only look at active medications
+      const activeMeds = await Medication.find({ isActive: true });
+
+      for (const med of activeMeds) {
+        // Fetch user timezone
+        const user = await User.findById(med.userId).select('timezone');
+        const tz   = user?.timezone || 'Asia/Kolkata';
+
+        // Current time in user's timezone
+        const nowInTz = new Date(new Date().toLocaleString('en-US', { timeZone: tz }));
+        const currentHH = String(nowInTz.getHours()).padStart(2, '0');
+        const currentMM = String(nowInTz.getMinutes()).padStart(2, '0');
+        const currentTime = `${currentHH}:${currentMM}`;
+
+        // Date key in user's timezone (YYYY-MM-DD)
+        const dateKey = `${nowInTz.getFullYear()}-${String(nowInTz.getMonth() + 1).padStart(2, '0')}-${String(nowInTz.getDate()).padStart(2, '0')}`;
+
+        for (const scheduleTime of med.scheduleTimes) {
+          // scheduleTime is stored as "HH:MM"
+          const [sH, sM] = scheduleTime.split(':');
+          const normalised = `${String(Number(sH)).padStart(2, '0')}:${String(Number(sM)).padStart(2, '0')}`;
+
+          if (normalised !== currentTime) continue;
+
+          // Dedup check
+          const alreadySent = await ReminderLog.findOne({
+            userId:       med.userId,
+            medicationId: med._id,
+            scheduledTime: normalised,
+            dateKey,
+          });
+          if (alreadySent) continue;
+
+          // Get push subscription for this user
+          const sub = await PushSubscription.findOne({ userId: med.userId });
+          if (!sub) continue;
+
+          try {
+            const sent = await sendPushNotification(
+              { endpoint: sub.endpoint, keys: sub.keys },
+              {
+                title: '💊 Medication Reminder',
+                body:  `Time to take ${med.name} ${med.dosage}${med.unit}`,
+                icon:  '/icons/medtrack-icon.png',
+                url:   '/today',
+                tag:   `med-reminder-${med._id}-${normalised}`,
+              }
+            );
+
+            if (sent) {
+              // Record send to prevent duplicates
+              await ReminderLog.create({
+                userId:       med.userId,
+                medicationId: med._id,
+                scheduledTime: normalised,
+                dateKey,
+              });
+              console.log(`[PushJob] Sent reminder for ${med.name} to user ${med.userId} at ${normalised}`);
+            }
+          } catch (pushErr: any) {
+            if (pushErr.message === 'SubscriptionExpired') {
+              // Subscription expired/invalid — remove it
+              await PushSubscription.findOneAndDelete({ userId: med.userId });
+              console.warn(`[PushJob] Removed stale push subscription for user ${med.userId}`);
+            } else {
+              console.error(`[PushJob] Warning - Transient error sending to user ${med.userId}:`, pushErr);
+            }
+          }
+        }
+      }
+    } catch (e) {
+      console.error('[PushReminderJob]', e);
+    }
+  });
+};
+
 export const startAllJobs = () => {
   startReminderJob();
   startMissedDoseJob();
   startDailyScheduleJob();
-  console.log('✅ Cron jobs started');
+  startPushReminderJob();
+  console.log('✅ Cron jobs started (including push reminder job)');
 };
