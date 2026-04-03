@@ -187,3 +187,25 @@ export const downloadAdherencePDF = async (patientId: string) => {
   });
   return response;
 };
+
+// Push Notification API
+export const subscribePush = async (subscription: { endpoint: string; keys: { p256dh: string; auth: string } }) => {
+  const response = await api.post('/push/subscribe', subscription);
+  return response.data;
+};
+
+export const unsubscribePush = async () => {
+  const response = await api.post('/push/unsubscribe');
+  return response.data;
+};
+
+export const sendTestPush = async () => {
+  const response = await api.post('/push/test');
+  return response.data;
+};
+
+export const getPushStatus = async () => {
+  const response = await api.get('/push/status');
+  return response.data;
+};
+

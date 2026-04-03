@@ -54,8 +54,8 @@ export const getPatterns = async (req: AuthRequest, res: Response) => {
 
 export const getRisk = async (req: AuthRequest, res: Response) => {
   try {
-    const { riskLevel, score } = await computeAdherenceScore(req.user!.id);
-    res.json({ success: true, data: { riskLevel, score } });
+    const { riskLevel, score, currentStreak } = await computeAdherenceScore(req.user!.id);
+    res.json({ success: true, data: { riskLevel, score, currentStreak } });
   } catch {
     res.status(500).json({ success: false, message: 'Internal server error' });
   }

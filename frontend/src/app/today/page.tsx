@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { getTodayDoses, markDoseAsTaken } from '@/lib/api/routes';
+import { getTodayDoses, markDoseAsTaken, getRiskLevel } from '@/lib/api/routes';
 import { useSocket } from '@/context/SocketContext';
 import { decryptData } from '@/lib/crypto';
 import { useRouter } from 'next/navigation';
@@ -240,7 +240,7 @@ export default function TodayMedsPage() {
   const [showConfetti, setShowConfetti]   = useState(false);
   const [allDoneToast, setAllDoneToast]   = useState(false);
   const [swipedId, setSwipedId]           = useState<string | null>(null);
-  const [streak]                          = useState(5); // TODO: wire from API
+  const [streak, setStreak]               = useState(0);
   const prevAllDone = useRef(false);
 
   // ── Auth guard ───────────────────────────────────────────────
@@ -261,12 +261,16 @@ export default function TodayMedsPage() {
     return () => { socket.off('DOSE_UPDATED', handler); socket.off('DOSE_TAKEN', handler); };
   }, [socket]);
 
-  // ── Fetch today's schedule ───────────────────────────────────
+  // ── Fetch today's schedule & streak ───────────────────────────────────
   const fetchDoses = useCallback(async () => {
     try {
       setLoading(true);
-      const res = await getTodayDoses();
+      const [res, riskRes] = await Promise.all([
+        getTodayDoses(),
+        getRiskLevel().catch(() => null) // fail gracefully
+      ]);
       if (res.success) setDoses(res.data);
+      if (riskRes?.success && riskRes.data) setStreak(riskRes.data.currentStreak || 0);
     } catch (e: any) {
       setError(e.response?.data?.message || 'Failed to load schedule');
     } finally {

@@ -138,7 +138,7 @@ export default function MedicationsPage() {
   };
 
   const startEdit = (med: MedicationResponse) => {
-    setEditingId(med.id);
+    setEditingId(med.id || (med as any)._id);
     setFormData({
       name: med.name,
       dosage: med.dosage,
@@ -220,9 +220,9 @@ export default function MedicationsPage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {medications.map((med) => (
+            {medications.map((med, i) => (
               <Card 
-                key={`med-card-${med.id || med.name}`} 
+                key={`med-card-${med.id || (med as any)._id || i}-${i}`} 
                 className={`bg-white border-gray-100 shadow-sm rounded-3xl group hover:shadow-md transition-all duration-300 ${!med.isActive ? 'opacity-60 grayscale' : ''}`}
               >
                 <CardHeader>
@@ -234,7 +234,7 @@ export default function MedicationsPage() {
                       <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400 hover:text-[#2b3654]" onClick={() => startEdit(med)}>
                         <Pencil size={14} />
                       </Button>
-                      <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400 hover:text-red-500" onClick={() => handleDeactivate(med.id)}>
+                      <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400 hover:text-red-500" onClick={() => handleDeactivate(med.id || (med as any)._id)}>
                         <Trash2 size={14} />
                       </Button>
                     </div>

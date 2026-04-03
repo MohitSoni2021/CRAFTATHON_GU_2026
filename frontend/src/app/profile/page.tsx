@@ -7,6 +7,13 @@ import { Button } from "@/components/ui/button"
 import Navbar from "@/components/Navbar"
 import { getProfile, updateProfile, getRiskLevel } from "@/lib/api/routes"
 import { 
+  subscribeToPushNotifications,
+  unsubscribeFromPushNotifications,
+  sendTestPushNotification,
+  getPushStatus,
+  getNotificationPermission,
+} from "@/lib/push-notifications"
+import { 
   Dialog,
   DialogContent,
   DialogHeader,
@@ -21,15 +28,17 @@ import {
   Phone, 
   Globe, 
   Shield, 
-  Camera, 
   Loader2, 
   Save, 
   CheckCircle2,
   AlertCircle,
   Settings,
   Edit2,
-  MapPin,
-  Clock
+  Clock,
+  Bell,
+  BellOff,
+  BellRing,
+  Zap,
 } from "lucide-react"
 
 export default function ProfilePage() {
@@ -41,6 +50,13 @@ export default function ProfilePage() {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
   const [status, setStatus] = useState<{ type: 'success' | 'error', message: string } | null>(null)
   
+  // Push notification state
+  const [pushSubscribed, setPushSubscribed] = useState(false)
+  const [pushPermission, setPushPermission] = useState<NotificationPermission | 'unsupported'>('default')
+  const [pushLoading, setPushLoading] = useState(false)
+  const [testLoading, setTestLoading] = useState(false)
+  const [pushStatus, setPushStatus] = useState<{ type: 'success' | 'error', message: string } | null>(null)
+
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
@@ -56,9 +72,19 @@ export default function ProfilePage() {
         const decryptedUser = decryptData(encryptedUser)
         setUser(decryptedUser)
         fetchProfile()
+        checkPushStatus()
       }
     }
   }, [router])
+
+  const checkPushStatus = async () => {
+    const perm = getNotificationPermission()
+    setPushPermission(perm)
+    if (perm === 'granted') {
+      const subscribed = await getPushStatus()
+      setPushSubscribed(subscribed)
+    }
+  }
 
   const fetchProfile = async () => {
     try {
@@ -95,7 +121,6 @@ export default function ProfilePage() {
         setStatus({ type: 'success', message: "Profile synchronized with health records" })
         setUser(res.data)
         setIsEditDialogOpen(false)
-        // Refresh profile to be sure
         setTimeout(() => setStatus(null), 5000)
       }
     } catch (err) {
@@ -103,6 +128,34 @@ export default function ProfilePage() {
     } finally {
       setSaving(false)
     }
+  }
+
+  const handleTogglePush = async () => {
+    setPushLoading(true)
+    setPushStatus(null)
+    try {
+      if (pushSubscribed) {
+        const ok = await unsubscribeFromPushNotifications()
+        setPushSubscribed(false)
+        setPushStatus({ type: ok ? 'success' : 'error', message: ok ? 'Notifications disabled.' : 'Failed to disable notifications.' })
+      } else {
+        const result = await subscribeToPushNotifications()
+        setPushPermission(result.permission)
+        setPushSubscribed(result.success)
+        setPushStatus({ type: result.success ? 'success' : 'error', message: result.message })
+      }
+    } finally {
+      setPushLoading(false)
+      setTimeout(() => setPushStatus(null), 5000)
+    }
+  }
+
+  const handleTestNotification = async () => {
+    setTestLoading(true)
+    const result = await sendTestPushNotification()
+    setPushStatus({ type: result.success ? 'success' : 'error', message: result.message })
+    setTestLoading(false)
+    setTimeout(() => setPushStatus(null), 5000)
   }
 
   if (loading && !user) {
@@ -118,7 +171,7 @@ export default function ProfilePage() {
       <Navbar user={user} riskLevel={risk?.riskLevel} />
 
       <div className="max-w-4xl mx-auto p-6 md:p-10">
-        {/* Header with Title and Edit Action */}
+        {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-10">
            <div className="flex items-center gap-4">
               <div className="p-3 bg-white rounded-2xl shadow-sm border border-gray-100">
@@ -235,7 +288,7 @@ export default function ProfilePage() {
         )}
 
         <div className="grid gap-8 md:grid-cols-3">
-          {/* Information Card (Read Only) */}
+          {/* Left Column: Avatar Card */}
           <div className="space-y-6">
             <div className="bg-white rounded-4xl p-8 shadow-xl shadow-gray-200/40 border border-gray-50 flex flex-col items-center text-center">
               <div className="relative">
@@ -298,8 +351,9 @@ export default function ProfilePage() {
             </div>
           </div>
 
-          {/* Main Content Area: Static Profile Details */}
+          {/* Right Column: Details + Notifications */}
           <div className="md:col-span-2 space-y-8">
+             {/* Credential Overview */}
              <div className="bg-white rounded-4xl p-10 shadow-xl shadow-gray-200/30 border border-gray-50">
                 <h3 className="text-2xl font-black mb-10 flex items-center gap-3 text-[#2b3654]">
                    <span className="w-1.5 h-10 bg-[#3bbdbf] rounded-full"></span>
@@ -330,14 +384,130 @@ export default function ProfilePage() {
                 </div>
              </div>
 
-             <div className="bg-[#fcfdfd] border border-dashed border-gray-200 rounded-4xl p-12 text-center flex flex-col items-center justify-center group hover:border-[#3bbdbf] transition-colors cursor-pointer" onClick={() => setIsEditDialogOpen(true)}>
-                <div className="p-4 bg-white rounded-2xl shadow-sm border border-gray-100 text-gray-300 group-hover:text-[#3bbdbf] transition-colors mb-4">
-                   <Settings size={32} />
+            {/* ── Push Notification Settings ── */}
+            <div className="bg-white rounded-4xl p-10 shadow-xl shadow-gray-200/30 border border-gray-50">
+              <h3 className="text-2xl font-black mb-2 flex items-center gap-3 text-[#2b3654]">
+                <span className="w-1.5 h-10 bg-violet-400 rounded-full"></span>
+                Medication Reminders
+              </h3>
+              <p className="text-sm text-gray-400 font-medium mb-8 ml-5">
+                Receive push notifications even when MedTrack is closed
+              </p>
+
+              {/* Permission Denied Warning */}
+              {pushPermission === 'denied' && (
+                <div className="mb-6 p-5 rounded-3xl bg-amber-50 border border-amber-100 flex items-start gap-4">
+                  <div className="p-2 bg-amber-100 rounded-xl text-amber-600 mt-0.5">
+                    <BellOff size={18} />
+                  </div>
+                  <div>
+                    <p className="font-black text-amber-700 text-sm">Notifications Blocked</p>
+                    <p className="text-xs text-amber-600 mt-1 leading-relaxed">
+                      Your browser has blocked notifications for this site. Click the 🔒 lock icon in the address bar → Site settings → Notifications → Allow.
+                    </p>
+                  </div>
                 </div>
-                <h4 className="font-bold text-[#2b3654]">System Preferences</h4>
-                <p className="text-sm text-gray-400 max-w-xs mt-2">Adjust your medication notification windows and privacy parameters.</p>
-                <Button variant="link" className="text-[#3bbdbf] font-bold mt-4">Advanced Configuration →</Button>
-             </div>
+              )}
+
+              {/* Unsupported */}
+              {pushPermission === 'unsupported' && (
+                <div className="mb-6 p-5 rounded-3xl bg-gray-50 border border-gray-100 flex items-start gap-4">
+                  <div className="p-2 bg-gray-200 rounded-xl text-gray-500 mt-0.5">
+                    <BellOff size={18} />
+                  </div>
+                  <div>
+                    <p className="font-black text-gray-600 text-sm">Browser Not Supported</p>
+                    <p className="text-xs text-gray-400 mt-1">Push notifications require a modern browser (Chrome, Firefox, Edge).</p>
+                  </div>
+                </div>
+              )}
+
+              {/* Onboarding Callout */}
+              {!pushSubscribed && pushPermission !== 'denied' && pushPermission !== 'unsupported' && (
+                <div className="mb-6 p-5 rounded-3xl bg-violet-50 border border-violet-100 flex items-start gap-4">
+                  <div className="p-2 bg-violet-100 rounded-xl text-violet-600 mt-0.5">
+                    <BellRing size={18} />
+                  </div>
+                  <div>
+                    <p className="font-black text-violet-700 text-sm">Stay on track even when MedTrack is closed</p>
+                    <p className="text-xs text-violet-500 mt-1">Enable notifications to receive desktop reminders at each medication schedule time.</p>
+                  </div>
+                </div>
+              )}
+
+              {/* Push Status Alert */}
+              {pushStatus && (
+                <div className={`mb-6 p-4 rounded-3xl flex items-center gap-3 border text-sm font-bold ${
+                  pushStatus.type === 'success'
+                    ? 'bg-emerald-50 text-emerald-700 border-emerald-100'
+                    : 'bg-red-50 text-red-700 border-red-100'
+                }`}>
+                  {pushStatus.type === 'success'
+                    ? <CheckCircle2 size={16} className="text-emerald-500 flex-shrink-0" />
+                    : <AlertCircle size={16} className="text-red-500 flex-shrink-0" />}
+                  {pushStatus.message}
+                </div>
+              )}
+
+              {/* Toggle Row */}
+              <div className="flex items-center justify-between p-5 bg-gray-50 rounded-3xl border border-gray-100">
+                <div className="flex items-center gap-4">
+                  <div className={`p-3 rounded-2xl ${pushSubscribed ? 'bg-emerald-100 text-emerald-600' : 'bg-gray-200 text-gray-400'}`}>
+                    {pushSubscribed ? <Bell size={20} /> : <BellOff size={20} />}
+                  </div>
+                  <div>
+                    <p className="font-black text-[#2b3654] text-sm">
+                      {pushSubscribed ? 'Notifications Enabled' : 'Notifications Disabled'}
+                    </p>
+                    <p className="text-xs text-gray-400 mt-0.5">
+                      {pushSubscribed
+                        ? 'You will be reminded at each medication time'
+                        : 'Enable to receive medication reminders'}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Toggle Switch */}
+                <button
+                  id="push-toggle"
+                  onClick={handleTogglePush}
+                  disabled={pushLoading || pushPermission === 'denied' || pushPermission === 'unsupported'}
+                  className={`relative w-14 h-7 rounded-full transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-violet-300 disabled:opacity-40 disabled:cursor-not-allowed ${
+                    pushSubscribed ? 'bg-emerald-400' : 'bg-gray-300'
+                  }`}
+                >
+                  <span className={`absolute top-0.5 left-0.5 w-6 h-6 bg-white rounded-full shadow transition-transform duration-300 ${
+                    pushSubscribed ? 'translate-x-7' : 'translate-x-0'
+                  }`} />
+                  {pushLoading && (
+                    <Loader2 size={14} className="absolute inset-0 m-auto text-white animate-spin" />
+                  )}
+                </button>
+              </div>
+
+              {/* Test Button */}
+              {pushSubscribed && (
+                <button
+                  id="push-test-btn"
+                  onClick={handleTestNotification}
+                  disabled={testLoading}
+                  className="mt-4 w-full flex items-center justify-center gap-2 py-4 rounded-3xl border-2 border-dashed border-violet-200 text-violet-600 font-bold text-sm hover:bg-violet-50 hover:border-violet-300 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {testLoading ? <Loader2 size={16} className="animate-spin" /> : <Zap size={16} />}
+                  {testLoading ? 'Sending...' : 'Send Test Notification'}
+                </button>
+              )}
+            </div>
+
+            {/* System Preferences */}
+            <div className="bg-[#fcfdfd] border border-dashed border-gray-200 rounded-4xl p-12 text-center flex flex-col items-center justify-center group hover:border-[#3bbdbf] transition-colors cursor-pointer" onClick={() => setIsEditDialogOpen(true)}>
+               <div className="p-4 bg-white rounded-2xl shadow-sm border border-gray-100 text-gray-300 group-hover:text-[#3bbdbf] transition-colors mb-4">
+                  <Settings size={32} />
+               </div>
+               <h4 className="font-bold text-[#2b3654]">System Preferences</h4>
+               <p className="text-sm text-gray-400 max-w-xs mt-2">Adjust your medication notification windows and privacy parameters.</p>
+               <Button variant="link" className="text-[#3bbdbf] font-bold mt-4">Advanced Configuration →</Button>
+            </div>
           </div>
         </div>
       </div>
