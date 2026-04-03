@@ -27,7 +27,14 @@ import {
   Clock
 } from "lucide-react"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
-import { format } from "date-fns"
+import { format, isValid } from "date-fns"
+
+/** Safely format a date string — returns fallback if the value is null/invalid */
+const safeFormat = (value: any, fmt: string, fallback = '—'): string => {
+  if (!value) return fallback;
+  const d = new Date(value);
+  return isValid(d) ? format(d, fmt) : fallback;
+}
 
 export default function AdherencePage() {
   const router = useRouter()
@@ -184,7 +191,7 @@ export default function AdherencePage() {
                                <Calendar size={20} />
                              </div>
                              <div>
-                               <p className="text-sm font-bold text-[#2b3654] uppercase tracking-wide">Week of {format(new Date(week.week), 'MMM dd')}</p>
+                               <p className="text-sm font-bold text-[#2b3654] uppercase tracking-wide">Week of {safeFormat(week.week, 'MMM dd')}</p>
                                <div className="flex items-center gap-3 mt-1">
                                   <span className="text-xs font-medium text-gray-400">TAKEN: <span className="text-green-600 font-bold">{week.taken}</span></span>
                                   <span className="text-xs font-medium text-gray-400">MISSED: <span className="text-red-500 font-bold">{week.missed}</span></span>
