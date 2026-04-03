@@ -2,6 +2,7 @@ import { OpenAPIRegistry, OpenApiGeneratorV3 } from '@asteasolutions/zod-to-open
 import {
   LoginSchema,
   RegisterSchema,
+  AuthResponseSchema,
   CreateMedicationSchema,
   UpdateMedicationSchema,
   LogDoseSchema,
@@ -25,14 +26,15 @@ registry.registerComponent('schemas', 'NotifType',     { type: 'string', enum: N
 // ─── Schema Registration ──────────────────────────────────────────
 registry.register('Login',            LoginSchema);
 registry.register('Register',         RegisterSchema);
+registry.register('AuthResponse',     AuthResponseSchema);
 registry.register('CreateMedication', CreateMedicationSchema);
 registry.register('UpdateMedication', UpdateMedicationSchema);
 registry.register('LogDose',          LogDoseSchema);
 registry.register('LinkCaregiver',    LinkCaregiverSchema);
 
 // ─── Auth Routes ──────────────────────────────────────────────────
-registry.registerPath({ method: 'post', path: '/api/auth/login',    tags: ['Auth'], summary: 'Login',    request: { body: { content: { 'application/json': { schema: LoginSchema    } } } }, responses: { 200: { description: 'Login OK'    }, 401: { description: 'Unauthorized' } } });
-registry.registerPath({ method: 'post', path: '/api/auth/register', tags: ['Auth'], summary: 'Register', request: { body: { content: { 'application/json': { schema: RegisterSchema } } } }, responses: { 201: { description: 'Created'       }, 400: { description: 'Exists'       } } });
+registry.registerPath({ method: 'post', path: '/api/auth/login',    tags: ['Auth'], summary: 'Login',    request: { body: { content: { 'application/json': { schema: LoginSchema    } } } }, responses: { 200: { description: 'Login OK', content: { 'application/json': { schema: AuthResponseSchema } } }, 401: { description: 'Unauthorized' } } });
+registry.registerPath({ method: 'post', path: '/api/auth/register', tags: ['Auth'], summary: 'Register', request: { body: { content: { 'application/json': { schema: RegisterSchema } } } }, responses: { 201: { description: 'Created', content: { 'application/json': { schema: AuthResponseSchema } } }, 400: { description: 'Exists'       } } });
 registry.registerPath({ method: 'post', path: '/api/auth/google',   tags: ['Auth'], summary: 'Google OAuth', request: { body: { content: { 'application/json': { schema: { type: 'object', properties: { credential: { type: 'string' } } } as any } } } }, responses: { 200: { description: 'OK' } } });
 
 // ─── Medication Routes ────────────────────────────────────────────
