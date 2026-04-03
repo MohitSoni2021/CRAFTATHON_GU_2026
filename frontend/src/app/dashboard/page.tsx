@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { decryptData } from "@/lib/crypto"
 import { Button } from "@/components/ui/button"
-import { APP_NAME } from "@/constants"
+import Navbar from "@/components/Navbar"
 import { Plus_Jakarta_Sans } from "next/font/google"
 import { 
   getAdherenceScore, 
@@ -15,9 +15,6 @@ import {
 } from "@/lib/api/routes"
 import { 
   Activity, 
-  Bell, 
-  Settings, 
-  LogOut, 
   CheckCircle2, 
   AlertCircle, 
   Clock, 
@@ -25,7 +22,8 @@ import {
   ActivitySquare, 
   ShieldCheck,
   TrendingUp,
-  Loader2
+  Loader2,
+  Settings
 } from "lucide-react"
 import { format } from "date-fns"
 
@@ -85,20 +83,11 @@ export default function Dashboard() {
         setTodayDoses(prev => prev.map(log => 
           log._id === logId ? { ...log, status: 'taken', takenAt: new Date().toISOString() } : log
         ))
-        // Refresh score
         const scoreRes = await getAdherenceScore()
         if (scoreRes.success) setScore(scoreRes.data)
       }
     } catch (err) {
       console.error("Failed to mark dose:", err)
-    }
-  }
-
-  const handleLogout = () => {
-    if (typeof window !== "undefined") {
-      localStorage.removeItem("user")
-      localStorage.removeItem("token")
-      router.push("/login")
     }
   }
 
@@ -116,33 +105,7 @@ export default function Dashboard() {
   return (
     <div className={`min-h-screen bg-[#f8faff] text-[#2b3654] ${jakarta.className}`}>
       
-      {/* Navbar */}
-      <nav className="bg-white border-b border-gray-100 px-8 py-4 flex justify-between items-center sticky top-0 z-10 shadow-sm">
-        <div className="flex items-center gap-3">
-          <div className="bg-[#e6fcfa] p-2 rounded-xl text-[#3bbdbf]">
-            <Activity size={24} />
-          </div>
-          <span className="font-bold text-xl">{APP_NAME} <span className="font-medium text-gray-400">| Patient</span></span>
-        </div>
-        <div className="hidden md:flex items-center gap-6 mx-auto">
-          <Link href="/dashboard" className="text-[#3bbdbf] font-bold border-b-2 border-[#3bbdbf] pb-1">Overview</Link>
-          <Link href="/medications" className="text-gray-500 hover:text-[#3bbdbf] font-semibold transition-colors">Medicine Cabinet</Link>
-          <Link href="#" className="text-gray-500 hover:text-[#3bbdbf] font-semibold transition-colors">Reports</Link>
-        </div>
-        <div className="flex items-center gap-4">
-          <button className="p-2 text-gray-400 hover:text-[#2b3654] transition-colors relative">
-            <Bell size={20} />
-            <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></span>
-          </button>
-          <div className="flex items-center gap-3 pl-4 border-l border-gray-200">
-            <div className="text-right hidden sm:block">
-              <p className="text-sm font-bold leading-none">{user?.name}</p>
-              <p className="text-xs text-gray-500 mt-1">Status: {risk?.riskLevel?.toUpperCase() || 'CALCULATING'}</p>
-            </div>
-            <img src={`https://api.dicebear.com/7.x/initials/svg?seed=${user?.name || 'User'}`} alt="Avatar" className="w-10 h-10 rounded-full border-2 border-[#e6fcfa] object-cover" />
-          </div>
-        </div>
-      </nav>
+      <Navbar user={user} riskLevel={risk?.riskLevel} />
 
       <div className="max-w-6xl mx-auto p-6 md:p-10 space-y-8">
         
@@ -151,7 +114,7 @@ export default function Dashboard() {
           <div className="absolute right-0 top-0 w-64 h-64 bg-white opacity-5 rounded-full blur-3xl transform translate-x-1/2 -translate-y-1/2"></div>
           
           <div className="relative z-10 space-y-2 text-center md:text-left">
-            <h1 className="text-3xl md:text-4xl font-bold tracking-tight">Good morning, {user?.name?.split(' ')[0] || "User"}!</h1>
+            <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-white">Good morning, {user?.name?.split(' ')[0] || "User"}!</h1>
             <p className="text-white/80 font-medium text-lg">
               {todayDoses.filter(d => d.status === 'pending').length > 0 
                 ? `You have ${todayDoses.filter(d => d.status === 'pending').length} medications scheduled for today.`
@@ -176,7 +139,7 @@ export default function Dashboard() {
                <ActivitySquare size={24} />
              </div>
              <p className="text-gray-500 font-semibold mb-1">Adherence Score</p>
-             <h3 className="text-3xl font-bold flex items-end gap-2">
+             <h3 className="text-3xl font-bold flex items-end gap-2 text-[#2b3654]">
                {score?.score ?? '--'}% 
                {score?.trend > 0 && <span className="text-sm text-green-500 font-bold mb-1 flex items-center"><TrendingUp size={14} className="mr-1" />+{score.trend}%</span>}
              </h3>
@@ -187,19 +150,21 @@ export default function Dashboard() {
                <ShieldCheck size={24} />
              </div>
              <p className="text-gray-500 font-semibold mb-1">Risk Classification</p>
-             <h3 className={`text-2xl font-bold ${risk?.riskLevel === 'low' ? 'text-green-600' : risk?.riskLevel === 'medium' ? 'text-amber-500' : 'text-red-500'}`}>
+             <h3 className={`text-2xl font-bold ${(risk?.riskLevel === 'low' || risk?.riskLevel === 'safe') ? 'text-green-600' : risk?.riskLevel === 'medium' ? 'text-amber-500' : 'text-red-500'}`}>
                {(risk?.riskLevel || 'ANALYZING').toUpperCase()}
              </h3>
           </div>
 
-          <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
-             <div className="w-12 h-12 bg-gray-50 text-gray-500 rounded-2xl flex items-center justify-center mb-4">
-               <LogOut size={24} />
+          <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
+             <div>
+               <div className="w-12 h-12 bg-gray-50 text-gray-500 rounded-2xl flex items-center justify-center mb-4">
+                 <Settings size={24} />
+               </div>
+               <p className="text-gray-500 font-semibold mb-1">Configuration</p>
              </div>
-             <p className="text-gray-500 font-semibold mb-1">Account Options</p>
-             <div className="flex gap-2 mt-2">
-               <Button variant="outline" size="sm" className="rounded-xl border-gray-200" onClick={handleLogout}>Log Out</Button>
-               <Button variant="outline" size="sm" className="rounded-xl border-gray-200">Settings</Button>
+             <div className="flex gap-2">
+               <Button variant="outline" size="sm" className="rounded-xl border-gray-200 text-gray-700">Device Sync</Button>
+               <Button variant="outline" size="sm" className="rounded-xl border-gray-200 text-gray-700">Preferences</Button>
              </div>
           </div>
         </div>
@@ -207,7 +172,6 @@ export default function Dashboard() {
         {/* Main Dashboard Layout */}
         <div className="grid gap-8 lg:grid-cols-3">
            
-           {/* Left Column: Today's Schedule */}
            <div className="lg:col-span-2 space-y-6">
               <div className="flex items-center justify-between">
                 <h2 className="text-xl font-bold flex items-center gap-2"><CalendarDays size={20} className="text-[#3bbdbf]" /> Today's Schedule</h2>
@@ -234,7 +198,7 @@ export default function Dashboard() {
                            <Clock size={28} />}
                         </div>
                         <div>
-                          <h4 className="font-bold text-lg">{log.medicationId?.name} ({log.medicationId?.dosage}{log.medicationId?.unit})</h4>
+                          <h4 className="font-bold text-lg text-[#2b3654]">{log.medicationId?.name} ({log.medicationId?.dosage}{log.medicationId?.unit})</h4>
                           <div className="flex items-center gap-2 mt-1 text-sm font-medium text-gray-500">
                             <Clock size={14} /> 
                             {format(new Date(log.scheduledAt), 'hh:mm a')} — 
@@ -265,19 +229,18 @@ export default function Dashboard() {
               </div>
            </div>
 
-           {/* Right Column: Connection & Info */}
            <div className="space-y-6">
               <h2 className="text-xl font-bold">System Connection</h2>
               
               <div className="bg-linear-to-br from-[#1E2A4F] to-[#2b3654] rounded-3xl shadow-xl p-6 text-white">
                  <div className="flex items-center gap-3 mb-4">
                    <Activity size={20} className="text-[#3bbdbf]" />
-                   <h3 className="font-bold text-lg">Health Engine Status</h3>
+                   <h3 className="font-bold text-lg text-white">Health Engine Status</h3>
                  </div>
                  <p className="text-sm text-gray-300 leading-relaxed mb-6">
                    Your account is securely connected to the Medication Adherence Monitoring System. Data is synced in real-time.
                  </p>
-                 <div className="space-y-4">
+                 <div className="space-y-4 text-white">
                    <div className="flex items-center justify-between text-sm">
                      <span className="text-gray-400">REST API</span>
                      <span className="text-green-400 font-bold flex items-center gap-1">
@@ -302,9 +265,8 @@ export default function Dashboard() {
                  </Button>
               </div>
 
-              {/* Tips Section */}
               <div className="bg-white border border-gray-100 rounded-3xl shadow-sm p-6">
-                 <h3 className="font-bold flex items-center gap-2 mb-3">
+                 <h3 className="font-bold flex items-center gap-2 mb-3 text-[#2b3654]">
                    <AlertCircle size={18} className="text-blue-500" />
                    Adherence Tip
                  </h3>

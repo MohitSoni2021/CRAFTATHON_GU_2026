@@ -40,6 +40,7 @@ export default function LoginPage() {
       if (typeof window !== "undefined") {
         const encryptedUser = encryptData(response.user)
         localStorage.setItem("user", encryptedUser)
+        localStorage.setItem("token", response.token)
       }
       
       router.push("/dashboard")
@@ -58,6 +59,7 @@ export default function LoginPage() {
       if (typeof window !== "undefined") {
         const encryptedUser = encryptData(response.user)
         localStorage.setItem("user", encryptedUser)
+        localStorage.setItem("token", response.token)
       }
       router.push("/dashboard")
     } catch (err: any) {

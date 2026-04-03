@@ -53,6 +53,7 @@ export default function SignupPage() {
       if (typeof window !== "undefined") {
         const encryptedUser = encryptData(response.user)
         localStorage.setItem("user", encryptedUser)
+        localStorage.setItem("token", response.token)
       }
       router.push("/dashboard")
     } catch (err: any) {
