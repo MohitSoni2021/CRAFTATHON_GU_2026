@@ -45,3 +45,26 @@ export const deactivateMedication = async (id: string) => {
   const response = await api.delete(`/medications/${id}`);
   return response.data;
 };
+
+export const getAdherenceScore = async () => {
+  const response = await api.get('/adherence/score');
+  return response.data;
+};
+
+export const getRiskLevel = async () => {
+  const response = await api.get('/adherence/risk');
+  return response.data;
+};
+
+export const getTodayDoses = async () => {
+  const response = await api.get('/dose-logs/today');
+  return response.data;
+};
+
+export const markDoseAsTaken = async (id: string) => {
+  const response = await api.put(`/dose-logs/${id}`, { 
+    status: 'taken', 
+    takenAt: new Date().toISOString() 
+  });
+  return response.data;
+};
