@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { APP_NAME } from "@/constants"
 import { Plus_Jakarta_Sans } from "next/font/google"
-import { Activity } from "lucide-react"
+import { Activity, HeartPulse, Stethoscope } from "lucide-react"
 
 const jakarta = Plus_Jakarta_Sans({ subsets: ['latin'] })
 
@@ -20,6 +20,7 @@ export default function SignupPage() {
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [role, setRole] = useState("patient")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
 
@@ -29,14 +30,14 @@ export default function SignupPage() {
     setError("")
 
     try {
-      const validation = RegisterSchema.safeParse({ name, email, password })
+      const validation = RegisterSchema.safeParse({ name, email, password, role })
       if (!validation.success) {
         setError(validation.error.errors[0].message)
         setLoading(false)
         return
       }
 
-      await registerUser({ name, email, password })
+      await registerUser({ name, email, password, role })
       router.push("/login")
     } catch (err: any) {
       setError(err.response?.data?.message || "Something went wrong. Please try again.")
@@ -53,6 +54,7 @@ export default function SignupPage() {
       if (typeof window !== "undefined") {
         const encryptedUser = encryptData(response.user)
         localStorage.setItem("user", encryptedUser)
+        localStorage.setItem("token", response.token)
       }
       router.push("/dashboard")
     } catch (err: any) {
@@ -109,20 +111,44 @@ export default function SignupPage() {
               </div>
             )}
             
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <label className="text-sm font-semibold text-[#2b3654]" htmlFor="name">Full Name</label>
-                <Input
-                  id="name"
-                  placeholder="John Doe"
-                  type="text"
-                  disabled={loading}
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  required
-                  className="rounded-xl border-gray-200 focus:border-[#4a7ae6] focus:ring-[#4a7ae6] py-6"
-                />
-              </div>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-semibold text-[#2b3654]">Select Your Role</label>
+                  <div className="grid grid-cols-3 gap-3">
+                    {[
+                      { id: 'patient', label: 'Patient', icon: Activity },
+                      { id: 'caregiver', label: 'Caregiver', icon: HeartPulse },
+                      { id: 'doctor', label: 'Doctor', icon: Stethoscope }
+                    ].map((r) => (
+                      <button
+                        key={r.id}
+                        type="button"
+                        onClick={() => setRole(r.id)}
+                        className={`flex flex-col items-center justify-center p-3 rounded-xl border-2 transition-all ${
+                          role === r.id 
+                            ? 'border-[#4a7ae6] bg-[#f0f4ff] text-[#4a7ae6]' 
+                            : 'border-gray-100 bg-white text-gray-400 hover:border-gray-200'
+                        }`}
+                      >
+                        <r.icon size={20} className="mb-1" />
+                        <span className="text-[10px] font-bold uppercase tracking-wider">{r.label}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-semibold text-[#2b3654]" htmlFor="name">Full Name</label>
+                  <Input
+                    id="name"
+                    placeholder="John Doe"
+                    type="text"
+                    disabled={loading}
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    required
+                    className="rounded-xl border-gray-200 focus:border-[#4a7ae6] focus:ring-[#4a7ae6] py-6"
+                  />
+                </div>
               <div className="space-y-2">
                 <label className="text-sm font-semibold text-[#2b3654]" htmlFor="email">Email</label>
                 <Input
