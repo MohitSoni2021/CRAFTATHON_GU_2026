@@ -32,7 +32,15 @@ export default function InsightsScreen() {
       if (s.success) setScore(s.data.score);
       if (r.success) setRisk(r.data);
       if (w.success) setWeekly(w.data);
-      if (p.success) setPatterns(p.data);
+      if (p.success) {
+        if (Array.isArray(p.data)) {
+          setPatterns(p.data);
+        } else if (p.data?.patterns && Array.isArray(p.data.patterns)) {
+          setPatterns(p.data.patterns);
+        } else {
+          setPatterns([]);
+        }
+      }
     } catch (e) {
       console.error(e);
     } finally {

@@ -5,8 +5,18 @@ export const getAdherenceScoreService = async () => {
     return response.data;
 };
 
-export const getRiskLevelService = async () => {
+export const getAdherenceRiskService = async () => {
     const response = await api.get('/adherence/risk');
+    return response.data;
+};
+
+export const getAdherenceWeeklyService = async () => {
+    const response = await api.get('/adherence/weekly');
+    return response.data;
+};
+
+export const getAdherencePatternsService = async () => {
+    const response = await api.get('/adherence/patterns');
     return response.data;
 };
 
