@@ -1,37 +1,18 @@
 import { z } from "zod";
 import { extendZodWithOpenApi } from "@asteasolutions/zod-to-openapi";
-import { Role } from "./enums";
 
 extendZodWithOpenApi(z);
 
-/**
- * Schema for user login.
- */
 export const LoginSchema = z.object({
   email: z.string().email().openapi({ example: "user@example.com" }),
   password: z.string().min(6).openapi({ example: "password123" }),
 }).openapi({ description: "Login credentials" });
 
-/**
- * Schema for user registration.
- * Includes name, email, password and role.
- */
 export const RegisterSchema = z.object({
   name: z.string().min(2).openapi({ example: "John Doe" }),
   email: z.string().email().openapi({ example: "john@example.com" }),
   password: z.string().min(6).openapi({ example: "secret123" }),
-  role: z.nativeEnum(Role).default(Role.PATIENT).openapi({ example: Role.PATIENT }),
-}).openapi({ description: "User registration details" });
-
-/**
- * Schema for updating user profile.
- * All fields are optional.
- */
-export const UpdateProfileSchema = z.object({
-  name: z.string().min(2).optional().openapi({ example: "Jane Doe" }),
-  password: z.string().min(6).optional().openapi({ example: "newpassword123" }),
-}).openapi({ description: "Update profile fields" });
+}).openapi({ description: "Register details" });
 
 export type LoginInput = z.infer<typeof LoginSchema>;
 export type RegisterInput = z.infer<typeof RegisterSchema>;
-export type UpdateProfileInput = z.infer<typeof UpdateProfileSchema>;
