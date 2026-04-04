@@ -5,8 +5,8 @@ import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { decryptData } from "@/lib/crypto"
 import { Button } from "@/components/ui/button"
-import Navbar from "@/components/Navbar"
-import { Plus_Jakarta_Sans } from "next/font/google"
+import Sidebar from "@/components/Sidebar"
+import { Merriweather, Plus_Jakarta_Sans, Poppins } from "next/font/google"
 import { 
   getAdherenceScore, 
   getRiskLevel, 
@@ -24,16 +24,26 @@ import {
   ShieldCheck,
   TrendingUp,
   Loader2,
-  Settings
+  Bell,
+  HeartPulse,
+  LayoutDashboard,
+  ArrowRight,
+  User,
+  Stethoscope,
+  AlertTriangle,
+  XCircle,
+  HelpCircle
 } from "lucide-react"
 import { format } from "date-fns"
-
-const jakarta = Plus_Jakarta_Sans({ subsets: ['latin'] })
-
 import { useSocket } from "@/context/SocketContext"
+
+const merriweather = Merriweather({ weight: ['400', '700', '900'], subsets: ['latin'] });
+const jakarta = Plus_Jakarta_Sans({ subsets: ['latin'] })
+const poppins = Poppins({ weight: ['300', '400', '500', '600', '700', '800', '900'], subsets: ['latin'] });
 
 export default function Dashboard() {
   const router = useRouter()
+  const [mounted, setMounted] = useState(false)
   const [user, setUser] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [score, setScore] = useState<any>(null)
@@ -46,41 +56,32 @@ export default function Dashboard() {
   const [toastMessage, setToastMessage] = useState<string | null>(null)
 
   useEffect(() => {
-    if (socket) {
-      const handleDoctorLinked = (data: any) => {
-        console.log("Doctor linked event:", data)
-        setToastMessage(`You have been added by doctor: ${data.doctorName}`)
-        setTimeout(() => setToastMessage(null), 5000)
-        
-        // Option 1: Refetch all dashboard data, or at least doctors
-        fetchDashboardData()
-      }
-      
-      socket.on("DOCTOR_LINKED", handleDoctorLinked)
-      
-      return () => {
-        socket.off("DOCTOR_LINKED", handleDoctorLinked)
-      }
-    }
-  }, [socket])
-
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const encryptedUser = localStorage.getItem("user")
-      if (!encryptedUser) {
+    setMounted(true)
+    
+    const encryptedUser = localStorage.getItem("user")
+    if (!encryptedUser || encryptedUser === 'undefined') {
+      router.push("/login")
+    } else {
+      const decryptedUser = decryptData(encryptedUser)
+      if (!decryptedUser) {
+        localStorage.removeItem("user")
         router.push("/login")
       } else {
-        const decryptedUser = decryptData(encryptedUser)
-        if (!decryptedUser) {
-          localStorage.removeItem("user")
-          router.push("/login")
-        } else {
-          setUser(decryptedUser)
-          fetchDashboardData()
-        }
+        setUser(decryptedUser)
+        fetchDashboardData()
       }
     }
-  }, [router])
+
+    if (socket) {
+      const handleDoctorLinked = (data: any) => {
+        setToastMessage(`New care connection established with Dr. ${data.doctorName}`)
+        setTimeout(() => setToastMessage(null), 5000)
+        fetchDashboardData()
+      }
+      socket.on("DOCTOR_LINKED", handleDoctorLinked)
+      return () => { socket.off("DOCTOR_LINKED", handleDoctorLinked) }
+    }
+  }, [socket, router])
 
   const fetchDashboardData = async () => {
     try {
@@ -97,8 +98,7 @@ export default function Dashboard() {
       if (dosesRes.success) setTodayDoses(dosesRes.data)
       if (doctorsRes.success) setDoctors(doctorsRes.data)
     } catch (err: any) {
-      console.error("Dashboard fetch error:", err)
-      setError("Failed to fetch real-time data")
+      setError("Synchronizing failed. Re-trying hub connection.")
     } finally {
       setLoading(false)
     }
@@ -109,7 +109,6 @@ export default function Dashboard() {
     if (takingId === uid) return
     setTakingId(uid)
 
-    // Optimistic update — instant visual feedback
     setTodayDoses(prev => prev.map(d =>
       (d.medicationId === log.medicationId && d.scheduledTime === log.scheduledTime)
         ? { ...d, status: 'taken', takenAt: new Date().toISOString() }
@@ -124,12 +123,11 @@ export default function Dashboard() {
         status:       'taken',
       })
       if (res.success) {
-        const scoreRes = await getAdherenceScore()
-        if (scoreRes.success) setScore(scoreRes.data)
+        const [scoreS, riskS] = await Promise.all([getAdherenceScore(), getRiskLevel()])
+        if (scoreS.success) setScore(scoreS.data)
+        if (riskS.success) setRisk(riskS.data)
       }
     } catch (err) {
-      // Revert on failure
-      console.error("Failed to mark dose:", err)
       setTodayDoses(prev => prev.map(d =>
         (d.medicationId === log.medicationId && d.scheduledTime === log.scheduledTime)
           ? { ...d, status: 'pending', takenAt: null }
@@ -140,283 +138,335 @@ export default function Dashboard() {
     }
   }
 
+  // Prevent hydration mismatch by returning null during SSR or until mounted
+  if (!mounted) {
+    return null
+  }
+
   if (loading && !user) {
     return (
-      <div className={`flex h-screen items-center justify-center bg-[#f8faff] ${jakarta.className}`}>
-        <div className="flex flex-col items-center gap-4">
-          <Loader2 size={40} className="text-[#3bbdbf] animate-spin" />
-          <p className="text-[#7b8ea6] font-semibold">Synchronizing with Health Engine...</p>
+      <div className={`flex h-screen items-center justify-center bg-[#fcfdfd] ${jakarta.className}`}>
+        <div className="flex flex-col items-center gap-1">
+          <Loader2 size={42} className="text-[#008080] animate-spin" />
         </div>
       </div>
     )
   }
 
-  return (
-    <div className={`min-h-screen bg-[#f8faff] text-[#2b3654] ${jakarta.className}`}>
-      
-      <Navbar user={user} riskLevel={risk?.riskLevel} />
+  const pendingDoses = todayDoses.filter(d => d.status === 'pending').length
+  const stats = {
+      taken: todayDoses.filter(l => (l.status === 'taken' || l.status === 'completed') && !l.delayMinutes).length,
+      delayed: todayDoses.filter(l => l.delayMinutes > 0 || l.status === 'delayed').length,
+      missed: todayDoses.filter(l => l.status === 'missed').length
+  }
 
-      <div className="w-full mx-auto p-6 md:p-10 space-y-8">
+  return (
+    <div className={`min-h-screen bg-[#fcfdfd] text-[#1a2233] flex ${poppins.className}`}>
+      
+      {/* Fixed Sidebar */}
+      <Sidebar user={user} riskLevel={risk?.riskLevel} />
+
+      {/* Main Dashboard Canvas */}
+      <main className="ml-72 flex-1 p-10 max-w-[1400px] w-full">
         
-        {/* Welcome Banner */}
-        <div className="bg-linear-to-r from-[#2b7a8c] to-[#3bbdbf] rounded-3xl p-8 md:p-10 text-white shadow-xl flex flex-col md:flex-row justify-between items-center overflow-hidden relative">
-          <div className="absolute right-0 top-0 w-64 h-64 bg-white opacity-5 rounded-full blur-3xl transform translate-x-1/2 -translate-y-1/2"></div>
-          
-          <div className="relative z-10 space-y-2 text-center md:text-left">
-            <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-white">Good morning, {user?.name?.split(' ')[0] || "User"}!</h1>
-            <p className="text-white/80 font-medium text-lg">
-              {todayDoses.filter(d => d.status === 'pending').length > 0 
-                ? `You have ${todayDoses.filter(d => d.status === 'pending').length} medications scheduled for today.`
-                : "You're all caught up with your medications today!"}
+        {/* Header Title Section */}
+        <div className="flex flex-col md:flex-row justify-between items-start mb-10 gap-6">
+          <div>
+            <h1 className={`${merriweather.className} text-4xl font-black text-[#008080] mb-2`}>
+               Care Context
+            </h1>
+            <p className="text-gray-500 font-bold uppercase text-[11px] tracking-[3px]">
+               Real-time Monitoring & Adherence Analytics
             </p>
           </div>
-          
-          <div className="relative z-10 mt-6 md:mt-0 flex gap-3">
-             <Link href="/medications">
-               <Button className="bg-white text-[#2b7a8c] hover:bg-gray-50 rounded-full px-6 font-bold shadow-lg">
-                 Manage My Cabinet
-               </Button>
+          <div className="flex items-center gap-4">
+             <div className="bg-white p-3.5 rounded-2xl shadow-sm border border-gray-50 relative group cursor-pointer hover:bg-gray-50 transition-all">
+                <Bell size={20} className="text-gray-300 group-hover:text-[#008080]" />
+                <div className="absolute top-3.5 right-3.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white animate-pulse"></div>
+             </div>
+             <Link href="/profile">
+               <button className="bg-[#1a2233] text-white px-8 py-4 rounded-[1.5rem] font-bold text-xs uppercase tracking-widest flex items-center gap-2 shadow-xl shadow-[#1a2233]/15 hover:scale-[1.03] active:scale-95 transition-all">
+                  <User size={18} className="text-[#008080]" />
+                  IDENTITY HUB
+               </button>
              </Link>
           </div>
         </div>
 
-        {/* Quick Stats Grid */}
-        <div className="grid gap-6 md:grid-cols-3">
-          
-          <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
-             <div className="w-12 h-12 bg-[#f0f4ff] text-[#4a7ae6] rounded-2xl flex items-center justify-center mb-4">
-               <ActivitySquare size={24} />
-             </div>
-             <p className="text-gray-500 font-semibold mb-1">Adherence Score</p>
-             <h3 className="text-3xl font-bold flex items-end gap-2 text-[#2b3654]">
-               {score?.score ?? '--'}% 
-               {score?.trend > 0 && <span className="text-sm text-green-500 font-bold mb-1 flex items-center"><TrendingUp size={14} className="mr-1" />+{score.trend}%</span>}
-             </h3>
-          </div>
-
-          <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
-             <div className="w-12 h-12 bg-[#e6fcfa] text-[#3bbdbf] rounded-2xl flex items-center justify-center mb-4">
-               <ShieldCheck size={24} />
-             </div>
-             <p className="text-gray-500 font-semibold mb-1">Risk Classification</p>
-             <h3 className={`text-2xl font-bold ${(risk?.riskLevel === 'low' || risk?.riskLevel === 'safe') ? 'text-green-600' : risk?.riskLevel === 'medium' ? 'text-amber-500' : 'text-red-500'}`}>
-               {(risk?.riskLevel || 'ANALYZING').toUpperCase()}
-             </h3>
-          </div>
-
-          <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
-             <div>
-               <div className="w-12 h-12 bg-gray-50 text-gray-500 rounded-2xl flex items-center justify-center mb-4">
-                 <Settings size={24} />
-               </div>
-               <p className="text-gray-500 font-semibold mb-1">Configuration</p>
-             </div>
-             <div className="flex gap-2">
-               <Button variant="outline" size="sm" className="rounded-xl border-gray-200 text-gray-700">Device Sync</Button>
-               <Button variant="outline" size="sm" className="rounded-xl border-gray-200 text-gray-700">Preferences</Button>
-             </div>
-          </div>
-        </div>
-
-        {/* Main Dashboard Layout */}
-        <div className="grid gap-8 lg:grid-cols-3">
-           
-           <div className="lg:col-span-2 space-y-6">
-              <div className="flex items-center justify-between">
-                <h2 className="text-xl font-bold flex items-center gap-2"><CalendarDays size={20} className="text-[#3bbdbf]" /> Today's Schedule</h2>
-                <div className="flex items-center gap-2">
-                  <Link href="/today">
-                    <Button variant="ghost" className="text-[#3bbdbf] font-bold hover:bg-[#e6fcfa] rounded-xl transition-colors">Full View</Button>
-                  </Link>
-                  <Link href="/history">
-                    <Button variant="ghost" className="text-gray-400 font-bold hover:bg-gray-50 rounded-xl transition-colors">History</Button>
-                  </Link>
+        {/* Actionable Insights Bar */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
+            <div className="bg-white p-8 rounded-[2.5rem] border border-gray-50 shadow-sm flex flex-col justify-between">
+                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4">Adherence Core</p>
+                <div className="flex items-end justify-between">
+                    <h3 className="text-4xl font-black text-[#008080]">{score?.score ?? '--'}%</h3>
+                    <TrendingUp className="text-green-500 mb-1" size={24} />
                 </div>
+            </div>
+            <div className="bg-white p-8 rounded-[2.5rem] border border-gray-50 shadow-sm flex flex-col justify-between border-l-8 border-emerald-500">
+                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4">Successful Logs</p>
+                <div className="flex items-end justify-between">
+                    <h3 className="text-4xl font-black text-[#1a2233]">{stats.taken}</h3>
+                    <CheckCircle2 className="text-emerald-500 mb-1" size={24} />
+                </div>
+            </div>
+            <div className="bg-white p-8 rounded-[2.5rem] border border-gray-50 shadow-sm flex flex-col justify-between border-l-8 border-amber-500">
+                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4">Delayed Doses</p>
+                <div className="flex items-end justify-between">
+                    <h3 className="text-4xl font-black text-[#1a2233] text-amber-600">{stats.delayed}</h3>
+                    <AlertTriangle className="text-amber-500 mb-1" size={24} />
+                </div>
+            </div>
+            <div className="bg-white p-8 rounded-[2.5rem] border border-gray-50 shadow-sm flex flex-col justify-between border-l-8 border-red-500">
+                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4">Critical Misses</p>
+                <div className="flex items-end justify-between">
+                    <h3 className="text-4xl font-black text-red-500">{stats.missed}</h3>
+                    <XCircle className="text-red-500 mb-1" size={24} />
+                </div>
+            </div>
+        </div>
+
+        {/* Dashboard Grid */}
+        <div className="grid grid-cols-12 gap-10">
+           
+           {/* Left Col: Core Stats & Today's Plan */}
+           <div className="col-span-12 xl:col-span-8 space-y-10">
+              
+              {/* Welcome Card & Clinical Context */}
+              <div className="bg-[#008080] p-10 rounded-[3.5rem] text-white relative overflow-hidden shadow-2xl">
+                 <div className="absolute right-0 top-0 w-96 h-96 bg-white/5 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2"></div>
+                 <div className="relative z-10">
+                    <div className="bg-white/10 backdrop-blur-md px-5 py-2 rounded-full inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[2px] mb-8 border border-white/10">
+                       <ShieldCheck size={16} className="text-[#3bbdbf] animate-pulse" />
+                       Therapeutic Protocol: Standard Monitoring
+                    </div>
+                    <h2 className={`${merriweather.className} text-4xl font-bold mb-6 leading-tight`}>
+                       Hello, {user?.name?.split(' ')[0] || user?.email?.split('@')[0]}. <br />
+                       <span className="text-white/60 text-2xl">Dashboard synchronized.</span>
+                    </h2>
+                    <p className="text-white/80 text-lg max-w-2xl leading-relaxed mb-10 font-medium opacity-90">
+                       {pendingDoses > 0 
+                         ? `Our system identifies ${pendingDoses} critical intakes requiring your action today. Timely synchronization is essential for clinical accuracy.` 
+                         : "All scheduled intakes for this session have been logged. System stability: Optimal."}
+                    </p>
+                    <div className="flex gap-6">
+                       <Link href="/medications">
+                          <button className="bg-white text-[#008080] px-10 py-5 rounded-[1.5rem] font-black shadow-xl flex items-center gap-3 hover:scale-105 active:scale-95 transition-all text-xs uppercase tracking-widest group">
+                             MANAGE CABINET 
+                             <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+                          </button>
+                       </Link>
+                       <Link href="/history">
+                          <button className="bg-black/10 backdrop-blur-sm border border-white/20 text-white px-10 py-5 rounded-[1.5rem] font-black flex items-center gap-3 hover:bg-white/10 transition-all text-xs uppercase tracking-widest">
+                             FULL HISTORY
+                          </button>
+                       </Link>
+                    </div>
+                 </div>
               </div>
 
-              <div className="bg-white border border-gray-100 rounded-3xl shadow-sm overflow-hidden min-h-[200px]">
-                {todayDoses.length === 0 ? (
-                  <div className="p-12 text-center flex flex-col items-center justify-center">
-                    <CheckCircle2 size={40} className="text-gray-200 mb-4" />
-                    <p className="text-gray-400 font-medium">No medications scheduled for today.</p>
-                    <Link href="/medications" className="text-[#3bbdbf] text-sm font-bold mt-2 hover:underline">Add medications to your cabinet</Link>
-                  </div>
-                ) : (
-                  todayDoses.map((log) => {
-                    const uid = `${log.medicationId}_${log.scheduledTime}`
-                    const isTaken  = log.status === 'taken' || log.status === 'delayed'
-                    const isMissed = log.status === 'missed'
-                    const isLoading = takingId === uid
+              {/* Today's Intake Table */}
+              <div className="bg-white rounded-[3.5rem] border border-gray-100 shadow-sm overflow-hidden p-2">
+                 <div className="px-10 py-8 flex justify-between items-center">
+                    <div>
+                        <h3 className={`${merriweather.className} text-2xl font-bold flex items-center gap-3 text-[#1a2233]`}>
+                           <Clock size={24} className="text-[#008080]" />
+                           Intake Schedule
+                        </h3>
+                        <p className="text-[10px] font-black text-gray-300 uppercase tracking-widest mt-1">Pending & Historical Events for Today</p>
+                    </div>
+                    <div className="flex gap-2">
+                        <span className="text-[10px] font-black bg-gray-50 text-gray-400 px-4 py-2 rounded-full uppercase tracking-widest border border-gray-100">
+                           {format(new Date(), 'EEEE, dd MMM')}
+                        </span>
+                    </div>
+                 </div>
 
-                    return (
-                      <div
-                        key={log.id ?? uid}
-                        className={`p-5 border-b border-gray-50 flex items-center justify-between transition-all duration-300
-                          ${isTaken  ? 'bg-emerald-50/40' : ''}
-                          ${isMissed ? 'bg-red-50/30 opacity-75' : ''}
-                          ${!isTaken && !isMissed ? 'hover:bg-gray-50/80' : ''}
-                        `}
-                      >
-                        {/* Left: checkbox + info */}
-                        <div className="flex items-center gap-4">
-                          {/* Circular checkbox button */}
-                          <button
-                            id={`dash-dose-${log.medicationId}-${encodeURIComponent(log.scheduledTime)}`}
-                            onClick={() => !isTaken && !isMissed && handleMarkTaken(log)}
-                            disabled={isTaken || isMissed || isLoading}
-                            className={`relative w-11 h-11 rounded-full border-2 flex shrink-0 items-center justify-center transition-all duration-200
-                              ${isTaken  ? 'bg-emerald-500 border-emerald-500 shadow-md shadow-emerald-200 cursor-default' : ''}
-                              ${isMissed ? 'bg-red-100 border-red-300 cursor-default' : ''}
-                              ${!isTaken && !isMissed ? 'border-gray-300 hover:border-[#3bbdbf] hover:shadow-[0_0_0_4px_rgba(59,189,191,0.12)] cursor-pointer active:scale-90' : ''}
-                              ${isLoading ? 'opacity-60' : ''}
-                            `}
-                          >
-                            {isLoading ? (
-                              <Loader2 size={16} className="animate-spin text-[#3bbdbf]" />
-                            ) : isTaken ? (
-                              <CheckCircle2 size={20} className="text-white" />
-                            ) : isMissed ? (
-                              <AlertCircle size={18} className="text-red-400" />
-                            ) : (
-                              <span className="w-4 h-4 rounded-full border-2 border-gray-300" />
-                            )}
-                          </button>
-
-                          {/* Medication info */}
-                          <div>
-                            <h4 className={`font-bold text-base text-[#2b3654] transition-all
-                              ${isTaken ? 'line-through decoration-emerald-400 opacity-60' : ''}`}>
-                              {log.medicationName}
-                              <span className="font-medium text-sm text-gray-400 ml-1.5 no-underline" style={{textDecoration:'none'}}>
-                                {log.dosage}
-                              </span>
-                            </h4>
-                            <div className="flex items-center gap-2 mt-0.5 text-xs font-medium">
-                              <Clock size={11} className="text-gray-400" />
-                              <span className="text-gray-400">{format(new Date(log.scheduledTime), 'h:mm a')}</span>
-                              <span className="text-gray-200">—</span>
-                              <span className={
-                                isTaken  ? 'text-emerald-500 font-semibold' :
-                                isMissed ? 'text-red-400 font-semibold' :
-                                'text-[#4a7ae6] font-semibold'
-                              }>
-                                {isTaken && log.takenAt
-                                  ? `Taken at ${format(new Date(log.takenAt), 'h:mm a')}`
-                                  : log.status.charAt(0).toUpperCase() + log.status.slice(1)}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Right: action or badge */}
-                        {!isTaken && !isMissed && (
-                          <button
-                            onClick={() => handleMarkTaken(log)}
-                            disabled={isLoading}
-                            className="text-xs font-bold bg-[#4a7ae6] hover:bg-[#3965ca] text-white px-4 py-2 rounded-xl shadow-sm transition-all active:scale-95 disabled:opacity-50"
-                          >
-                            {isLoading ? 'Saving…' : 'Mark Taken'}
-                          </button>
-                        )}
-                        {isTaken && (
-                          <span className="text-xs font-bold bg-emerald-50 text-emerald-600 px-3 py-1.5 rounded-full border border-emerald-100 shrink-0">
-                            ✓ Done
-                          </span>
-                        )}
-                        {isMissed && (
-                          <span className="text-xs font-bold bg-red-50 text-red-500 px-3 py-1.5 rounded-full border border-red-100 shrink-0">
-                            Missed
-                          </span>
-                        )}
+                 <div className="min-h-[300px]">
+                    {todayDoses.length === 0 ? (
+                      <div className="py-32 text-center flex flex-col items-center">
+                         <div className="w-20 h-20 bg-gray-50 rounded-[2.5rem] flex items-center justify-center mb-6 text-gray-200">
+                           <Activity size={40} />
+                         </div>
+                         <h4 className={`${merriweather.className} text-xl font-bold text-[#1a2233] mb-2`}>No Daily Regimen</h4>
+                         <p className="text-gray-400 font-bold text-sm max-w-sm mb-10">Zero medications are currently scheduled for this node today.</p>
+                         <Link href="/medications">
+                            <button className="bg-[#008080] text-white px-10 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl shadow-[#008080]/15">Register Regimen</button>
+                         </Link>
                       </div>
-                    )
-                  })
-                )}
+                    ) : (
+                      <div className="divide-y divide-gray-50">
+                        {todayDoses.map((log) => {
+                          const uid = `${log.medicationId}_${log.scheduledTime}`
+                          const isTaken  = (log.status === 'taken' || log.status === 'completed' || log.status === 'delayed')
+                          const isMissed = log.status === 'missed'
+                          const isDelayed = log.delayMinutes > 0 || log.status === 'delayed'
+                          const isLoading = takingId === uid
+
+                          return (
+                            <div key={uid} className={`group flex items-center justify-between p-8 hover:bg-gray-50/30 transition-all duration-300 ${isTaken ? 'opacity-60' : ''}`}>
+                               <div className="flex items-center gap-8">
+                                  <button
+                                    onClick={() => !isTaken && !isMissed && handleMarkTaken(log)}
+                                    disabled={isTaken || isMissed || isLoading}
+                                    className={`w-16 h-16 rounded-[1.75rem] border-2 flex items-center justify-center transition-all duration-500 ${
+                                       isTaken ? 'bg-[#008080] border-[#008080] text-white shadow-xl shadow-[#008080]/20' :
+                                       isMissed ? 'bg-red-50 border-red-100 text-red-500' :
+                                       'bg-white border-gray-100 text-[#008080]/10 hover:border-[#008080] group-hover:scale-105 group-hover:shadow-lg'
+                                    }`}
+                                  >
+                                    {isLoading ? <Loader2 size={18} className="animate-spin text-[#008080]" /> : 
+                                     isTaken ? <CheckCircle2 size={32} /> : 
+                                     isMissed ? <XCircle size={32} /> :
+                                     <Activity size={32} className="group-hover:text-[#008080] transition-colors" />}
+                                  </button>
+                                  
+                                  <div className="space-y-1.5">
+                                     <h4 className={`text-xl font-extrabold tracking-tight ${isTaken ? 'text-gray-400' : 'text-[#1a2233]'}`}>
+                                        {log.medicationName}
+                                        <span className="ml-3 py-1 px-3 bg-gray-100 text-gray-500 text-[10px] font-black rounded-xl uppercase border border-gray-100">
+                                          {log.dosage}
+                                        </span>
+                                     </h4>
+                                     <div className="flex flex-wrap items-center gap-6">
+                                        <div className="flex items-center gap-2 text-[11px] font-bold text-gray-400 uppercase tracking-tighter">
+                                           <Clock size={14} className="text-[#008080]" />
+                                           Scheduled {format(new Date(log.scheduledTime), 'hh:mm a')}
+                                        </div>
+                                        <div className={`text-[10px] font-black uppercase tracking-[2px] px-3 py-1 rounded-lg border ${
+                                           isTaken && !isDelayed ? 'bg-emerald-50 text-emerald-600 border-emerald-100' :
+                                           isDelayed ? 'bg-amber-50 text-amber-600 border-amber-100' :
+                                           isMissed ? 'bg-red-50 text-red-600 border-red-100' : 'bg-gray-50 text-gray-400'
+                                        }`}>
+                                           {isDelayed ? 'DELAYED' : log.status}
+                                        </div>
+                                     </div>
+                                  </div>
+                               </div>
+
+                               <div className="flex items-center gap-8">
+                                  {!isTaken && !isMissed ? (
+                                     <button 
+                                       onClick={() => handleMarkTaken(log)}
+                                       disabled={isLoading}
+                                       className="bg-[#008080] text-white px-8 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl shadow-[#008080]/15 hover:scale-105 active:scale-95 transition-all"
+                                     >
+                                        Log Dose
+                                     </button>
+                                  ) : (
+                                     <div className="text-right border-l pl-8 border-gray-50">
+                                        <p className="text-[10px] font-black text-gray-300 uppercase tracking-widest mb-1">Audit Log</p>
+                                        <p className={`text-xs font-black uppercase tracking-tight ${isTaken ? 'text-[#008080]' : 'text-red-500'}`}>
+                                           {isTaken ? `Intake @ ${format(new Date(log.takenAt || new Date()), 'hh:mm a')}` : 'Missed Event'}
+                                        </p>
+                                        {isDelayed && log.delayMinutes > 0 && <p className="text-[10px] font-bold text-amber-500 mt-0.5">{log.delayMinutes}m Clinical Delay</p>}
+                                     </div>
+                                  )}
+                               </div>
+                            </div>
+                          )
+                        })}
+                      </div>
+                    )}
+                 </div>
               </div>
            </div>
 
-           <div className="space-y-6">
-              <h2 className="text-xl font-bold">System Connection</h2>
+           {/* Right Col: Health Stats & Care Connections */}
+           <div className="col-span-12 xl:col-span-4 space-y-10">
               
-              <div className="bg-linear-to-br from-[#1E2A4F] to-[#2b3654] rounded-3xl shadow-xl p-6 text-white">
-                 <div className="flex items-center gap-3 mb-4">
-                   <Activity size={20} className="text-[#3bbdbf]" />
-                   <h3 className="font-bold text-lg text-white">Health Engine Status</h3>
+              {/* Clinical Assessment Card */}
+              <div className="bg-white p-10 rounded-[3.5rem] border border-gray-100 shadow-sm relative group overflow-hidden">
+                 <div className="absolute top-0 right-0 p-10 translate-x-1/2 -translate-y-1/2 opacity-5 group-hover:opacity-10 transition-transform duration-700">
+                    <ShieldCheck size={160} className="text-[#008080]" />
                  </div>
-                 <p className="text-sm text-gray-300 leading-relaxed mb-6">
-                   Your account is securely connected to the Medication Adherence Monitoring System. Data is synced in real-time.
-                 </p>
-                 <div className="space-y-4 text-white">
-                   <div className="flex items-center justify-between text-sm">
-                     <span className="text-gray-400">WebSocket</span>
-                     <span className={`${isConnected ? 'text-green-400' : 'text-red-400'} font-bold flex items-center gap-1`}>
-                       <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-400' : 'bg-red-400 blink'}`}></div> {isConnected ? 'Real-time Active' : 'Connecting...'}
-                     </span>
-                   </div>
-                   <div className="flex items-center justify-between text-sm">
-                     <span className="text-gray-400">Encryption</span>
-                     <span className="text-green-400 font-bold flex items-center gap-1">
-                       <div className="w-2 h-2 rounded-full bg-green-400"></div> AES-256
-                     </span>
-                   </div>
-                   <div className="flex items-center justify-between text-sm">
-                     <span className="text-gray-400">Adherence Hub</span>
-                     <span className="text-green-400 font-bold flex items-center gap-1">
-                       <div className="w-2 h-2 rounded-full bg-green-400"></div> Active
-                     </span>
-                   </div>
-                 </div>
-                 <Button variant="ghost" className="w-full mt-6 text-xs text-gray-400 hover:text-white hover:bg-white/5 font-bold rounded-xl border border-white/10">
-                   Sync Diagnostics
-                 </Button>
-              </div>
-
-              <div className="bg-white border border-gray-100 rounded-3xl shadow-sm p-6">
-                 <h3 className="font-bold flex items-center gap-2 mb-3 text-[#2b3654]">
-                   <AlertCircle size={18} className="text-blue-500" />
-                   Adherence Tip
+                 <h3 className={`${merriweather.className} text-2xl font-bold mb-10 text-[#1a2233] flex items-center gap-3`}>
+                    <div className="w-1.5 h-8 bg-[#008080] rounded-full"></div>
+                    Adherence Score
                  </h3>
-                 <p className="text-sm text-gray-500 leading-relaxed">
-                   Taking your medications at the same time every day helps maintain a consistent level of the drug in your body.
-                 </p>
-              </div>
-
-              {/* Care Team Section (Doctors) */}
-              <div className="bg-white border border-gray-100 rounded-3xl shadow-sm p-6">
-                 <h3 className="font-bold flex items-center gap-2 mb-4 text-[#2b3654]">
-                   <ShieldCheck size={18} className="text-emerald-500" />
-                   Your Care Team
-                 </h3>
-                 {doctors.length === 0 ? (
-                   <p className="text-sm text-gray-400">No doctors linked yet.</p>
-                 ) : (
-                   <div className="space-y-3">
-                     {doctors.map((doc) => (
-                       <div key={doc._id} className="flex flex-col gap-1 p-3 rounded-xl bg-gray-50 border border-gray-100">
-                         <div className="flex justify-between items-start">
-                           <div>
-                             <h4 className="font-semibold text-sm text-[#2b3654]">Dr. {doc.name}</h4>
-                             <p className="text-xs text-gray-500">{doc.specialization || "General Physician"}</p>
-                           </div>
-                           <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${doc.status === 'ACTIVE' ? 'bg-emerald-100 text-emerald-600' : 'bg-gray-200 text-gray-500'}`}>
-                             {doc.status}
-                           </span>
-                         </div>
-                         <p className="text-xs text-gray-400 mt-1">{doc.email}</p>
+                 
+                 <div className="space-y-10">
+                    <div className="flex flex-col items-center justify-center relative py-4">
+                       <div className="w-56 h-56 rounded-full border-[12px] border-gray-50 flex flex-col items-center justify-center relative overflow-hidden group/chart">
+                          <div 
+                             className="absolute inset-0 bg-[#008080]/5 transition-all duration-1000" 
+                             style={{ clipPath: `inset(${100 - (score?.score ?? 0)}% 0 0 0)` }}
+                          ></div>
+                          <span className="text-6xl font-black text-[#1a2233] relative z-10">{score?.score ?? '--'}</span>
+                          <span className="text-[11px] font-black text-gray-400 uppercase tracking-widest relative z-10 mt-1">COMPLIANCE</span>
                        </div>
-                     ))}
-                   </div>
-                 )}
+                       
+                       <div className="mt-8 flex items-center gap-3 bg-emerald-50 px-6 py-3 rounded-full border border-emerald-100 shadow-sm">
+                          <TrendingUp size={20} className="text-emerald-500" />
+                          <span className="text-xs font-black text-emerald-600 uppercase tracking-widest">{score?.trend ?? 0}% Clinical Trend</span>
+                       </div>
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-6 pt-4">
+                       <div className="bg-gray-50 p-6 rounded-[2rem] border border-gray-100">
+                          <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 flex items-center gap-2">
+                             Risk Hub <div className="w-1.5 h-1.5 rounded-full bg-[#008080]"></div>
+                          </p>
+                          <p className={`text-sm font-black uppercase tracking-tight ${risk?.riskLevel?.toLowerCase() === 'high' ? 'text-red-500' : 'text-[#008080]'}`}>
+                             {risk?.riskLevel || 'SECURE'}
+                          </p>
+                       </div>
+                       <div className="bg-gray-50 p-6 rounded-[2rem] border border-gray-100">
+                          <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Streak</p>
+                          <p className="text-sm font-black uppercase text-[#1a2233] tracking-tight">
+                             {score?.streak || 0} DAY CYCLE
+                          </p>
+                       </div>
+                    </div>
+                 </div>
               </div>
+
+              {/* Verified Clinicians Node */}
+              <div className="bg-white p-10 rounded-[3.5rem] border border-gray-100 shadow-sm">
+                 <div className="flex justify-between items-center mb-8">
+                    <div>
+                        <h3 className={`${merriweather.className} text-2xl font-bold text-[#1a2233]`}>Care Network</h3>
+                        <p className="text-[10px] font-black text-gray-300 uppercase tracking-widest mt-1">Authorized Medical Nodes</p>
+                    </div>
+                 </div>
+                 
+                 <div className="space-y-6">
+                    {doctors.length === 0 ? (
+                      <div className="p-10 text-center bg-gray-50 rounded-[2.5rem] border border-dashed border-gray-200">
+                         <HelpCircle size={32} className="mx-auto text-gray-200 mb-4" />
+                         <p className="text-xs font-black text-gray-400 uppercase tracking-[2px]">Clinical isolation</p>
+                         <button className="text-[10px] font-black text-[#008080] mt-4 uppercase tracking-widest hover:underline">Link Primary Physician</button>
+                      </div>
+                    ) : (
+                      doctors.map((doc) => (
+                        <div key={doc._id} className="group flex items-center gap-6 p-5 rounded-[2.25rem] bg-gray-50 border border-transparent hover:border-[#008080]/10 hover:bg-white hover:shadow-xl transition-all duration-500 cursor-pointer">
+                           <div className="w-16 h-16 rounded-[1.5rem] bg-white shadow-sm flex items-center justify-center text-[#008080] group-hover:bg-[#008080] group-hover:text-white transition-all">
+                             <Stethoscope size={28} />
+                           </div>
+                           <div className="flex-1">
+                              <h4 className="text-base font-black text-[#1a2233]">Dr. {doc.name}</h4>
+                              <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-0.5">{doc.specialization || "Clinical Hub Supervisor"}</p>
+                           </div>
+                           <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_12px_rgba(16,185,129,0.5)]"></div>
+                        </div>
+                      ))
+                    )}
+                 </div>
+              </div>
+
            </div>
         </div>
-      </div>
-      
-      {/* Toast Notification */}
+      </main>
+
+      {/* Persistence Notifications */}
       {toastMessage && (
-        <div className="fixed bottom-6 right-6 bg-[#2b3654] text-white px-6 py-4 rounded-xl shadow-2xl z-50 flex items-center gap-3 animate-in slide-in-from-bottom-5">
-          <CheckCircle2 size={24} className="text-[#3bbdbf]" />
-          <p className="font-medium">{toastMessage}</p>
+        <div className="fixed bottom-12 right-12 bg-[#1a2233] text-white px-10 py-6 rounded-[2.5rem] shadow-3xl z-[100] flex items-center gap-6 animate-in slide-in-from-bottom-12 duration-700">
+          <div className="w-14 h-14 bg-[#008080] rounded-2xl flex items-center justify-center shadow-lg shadow-[#008080]/20">
+            <ShieldCheck size={28} className="text-white" />
+          </div>
+          <div>
+            <p className="text-[10px] font-black uppercase tracking-[3px] text-[#008080] mb-1">Security Alert</p>
+            <p className="font-black text-base">{toastMessage}</p>
+          </div>
         </div>
       )}
     </div>

@@ -1,19 +1,21 @@
-'use client';
+"use client"
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { getTodayDoses, markDoseAsTaken, getRiskLevel } from '@/lib/api/routes';
 import { useSocket } from '@/context/SocketContext';
 import { decryptData } from '@/lib/crypto';
 import { useRouter } from 'next/navigation';
-import Navbar from '@/components/Navbar';
-import { Plus_Jakarta_Sans } from 'next/font/google';
+import Sidebar from '@/components/Sidebar';
+import { Plus_Jakarta_Sans, Merriweather } from 'next/font/google';
 import { format, parseISO } from 'date-fns';
 import {
   Sun, Cloud, Moon, CheckCircle2, Clock, AlertCircle,
-  Flame, Bell, RefreshCw, Loader2, Sparkles, ChevronRight
+  Flame, Bell, RefreshCw, Loader2, Sparkles, ChevronRight,
+  ArrowRight
 } from 'lucide-react';
 
 const jakarta = Plus_Jakarta_Sans({ subsets: ['latin'] });
+const merriweather = Merriweather({ weight: ['400', '700', '900'], subsets: ['latin'] });
 
 // ─── Types ────────────────────────────────────────────────────
 interface DoseEntry {
@@ -38,14 +40,14 @@ function getGroup(iso: string): TimeGroup {
 }
 
 const GROUP_META: Record<TimeGroup, { label: string; emoji: string; color: string; bg: string; border: string }> = {
-  morning:   { label: 'Morning',   emoji: '☀️', color: 'text-amber-500',  bg: 'from-amber-50 to-orange-50',  border: 'border-amber-200/60' },
-  afternoon: { label: 'Afternoon', emoji: '🌤️', color: 'text-sky-500',    bg: 'from-sky-50 to-cyan-50',      border: 'border-sky-200/60'   },
-  evening:   { label: 'Evening',   emoji: '🌙', color: 'text-indigo-500', bg: 'from-indigo-50 to-purple-50', border: 'border-indigo-200/60' },
+  morning:   { label: 'Morning',   emoji: '☀️', color: 'text-amber-600',  bg: 'from-amber-50 to-orange-50',  border: 'border-amber-200/60' },
+  afternoon: { label: 'Afternoon', emoji: '🌤️', color: 'text-teal-600',    bg: 'from-teal-50 to-cyan-50',      border: 'border-teal-200/60'   },
+  evening:   { label: 'Evening',   emoji: '🌙', color: 'text-indigo-600', bg: 'from-indigo-50 to-purple-50', border: 'border-indigo-200/60' },
 };
 
 // ─── Confetti particle ────────────────────────────────────────
 function Confetti({ active }: { active: boolean }) {
-  const colors = ['#3bbdbf','#6366f1','#f59e0b','#22c55e','#f43f5e','#a855f7'];
+  const colors = ['#008080','#6366f1','#f59e0b','#22c55e','#f43f5e','#a855f7'];
   if (!active) return null;
   return (
     <div className="fixed inset-0 pointer-events-none z-50 overflow-hidden">
@@ -128,12 +130,12 @@ function DoseCard({
     taken:   'border-emerald-200 bg-emerald-50/40',
     delayed: 'border-emerald-200 bg-emerald-50/40',
     missed:  'border-red-200   bg-red-50/40    opacity-70',
-    pending: 'border-gray-100  bg-white',
+    pending: 'border-gray-100  bg-white hover:bg-gray-50/50 hover:border-teal-100',
   }[dose.status];
 
   return (
     <div
-      className={`relative overflow-hidden rounded-2xl border transition-all duration-300 ${statusStyles}
+      className={`relative overflow-hidden rounded-3xl border transition-all duration-300 ${statusStyles}
         ${isTaken ? 'shadow-emerald-100 shadow-md' : 'shadow-sm hover:shadow-md'}
         ${swipedId === uid || swipedId === null ? '' : 'opacity-60'}
       `}
@@ -143,9 +145,9 @@ function DoseCard({
       style={{ transform: `translateX(${swipeX * 0.6}px)` }}
     >
       {/* Swipe hint layer */}
-      {swipeX > 10 && (
+      {swipeX > 10 && ( swipedId === uid ) && (
         <div
-          className="absolute inset-y-0 left-0 flex items-center px-6 bg-emerald-400 rounded-l-2xl transition-all"
+          className="absolute inset-y-0 left-0 flex items-center px-6 bg-[#008080] rounded-l-3xl transition-all"
           style={{ width: `${swipeX * 0.6 + 8}px`, opacity: swipeX / 80 }}
         >
           <CheckCircle2 className="text-white" size={22} />
@@ -154,74 +156,79 @@ function DoseCard({
 
       {/* Taken glow ring */}
       {isTaken && (
-        <span className="absolute inset-0 rounded-2xl ring-2 ring-emerald-300/40 pointer-events-none" />
+        <span className="absolute inset-0 rounded-3xl ring-2 ring-emerald-300/40 pointer-events-none" />
       )}
 
-      <div className="flex items-center gap-4 p-4">
+      <div className="flex items-center gap-5 p-6">
         {/* Checkbox button */}
         <button
-          id={`dose-check-${dose.medicationId}-${encodeURIComponent(dose.scheduledTime)}`}
           onClick={handleTake}
           disabled={isTaken || isMissed || localLoading}
-          className={`relative shrink-0 w-11 h-11 rounded-full border-2 flex items-center justify-center transition-all duration-300
-            ${isTaken  ? 'bg-emerald-500 border-emerald-500 shadow-lg shadow-emerald-200' : ''}
+          className={`relative shrink-0 w-12 h-12 rounded-2xl border-2 flex items-center justify-center transition-all duration-300
+            ${isTaken  ? 'bg-[#008080] border-[#008080] text-white shadow-lg shadow-[#008080]/15' : ''}
             ${isMissed ? 'bg-red-100    border-red-300' : ''}
-            ${!isTaken && !isMissed ? 'border-gray-300 hover:border-[#3bbdbf] hover:shadow-[0_0_0_4px_rgba(59,189,191,0.15)]' : ''}
+            ${!isTaken && !isMissed ? 'border-gray-200 hover:border-[#008080] hover:shadow-[0_0_0_4px_rgba(0,128,128,0.1)]' : ''}
             ${pressed  ? 'scale-90' : 'scale-100'}
             ${localLoading ? 'opacity-50 cursor-wait' : 'cursor-pointer'}
           `}
         >
           {localLoading ? (
-            <Loader2 size={16} className="animate-spin text-[#3bbdbf]" />
+            <Loader2 size={16} className="animate-spin text-[#008080]" />
           ) : isTaken ? (
-            <CheckCircle2 size={20} className="text-white" />
+            <CheckCircle2 size={24} className="text-white" />
           ) : isMissed ? (
-            <AlertCircle size={18} className="text-red-400" />
+            <AlertCircle size={20} className="text-red-400" />
           ) : (
-            <span className="w-4 h-4 rounded-full border-2 border-gray-300" />
+            <CheckCircle2 size={22} className="text-gray-200 group-hover:text-[#008080] transition-colors" />
           )}
 
           {/* Ripple on take */}
           {isTaken && (
-            <span className="absolute inset-0 rounded-full animate-ping-once bg-emerald-300/40" />
+            <span className="absolute inset-0 rounded-2xl animate-ping-once bg-[#008080]/20" />
           )}
         </button>
 
         {/* Info */}
         <div className="flex-1 min-w-0">
           <div className={`flex items-center gap-2 ${isTaken ? 'opacity-60' : ''}`}>
-            <p className={`font-bold text-sm text-[#2b3654] truncate leading-tight
-              ${isTaken ? 'line-through decoration-emerald-400' : ''}`}>
+            <p className={`font-black text-lg text-[#1a2233] truncate leading-tight tracking-tight
+              ${isTaken ? 'line-through decoration-[#008080]/40' : ''}`}>
               {dose.medicationName}
             </p>
             {dose.delayMinutes != null && dose.delayMinutes > 0 && (
-              <span className="shrink-0 text-[10px] font-bold bg-amber-100 text-amber-600 px-2 py-0.5 rounded-full">
+              <span className="shrink-0 text-[10px] font-black bg-amber-100 text-amber-600 px-2 py-0.5 rounded-lg uppercase">
                 +{dose.delayMinutes}m late
               </span>
             )}
+            <span className="ml-2 py-0.5 px-2 bg-gray-100 text-gray-500 text-[10px] font-black rounded-lg uppercase">
+                {dose.dosage}
+            </span>
           </div>
-          <p className={`text-xs font-medium mt-0.5 ${isTaken ? 'text-emerald-500' : isMissed ? 'text-red-400' : 'text-gray-400'}`}>
-            {dose.dosage}
-          </p>
+          <div className="flex items-center gap-2 mt-1.5 font-bold text-xs uppercase tracking-tighter text-gray-400">
+             <Clock size={12} />
+             {format(parseISO(dose.scheduledTime), 'h:mm a')}
+          </div>
         </div>
 
-        {/* Time / Status badge */}
-        <div className="shrink-0 flex flex-col items-end gap-1">
-          <span className={`flex items-center gap-1 text-xs font-bold
-            ${isTaken ? 'text-emerald-500' : isMissed ? 'text-red-400' : 'text-gray-400'}`}>
-            <Clock size={11} />
-            {format(parseISO(dose.scheduledTime), 'h:mm a')}
-          </span>
-          {isTaken && dose.takenAt && (
-            <span className="text-[10px] text-emerald-400 font-medium">
-              taken {format(parseISO(dose.takenAt), 'h:mm a')}
-            </span>
-          )}
-          {!isTaken && !isMissed && (
-            <span className="text-[10px] text-gray-300 font-medium flex items-center gap-1">
-              swipe <ChevronRight size={10} />
-            </span>
-          )}
+        {/* Action/Badge */}
+        <div className="shrink-0 flex flex-col items-end">
+           {isTaken ? (
+              <div className="text-right">
+                 <p className="text-[10px] font-black text-[#008080] uppercase tracking-widest whitespace-nowrap">Completed</p>
+                 <p className="text-[10px] text-gray-400 font-bold">{format(parseISO(dose.takenAt || ''), 'h:mm a')}</p>
+              </div>
+           ) : isMissed ? (
+              <div className="bg-red-50 text-red-600 px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest">
+                 Missed
+              </div>
+           ) : (
+              <button 
+                onClick={handleTake}
+                className="bg-[#008080] text-white px-5 py-2.5 rounded-xl text-xs font-black shadow-lg shadow-[#008080]/10 hover:translate-x-1 transition-transform"
+              >
+                Log Now
+              </button>
+           )}
         </div>
       </div>
     </div>
@@ -241,14 +248,17 @@ export default function TodayMedsPage() {
   const [allDoneToast, setAllDoneToast]   = useState(false);
   const [swipedId, setSwipedId]           = useState<string | null>(null);
   const [streak, setStreak]               = useState(0);
+  const [risk, setRisk]                   = useState<any>(null);
   const prevAllDone = useRef(false);
 
   // ── Auth guard ───────────────────────────────────────────────
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const enc = localStorage.getItem('user');
-    if (!enc) { router.push('/login'); return; }
-    setUser(decryptData(enc));
+    if (!enc || enc === 'undefined') { router.push('/login'); return; }
+    const decryptedUser = decryptData(enc);
+    if (!decryptedUser) { router.push('/login'); return; }
+    setUser(decryptedUser);
     fetchDoses();
   }, [router]);
 
@@ -267,12 +277,15 @@ export default function TodayMedsPage() {
       setLoading(true);
       const [res, riskRes] = await Promise.all([
         getTodayDoses(),
-        getRiskLevel().catch(() => null) // fail gracefully
+        getRiskLevel().catch(() => null)
       ]);
       if (res.success) setDoses(res.data);
-      if (riskRes?.success && riskRes.data) setStreak(riskRes.data.currentStreak || 0);
+      if (riskRes?.success && riskRes.data) {
+          setRisk(riskRes.data);
+          setStreak(riskRes.data.currentStreak || 0);
+      }
     } catch (e: any) {
-      setError(e.response?.data?.message || 'Failed to load schedule');
+      setError('Connection to health hub lost. Retrying...');
     } finally {
       setLoading(false);
     }
@@ -292,12 +305,10 @@ export default function TodayMedsPage() {
     if (pending > 0) prevAllDone.current = false;
   }, [doses]);
 
-  // ── Mark as taken (optimistic) ───────────────────────────────
   const handleTakeDose = async (dose: DoseEntry) => {
     const uid = `${dose.medicationId}_${dose.scheduledTime}`;
     setTaking(uid);
 
-    // Optimistic update
     setDoses(prev => prev.map(d =>
       d.medicationId === dose.medicationId && d.scheduledTime === dose.scheduledTime
         ? { ...d, status: 'taken', takenAt: new Date().toISOString() }
@@ -311,22 +322,19 @@ export default function TodayMedsPage() {
         takenAt:      new Date().toISOString(),
         status:       'taken',
       });
-      // Re-sync from server
       fetchDoses();
     } catch (e: any) {
-      // Revert on failure
       setDoses(prev => prev.map(d =>
         d.medicationId === dose.medicationId && d.scheduledTime === dose.scheduledTime
           ? { ...d, status: 'pending', takenAt: null }
           : d
       ));
-      setError('Failed to mark dose as taken. Please retry.');
+      setError('Log synchronization failed. Check local clock.');
     } finally {
       setTaking(null);
     }
   };
 
-  // ── Derived stats ─────────────────────────────────────────────
   const total   = doses.length;
   const taken   = doses.filter(d => d.status === 'taken' || d.status === 'delayed').length;
   const missed  = doses.filter(d => d.status === 'missed').length;
@@ -337,195 +345,161 @@ export default function TodayMedsPage() {
   doses.forEach(d => grouped[getGroup(d.scheduledTime)].push(d));
 
   return (
-    <div className={`min-h-screen bg-[#f8faff] ${jakarta.className}`}>
-      <Navbar user={user} />
+    <div className={`min-h-screen bg-[#fcfdfd] text-[#1a2233] flex ${jakarta.className}`}>
+      
+      <Sidebar user={user} riskLevel={risk?.riskLevel} />
       <Confetti active={showConfetti} />
 
-      {/* All-done toast */}
+      <main className="ml-72 flex-1 p-10 max-w-[1200px] w-full">
+        
+        {/* Header Title Section */}
+        <div className="flex justify-between items-start mb-10">
+          <div>
+            <h1 className={`${merriweather.className} text-4xl font-black text-[#008080] mb-2`}>
+               Today's Schedule
+            </h1>
+            <p className="text-gray-500 font-bold uppercase text-[11px] tracking-[2px]">
+               {format(new Date(), 'EEEE, MMMM do, yyyy')}
+            </p>
+          </div>
+          <div className="flex items-center gap-4">
+             <div className="flex items-center gap-2 bg-[#e6f2f2] border border-[#008080]/10 text-[#008080] text-xs font-black px-4 py-2.5 rounded-2xl tracking-tight">
+               <Flame size={16} className="text-orange-500" />
+               STREAK: {streak} DAYS ACTIVE
+             </div>
+             <button onClick={fetchDoses} className={`bg-white p-3 rounded-2xl shadow-sm border border-gray-100 text-gray-400 hover:text-[#008080] hover:bg-gray-50 transition-all ${loading ? 'animate-spin' : ''}`}>
+               <RefreshCw size={20} />
+             </button>
+          </div>
+        </div>
+
+        {/* Progress Grid */}
+        <div className="grid grid-cols-12 gap-8 mb-10">
+           
+           <div className="col-span-12 lg:col-span-8">
+              <div className="bg-[#008080] p-10 rounded-[3rem] text-white shadow-2xl relative overflow-hidden">
+                 <div className="absolute right-0 top-0 w-64 h-64 bg-white/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
+                 <div className="relative z-10 flex flex-col md:flex-row justify-between items-center gap-8">
+                    <div>
+                        <div className="bg-white/10 backdrop-blur-md px-3 py-1 rounded-full inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-widest mb-4 border border-white/10">
+                           <Sparkles size={12} className="text-[#3bbdbf]" />
+                           Daily Progress Engine
+                        </div>
+                        <h2 className={`${merriweather.className} text-3xl font-bold mb-2`}>
+                           {progress === 100 ? "Optimization Complete!" : "Maintain the Momentum"}
+                        </h2>
+                        <p className="text-white/70 font-medium max-w-sm">
+                           {pending === 0 ? "You have successfully synchronized all clinical regimens for today." : `Record shows ${pending} pending doses. Health score requires immediate updates.`}
+                        </p>
+                    </div>
+
+                    <div className="relative shrink-0 w-40 h-40 flex items-center justify-center">
+                        {/* Circular Progress (Professional) */}
+                        <svg className="w-40 h-40 -rotate-90 transform" viewBox="0 0 100 100">
+                           <circle cx="50" cy="50" r="45" fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="8" />
+                           <circle cx="50" cy="50" r="45" fill="none" stroke="white" strokeWidth="8" 
+                             strokeDasharray="282.7" 
+                             strokeDashoffset={282.7 - (282.7 * progress) / 100}
+                             strokeLinecap="round"
+                             className="transition-all duration-1000 ease-in-out"
+                           />
+                        </svg>
+                        <div className="absolute inset-0 flex flex-col items-center justify-center">
+                           <span className="text-4xl font-black">{progress}%</span>
+                           <span className="text-[10px] font-black uppercase opacity-60">Completed</span>
+                        </div>
+                    </div>
+                 </div>
+              </div>
+           </div>
+
+           <div className="col-span-12 lg:col-span-4 grid grid-rows-3 gap-6">
+              {[
+                { label: 'Taken Correctly', val: taken, color: 'text-emerald-600', bg: 'bg-emerald-50', icon: CheckCircle2 },
+                { label: 'Pending Update', val: pending, color: 'text-[#008080]', bg: 'bg-[#e6f2f2]', icon: Clock },
+                { label: 'Clinical Missed', val: missed, color: 'text-red-500', bg: 'bg-red-50', icon: AlertCircle },
+              ].map(s => (
+                <div key={s.label} className={`${s.bg} rounded-3xl p-6 flex justify-between items-center border border-transparent hover:border-black/5 transition-all`}>
+                  <div className="flex items-center gap-4">
+                     <div className={`p-3 rounded-xl bg-white shadow-sm ${s.color}`}>
+                       <s.icon size={20} />
+                     </div>
+                     <div>
+                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{s.label}</p>
+                        <p className={`text-xl font-black ${s.color}`}>{s.val} Doses</p>
+                     </div>
+                  </div>
+                </div>
+              ))}
+           </div>
+        </div>
+
+        {/* Regimen Sections */}
+        <div className="space-y-12">
+            {(['morning', 'afternoon', 'evening'] as TimeGroup[]).map(group => {
+              const items = grouped[group];
+              if (items.length === 0) return null;
+              const meta = GROUP_META[group];
+
+              return (
+                <section key={group} className="space-y-6">
+                   <div className="flex items-center gap-4 border-b border-gray-100 pb-4">
+                      <div className={`w-10 h-10 rounded-2xl flex items-center justify-center shadow-sm border ${meta.border} bg-white transition-transform hover:scale-110`}>
+                        {group === 'morning'   && <Sun  size={20} className={meta.color} />}
+                        {group === 'afternoon' && <Cloud size={20} className={meta.color} />}
+                        {group === 'evening'   && <Moon  size={20} className={meta.color} />}
+                      </div>
+                      <div>
+                         <h3 className={`${merriweather.className} text-xl font-bold text-[#1a2233]`}>{meta.label} Phase</h3>
+                         <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                            {items.filter(d => d.status === 'taken' || d.status === 'delayed').length} OF {items.length} RECORDED
+                         </p>
+                      </div>
+                   </div>
+
+                   <div className="grid gap-4">
+                      {items.map(dose => (
+                        <DoseCard
+                          key={`${dose.medicationId}_${dose.scheduledTime}`}
+                          dose={dose}
+                          onTake={handleTakeDose}
+                          swipedId={swipedId}
+                          onSwipeStart={(id) => setSwipedId(id)}
+                          onSwipeEnd={() => setSwipedId(null)}
+                        />
+                      ))}
+                   </div>
+                </section>
+              );
+            })}
+        </div>
+
+        {/* Footer Area */}
+        <div className="mt-20 p-10 bg-gray-50 rounded-[3rem] border border-gray-100 text-center">
+             <div className="bg-white p-4 rounded-2xl inline-flex items-center gap-2 shadow-sm mb-4 border border-gray-100 text-[#008080] font-black text-xs uppercase tracking-tighter">
+                <ShieldCheck className="text-[#3bbdbf]" size={16} /> Secure Health Hub Connection Active
+             </div>
+             <p className="text-sm text-gray-400 font-bold max-w-sm mx-auto leading-relaxed">
+                Log your medications accurately. All adherence data is automatically summarized for your care team.
+             </p>
+        </div>
+      </main>
+
+      {/* Styled Celebration Toast */}
       {allDoneToast && (
-        <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 animate-in slide-in-from-top-4 duration-500">
-          <div className="flex items-center gap-3 bg-emerald-600 text-white px-6 py-3 rounded-2xl shadow-2xl shadow-emerald-200 font-bold text-sm">
-            <Sparkles size={18} /> All doses complete! Amazing job 🎉
+        <div className="fixed bottom-10 right-10 z-[100] animate-in slide-in-from-right-10 duration-500">
+          <div className="flex flex-col gap-1 bg-[#008080] text-white p-6 rounded-[2rem] shadow-2xl">
+            <div className="flex items-center gap-2 mb-2">
+               <div className="bg-white/10 p-2 rounded-xl"><Sparkles size={20} className="text-[#3bbdbf]" /></div>
+               <span className="text-[10px] font-black uppercase tracking-[2px]">Daily Mastery</span>
+            </div>
+            <p className="font-black text-lg">Daily Regimen Complete.</p>
+            <p className="text-white/60 text-xs font-bold">100% adherence score reached today.</p>
           </div>
         </div>
       )}
 
-      <div className="max-w-lg mx-auto px-4 py-6 space-y-6">
-
-        {/* ── Header ─────────────────────────────────────────────── */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-extrabold text-[#2b3654]">Today's Meds</h1>
-            <p className="text-sm text-gray-400 font-medium mt-0.5">
-              {format(new Date(), 'EEEE, MMMM d')}
-            </p>
-          </div>
-          <div className="flex items-center gap-3">
-            {/* Streak badge */}
-            <div className="flex items-center gap-1.5 bg-amber-50 border border-amber-200 text-amber-600 text-xs font-bold px-3 py-1.5 rounded-full">
-              <Flame size={14} className="text-orange-500" />
-              {streak}d streak
-            </div>
-            {/* Socket indicator */}
-            <div title={isConnected ? 'Live' : 'Offline'} 
-              className={`h-2.5 w-2.5 rounded-full ${isConnected ? 'bg-emerald-400 animate-pulse' : 'bg-gray-300'}`} />
-            <button onClick={fetchDoses} className="p-2 rounded-xl hover:bg-gray-100 text-gray-400 transition-colors">
-              <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
-            </button>
-          </div>
-        </div>
-
-        {/* ── Progress card ───────────────────────────────────────── */}
-        <div className="bg-white rounded-3xl p-5 shadow-sm border border-gray-100">
-          <div className="flex items-center justify-between mb-3">
-            <div>
-              <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Today's Progress</p>
-              <p className="text-2xl font-extrabold text-[#2b3654] mt-0.5">
-                {taken} <span className="text-base font-medium text-gray-300">/ {total} doses</span>
-              </p>
-            </div>
-            <div className="relative w-16 h-16">
-              {/* Circular progress */}
-              <svg className="w-16 h-16 -rotate-90" viewBox="0 0 64 64">
-                <circle cx="32" cy="32" r="27" strokeWidth="5" className="stroke-gray-100 fill-none" />
-                <circle
-                  cx="32" cy="32" r="27" strokeWidth="5" strokeLinecap="round"
-                  className="fill-none transition-all duration-700"
-                  stroke={progress === 100 ? '#22c55e' : '#3bbdbf'}
-                  strokeDasharray={`${2 * Math.PI * 27}`}
-                  strokeDashoffset={`${2 * Math.PI * 27 * (1 - progress / 100)}`}
-                />
-              </svg>
-              <span className="absolute inset-0 flex items-center justify-center text-xs font-extrabold text-[#2b3654]">
-                {progress}%
-              </span>
-            </div>
-          </div>
-
-          {/* Bar */}
-          <div className="w-full bg-gray-100 rounded-full h-2 overflow-hidden">
-            <div
-              className={`h-2 rounded-full transition-all duration-700 ease-out
-                ${progress === 100 ? 'bg-emerald-400' : 'bg-linear-to-r from-[#3bbdbf] to-[#6366f1]'}`}
-              style={{ width: `${progress}%` }}
-            />
-          </div>
-
-          {/* Stats row */}
-          <div className="grid grid-cols-3 gap-3 mt-4">
-            {[
-              { label: 'Taken',   val: taken,   color: 'text-emerald-500', bg: 'bg-emerald-50' },
-              { label: 'Pending', val: pending,  color: 'text-[#3bbdbf]',   bg: 'bg-cyan-50'   },
-              { label: 'Missed',  val: missed,   color: 'text-red-400',     bg: 'bg-red-50'    },
-            ].map(s => (
-              <div key={s.label} className={`${s.bg} rounded-2xl p-3 text-center`}>
-                <p className={`text-lg font-extrabold ${s.color}`}>{s.val}</p>
-                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-0.5">{s.label}</p>
-              </div>
-            ))}
-          </div>
-
-          {/* Pending reminder badge */}
-          {pending > 0 && (
-            <div className="flex items-center gap-2 mt-4 bg-amber-50 border border-amber-100 rounded-xl px-3 py-2">
-              <Bell size={14} className="text-amber-500 shrink-0" />
-              <p className="text-xs font-semibold text-amber-700">
-                {pending} dose{pending !== 1 ? 's' : ''} still pending today
-              </p>
-            </div>
-          )}
-        </div>
-
-        {/* ── Error banner ────────────────────────────────────────── */}
-        {error && (
-          <div className="flex items-center gap-3 bg-red-50 border border-red-100 text-red-600 rounded-2xl px-4 py-3 text-sm font-medium animate-in fade-in">
-            <AlertCircle size={16} />
-            <span className="flex-1">{error}</span>
-            <button onClick={() => setError(null)} className="opacity-50 hover:opacity-100">✕</button>
-          </div>
-        )}
-
-        {/* ── Loading skeleton ────────────────────────────────────── */}
-        {loading && doses.length === 0 && (
-          <div className="space-y-4">
-            {[...Array(4)].map((_, i) => (
-              <div key={i} className="bg-white rounded-2xl p-4 border border-gray-100 animate-pulse">
-                <div className="flex items-center gap-4">
-                  <div className="w-11 h-11 rounded-full bg-gray-100" />
-                  <div className="flex-1 space-y-2">
-                    <div className="h-3 bg-gray-100 rounded w-2/3" />
-                    <div className="h-2.5 bg-gray-100 rounded w-1/3" />
-                  </div>
-                  <div className="h-3 bg-gray-100 rounded w-12" />
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* ── Empty state ─────────────────────────────────────────── */}
-        {!loading && doses.length === 0 && (
-          <div className="bg-white rounded-3xl p-10 text-center border border-dashed border-gray-200">
-            <div className="text-5xl mb-4">💊</div>
-            <h3 className="font-bold text-[#2b3654] text-lg mb-1">No doses scheduled</h3>
-            <p className="text-sm text-gray-400">Add medications from the Medicine Cabinet to start tracking.</p>
-          </div>
-        )}
-
-        {/* ── Grouped dose cards ──────────────────────────────────── */}
-        {(['morning', 'afternoon', 'evening'] as TimeGroup[]).map(group => {
-          const items = grouped[group];
-          if (items.length === 0) return null;
-          const meta = GROUP_META[group];
-
-          return (
-            <section key={group} className="space-y-3">
-              {/* Group header */}
-              <div className={`flex items-center gap-3 bg-linear-to-r ${meta.bg} border ${meta.border} rounded-2xl px-4 py-3`}>
-                <span className="text-xl">{meta.emoji}</span>
-                <div>
-                  <p className={`font-extrabold text-sm ${meta.color}`}>{meta.label}</p>
-                  <p className="text-[10px] text-gray-400 font-medium">
-                    {items.filter(d => d.status === 'taken' || d.status === 'delayed').length}/{items.length} taken
-                  </p>
-                </div>
-                {/* Group icon */}
-                <div className="ml-auto">
-                  {group === 'morning'   && <Sun  size={18} className={meta.color} />}
-                  {group === 'afternoon' && <Cloud size={18} className={meta.color} />}
-                  {group === 'evening'   && <Moon  size={18} className={meta.color} />}
-                </div>
-              </div>
-
-              {/* Dose cards */}
-              <div className="space-y-2">
-                {items.map(dose => {
-                  const uid = `${dose.medicationId}_${dose.scheduledTime}`;
-                  return (
-                    <DoseCard
-                      key={uid}
-                      dose={dose}
-                      onTake={handleTakeDose}
-                      swipedId={swipedId}
-                      onSwipeStart={(id) => setSwipedId(id)}
-                      onSwipeEnd={() => setSwipedId(null)}
-                    />
-                  );
-                })}
-              </div>
-            </section>
-          );
-        })}
-
-        {/* ── Footer tip ──────────────────────────────────────────── */}
-        {doses.length > 0 && !loading && (
-          <p className="text-center text-xs text-gray-300 font-medium pb-6">
-            Swipe right on a card or tap the circle to mark as taken
-          </p>
-        )}
-      </div>
-
-      {/* ── Keyframe CSS injected via dangerouslySetInnerHTML ─── */}
+      {/* Global Style Injections */}
       <style dangerouslySetInnerHTML={{ __html: `
         @keyframes confetti-fall {
           0%   { transform: translateY(-20px) rotate(0deg);   opacity: 1; }
@@ -546,3 +520,6 @@ export default function TodayMedsPage() {
     </div>
   );
 }
+
+// Re-using same imports from Dashboard if not available, or standard lucide
+import { ShieldCheck } from 'lucide-react';

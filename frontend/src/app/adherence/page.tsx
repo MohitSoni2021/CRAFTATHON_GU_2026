@@ -4,7 +4,8 @@ import React, { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { decryptData } from "@/lib/crypto"
 import { Button } from "@/components/ui/button"
-import Navbar from "@/components/Navbar"
+import Sidebar from "@/components/Sidebar"
+import { Merriweather, Plus_Jakarta_Sans } from "next/font/google"
 import { 
   getAdherenceScore, 
   getDailyAdherence, 
@@ -20,16 +21,19 @@ import {
   Brain, 
   Calendar, 
   Activity,
-  ArrowUpRight,
   Target,
   BarChart3,
   Loader2,
-  Clock
+  Clock,
+  ShieldCheck,
+  Zap,
+  ArrowRight
 } from "lucide-react"
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { format, isValid } from "date-fns"
 
-/** Safely format a date string — returns fallback if the value is null/invalid */
+const merriweather = Merriweather({ weight: ['400', '700', '900'], subsets: ['latin'] });
+const jakarta = Plus_Jakarta_Sans({ subsets: ['latin'] })
+
 const safeFormat = (value: any, fmt: string, fallback = '—'): string => {
   if (!value) return fallback;
   const d = new Date(value);
@@ -51,12 +55,16 @@ export default function AdherencePage() {
   useEffect(() => {
     if (typeof window !== "undefined") {
       const encryptedUser = localStorage.getItem("user")
-      if (!encryptedUser) {
+      if (!encryptedUser || encryptedUser === 'undefined') {
         router.push("/login")
       } else {
         const decryptedUser = decryptData(encryptedUser)
-        setUser(decryptedUser)
-        fetchAdherenceData()
+        if (!decryptedUser) {
+           router.push("/login")
+        } else {
+           setUser(decryptedUser)
+           fetchAdherenceData()
+        }
       }
     }
   }, [router])
@@ -80,7 +88,7 @@ export default function AdherencePage() {
         risk: risk.success ? risk.data : null
       })
     } catch (err) {
-      console.error("Adherence fetch error:", err)
+      console.error("Adherence intelligence error:", err)
     } finally {
       setLoading(false)
     }
@@ -88,188 +96,212 @@ export default function AdherencePage() {
 
   if (loading && !user) {
     return (
-      <div className="flex h-screen items-center justify-center bg-[#f8faff]">
-        <Loader2 size={40} className="text-[#3bbdbf] animate-spin" />
+      <div className={`flex h-screen items-center justify-center bg-[#fcfdfd] ${jakarta.className}`}>
+        <Loader2 size={42} className="text-[#008080] animate-spin" />
       </div>
     )
   }
 
-  if (!user) return null;
-
   return (
-    <div className="min-h-screen bg-[#f8faff] text-[#2b3654]">
-      <Navbar user={user} riskLevel={data.risk?.riskLevel} />
+    <div className={`min-h-screen bg-[#fcfdfd] text-[#1a2233] flex ${jakarta.className}`}>
+      
+      <Sidebar user={user} riskLevel={data.risk?.riskLevel} />
 
-      {/* Header Section */}
-      <div className="bg-linear-to-r from-[#2b7a8c] to-[#3bbdbf] text-white shadow-xl overflow-hidden relative">
-        <div className="absolute right-0 top-0 w-96 h-96 bg-white opacity-10 rounded-full blur-3xl transform translate-x-1/2 -translate-y-1/2"></div>
-        <div className="w-full mx-auto px-6 py-14 md:px-10 relative z-10">
-          <div className="flex flex-col md:flex-row justify-between items-end gap-6">
-            <div className="space-y-4">
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-md rounded-full border border-white/20 text-sm font-bold">
-                 <Brain size={16} className="text-[#e6fcfa]" />
-                 AI POWERED ANALYTICS
-              </div>
-              <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight">Adherence Intelligence</h1>
-              <p className="text-white/80 text-lg font-medium max-w-xl">
-                 Real-time clinical insights into your medication behavior and preventative health metrics.
-              </p>
-            </div>
-            
-            <div className="bg-white/10 backdrop-blur-xl p-8 rounded-[2.5rem] border border-white/20 shadow-2xl min-w-[280px]">
-               <p className="text-xs font-bold text-white/60 uppercase tracking-widest mb-1">Overall Core Score</p>
-               <div className="flex items-baseline gap-2">
-                 <span className="text-6xl font-black">{data.score?.score || '--'}</span>
-                 <span className="text-2xl font-bold opacity-60">%</span>
-               </div>
-               <div className="mt-4 flex items-center gap-2 text-sm font-bold">
-                  {data.score?.trend > 0 ? (
-                    <span className="flex items-center gap-1 text-green-300"><TrendingUp size={16}/> +{data.score.trend}%</span>
-                  ) : (
-                    <span className="flex items-center gap-1 text-red-300"><TrendingDown size={16}/> {data.score?.trend}%</span>
-                  )}
-                  <span className="opacity-60">vs last 30 days</span>
-               </div>
-            </div>
+      <main className="ml-72 flex-1 p-10 max-w-[1400px] w-full">
+        
+        {/* Professional Header Section */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
+          <div>
+            <h1 className={`${merriweather.className} text-4xl font-black text-[#008080] mb-2`}>
+               Adherence Intelligence
+            </h1>
+            <p className="text-gray-500 font-bold uppercase text-[11px] tracking-[2px]">
+               Behavioral Analytics & Clinical Risk Forecasting
+            </p>
+          </div>
+          <div className="flex gap-4">
+             <div className="bg-[#e6f2f2] px-6 py-3 rounded-2xl border border-[#008080]/10 text-[#008080] text-xs font-black uppercase tracking-widest flex items-center gap-2">
+                <Brain size={18} /> AI READY
+             </div>
           </div>
         </div>
-      </div>
 
-      <div className="w-full mx-auto p-6 md:p-10 space-y-8">
-        
-        {/* Main Analytics Grid */}
-        <div className="grid gap-8 lg:grid-cols-3">
+        {/* Hero Analytics Card */}
+        <div className="bg-[#008080] p-10 rounded-[3rem] text-white shadow-2xl mb-12 relative overflow-hidden">
+           <div className="absolute right-0 top-0 w-80 h-80 bg-white/5 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/2"></div>
+           <div className="relative z-10 flex flex-col xl:flex-row items-center justify-between gap-12">
+              <div className="flex-1">
+                 <div className="bg-white/10 backdrop-blur-md px-4 py-1.5 rounded-full inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest mb-6 border border-white/10 text-[#3bbdbf]">
+                    <ShieldCheck size={14} />
+                    Integrity Metrics Synchronized
+                 </div>
+                 <h2 className={`${merriweather.className} text-3xl font-bold mb-4`}>
+                    Therapeutic Momentum
+                 </h2>
+                 <p className="text-white/70 text-lg font-medium leading-relaxed max-w-xl">
+                    Our behavioral engine analyzes complex intake patterns to determine your adherence trajectory and clinical risk classification.
+                 </p>
+              </div>
+
+              <div className="bg-white/5 backdrop-blur-xl p-10 rounded-[3rem] border border-white/10 shadow-inner min-w-[320px] text-center xl:text-left">
+                  <p className="text-[10px] font-black text-[#3bbdbf] uppercase tracking-[3px] mb-2">Primary Core Score</p>
+                  <div className="flex items-baseline justify-center xl:justify-start gap-2">
+                      <span className="text-7xl font-black text-white">{data.score?.score || '--'}</span>
+                      <span className="text-2xl font-bold opacity-40">%</span>
+                  </div>
+                  <div className="mt-6 flex items-center justify-center xl:justify-start gap-3">
+                     {data.score?.trend >= 0 ? (
+                        <div className="flex items-center gap-1.5 bg-green-500/20 text-green-300 px-3 py-1 rounded-full text-xs font-black">
+                           <TrendingUp size={14} /> +{data.score?.trend || 0}%
+                        </div>
+                     ) : (
+                        <div className="flex items-center gap-1.5 bg-red-500/20 text-red-300 px-3 py-1 rounded-full text-xs font-black">
+                           <TrendingDown size={14} /> {data.score?.trend || 0}%
+                        </div>
+                     )}
+                     <span className="text-[10px] font-black uppercase tracking-widest opacity-40">Monthly Velocity</span>
+                  </div>
+              </div>
+           </div>
+        </div>
+
+        <div className="grid gap-10 lg:grid-cols-12">
            
-           {/* Patterns & Insights */}
-           <div className="lg:col-span-2 space-y-8">
-              <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-bold flex items-center gap-3">
-                   <div className="p-2 bg-white rounded-xl shadow-sm border border-gray-100">
-                     <Target size={20} className="text-[#3bbdbf]" />
-                   </div>
-                   Behavioral Patterns
-                </h2>
-              </div>
+           <div className="lg:col-span-8 space-y-10">
+              {/* Pattern Recognition */}
+              <section>
+                 <h3 className={`${merriweather.className} text-2xl font-bold text-[#1a2233] mb-6 flex items-center gap-3`}>
+                    <Target size={24} className="text-[#008080]" /> Behavioral Patterns
+                 </h3>
+                 <div className="grid gap-6 md:grid-cols-2">
+                    {data.patterns.length === 0 ? (
+                       <div className="col-span-2 py-20 bg-white border-2 border-dashed border-gray-100 rounded-[2.5rem] flex flex-col items-center justify-center text-center">
+                          <Activity size={40} className="text-gray-200 mb-4" />
+                          <p className="text-gray-400 font-bold max-w-xs">Data acquisition in progress. AI requires more clinical logs to detect valid patterns.</p>
+                       </div>
+                    ) : (
+                       data.patterns.map((p: string, i: number) => (
+                          <div key={i} className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-xl hover:border-[#008080]/10 transition-all group overflow-hidden relative">
+                             <div className="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transition-opacity"><Zap size={100} /></div>
+                             <div className="w-12 h-12 rounded-2xl bg-amber-50 text-amber-500 flex items-center justify-center mb-6">
+                                <AlertTriangle size={24} />
+                             </div>
+                             <h4 className="font-black text-[#1a2233] text-lg mb-2">{p.split(':')[0]}</h4>
+                             <p className="text-sm font-bold text-gray-400 leading-relaxed">{p.split(':')[1] || p}</p>
+                          </div>
+                       ))
+                    )}
+                 </div>
+              </section>
 
-              <div className="grid gap-4 md:grid-cols-2">
-                 {data.patterns.length === 0 ? (
-                   <div className="col-span-2 py-12 bg-white border border-dashed border-gray-200 rounded-3xl flex flex-col items-center justify-center text-gray-400">
-                      <Clock size={32} className="mb-2 opacity-20" />
-                      <p className="font-medium">Collecting data for pattern recognition...</p>
-                   </div>
-                 ) : (
-                    data.patterns.map((pattern: string, idx: number) => (
-                      <div key={idx} className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm hover:shadow-md transition-all">
-                        <div className="w-12 h-12 rounded-2xl flex items-center justify-center mb-4 bg-amber-50 text-amber-500">
-                           <AlertTriangle size={24} />
-                        </div>
-                        <h4 className="font-bold text-[#2b3654] mb-1">{pattern.split(':')[0]}</h4>
-                        <p className="text-sm text-gray-500 leading-relaxed mb-4">{pattern.split(':')[1] || pattern}</p>
-                        <div className="flex items-center justify-between pt-4 border-t border-gray-50 uppercase tracking-widest text-[10px] font-bold">
-                           <span className="text-amber-500">Medium Impact</span>
-                           <span className="text-gray-400">Detected Recently</span>
-                        </div>
-                      </div>
-                    ))
-                 )}
-              </div>
-
-              {/* Weekly Trend Table/List */}
-              <div className="bg-white border border-gray-100 rounded-[2.5rem] shadow-sm overflow-hidden">
-                 <div className="p-8 border-b border-gray-50 flex items-center justify-between bg-gray-50/30">
-                    <h3 className="font-bold flex items-center gap-2">
-                      <BarChart3 size={18} className="text-[#4a7ae6]" />
-                      Weekly Adherence Trend
+              {/* Statistical History Table */}
+              <section className="bg-white border border-gray-100 rounded-[3rem] shadow-sm overflow-hidden">
+                 <div className="p-8 border-b border-gray-50 flex justify-between items-center bg-gray-50/30">
+                    <h3 className={`${merriweather.className} text-xl font-bold text-[#1a2233] flex items-center gap-3`}>
+                       <BarChart3 size={20} className="text-[#008080]" /> Adherence Trajectory
                     </h3>
-                    <Button variant="ghost" size="sm" className="text-xs font-bold text-[#4a7ae6]">EXPORT DATA</Button>
+                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">7 Period Review</span>
                  </div>
                  <div className="divide-y divide-gray-50">
-                    {data.weekly.map((week: any, idx: number) => (
-                       <div key={idx} className="p-6 flex items-center justify-between hover:bg-gray-50 transition-colors">
-                          <div className="flex items-center gap-4">
-                             <div className="bg-[#f0f4ff] p-3 rounded-2xl text-[#4a7ae6]">
-                               <Calendar size={20} />
+                    {data.weekly.map((w: any, idx: number) => (
+                       <div key={idx} className="px-8 py-6 flex items-center justify-between hover:bg-gray-50/50 transition-colors group">
+                          <div className="flex items-center gap-6">
+                             <div className="w-12 h-12 bg-[#e6f2f2] rounded-2xl flex items-center justify-center text-[#008080] group-hover:bg-[#008080] group-hover:text-white transition-all">
+                                <Calendar size={22} />
                              </div>
                              <div>
-                               <p className="text-sm font-bold text-[#2b3654] uppercase tracking-wide">Week of {safeFormat(week.week, 'MMM dd')}</p>
-                               <div className="flex items-center gap-3 mt-1">
-                                  <span className="text-xs font-medium text-gray-400">TAKEN: <span className="text-green-600 font-bold">{week.taken}</span></span>
-                                  <span className="text-xs font-medium text-gray-400">MISSED: <span className="text-red-500 font-bold">{week.missed}</span></span>
-                               </div>
+                                <p className="text-sm font-black text-[#1a2233] uppercase">Week of {safeFormat(w.week, 'MMM dd')}</p>
+                                <div className="flex gap-4 mt-1.5">
+                                   <div className="flex items-center gap-1.5 text-[10px] font-black text-gray-400">
+                                      <CheckCircle2 size={12} className="text-green-500" /> TAKEN: {w.taken}
+                                   </div>
+                                   <div className="flex items-center gap-1.5 text-[10px] font-black text-gray-400">
+                                      <AlertTriangle size={12} className="text-red-400" /> MISSED: {w.missed}
+                                   </div>
+                                </div>
                              </div>
                           </div>
-                          <div className="text-right">
-                             <div className="text-xl font-black text-[#2b3654]">{week.score}%</div>
-                             <div className="w-24 h-1.5 bg-gray-100 rounded-full mt-1 overflow-hidden">
-                                <div 
-                                  className="h-full bg-[#4a7ae6] rounded-full" 
-                                  style={{ width: `${week.score}%` }}
-                                />
+                          <div className="text-right flex items-center gap-8">
+                             <div>
+                                <div className={`${merriweather.className} text-xl font-black text-[#1a2233]`}>{w.score}%</div>
+                                <div className="w-24 h-1.5 bg-gray-50 rounded-full mt-1.5 overflow-hidden border border-gray-100">
+                                   <div className="h-full bg-[#008080] rounded-full shadow-[0_0_8px_rgba(0,128,128,0.3)]" style={{ width: `${w.score}%` }} />
+                                </div>
                              </div>
+                             <ArrowRight size={18} className="text-gray-200 group-hover:text-[#008080] transition-transform translate-x-0 group-hover:translate-x-1" />
                           </div>
                        </div>
                     ))}
                  </div>
-              </div>
+              </section>
            </div>
 
-           {/* Sidebar: Diagnostics & Risk */}
-           <div className="space-y-8">
-              
-              <div className="bg-white border border-gray-100 rounded-[2.5rem] p-8 shadow-sm">
-                 <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
-                    <Activity size={20} className="text-red-500" />
-                    Risk Assessment
-                 </h2>
-                 
-                 <div className="flex flex-col items-center justify-center py-6 text-center">
-                    <div className={`text-5xl font-black uppercase mb-2 ${
-                      data.risk?.riskLevel === 'low' ? 'text-green-500' : 'text-amber-500'
-                    }`}>
-                      {data.risk?.riskLevel || 'ANALYZING'}
-                    </div>
-                    <p className="text-gray-400 font-bold text-xs uppercase tracking-widest">CURRENT RISK CLASSIFICATION</p>
-                 </div>
+           <div className="lg:col-span-4 space-y-10">
+              {/* Risk Triage Hub */}
+              <div className="bg-white border border-gray-100 rounded-[3rem] p-10 shadow-sm relative overflow-hidden group">
+                  <div className="absolute -top-10 -right-10 w-40 h-40 bg-red-500/5 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                  <h3 className={`${merriweather.className} text-xl font-bold mb-8 flex items-center gap-3`}>
+                     <Activity size={20} className="text-red-500 font-black" /> Clinical Triage
+                  </h3>
 
-                 <div className="space-y-4 mt-8">
-                    <div className="bg-[#fcfdfd] border border-gray-100 p-4 rounded-2xl">
-                       <div className="flex justify-between items-center mb-2">
-                          <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">Sync Consistency</span>
-                          <span className="text-xs font-bold text-green-600">98%</span>
-                       </div>
-                       <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                          <div className="h-full bg-green-500 w-[98%]"></div>
-                       </div>
-                    </div>
-                 </div>
+                  <div className="flex flex-col items-center py-10 border-y border-gray-50 my-8">
+                      <div className={`text-6xl font-black mb-2 tracking-tighter ${
+                        (data.risk?.riskLevel || '').toLowerCase() === 'high' ? 'text-red-500' : 'text-[#008080]'
+                      }`}>
+                         {(data.risk?.riskLevel || 'ANALYZING').toUpperCase()}
+                      </div>
+                      <p className="text-[10px] font-black text-gray-400 uppercase tracking-[3px]">Risk Classification</p>
+                  </div>
 
-                 <Button className="w-full mt-8 bg-[#2b3654] hover:bg-[#1E2A4F] text-white py-6 rounded-2xl font-bold shadow-lg shadow-[#2b3654]/10">
-                    Detailed Diagnostics
-                 </Button>
+                  <div className="space-y-6">
+                     <div className="bg-gray-50 rounded-[2rem] p-6">
+                        <div className="flex justify-between items-center mb-2">
+                           <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Regimen Latency</span>
+                           <span className="text-xs font-black text-[#008080]">OPTIMAL</span>
+                        </div>
+                        <div className="h-1.5 bg-white rounded-full overflow-hidden border border-gray-100">
+                           <div className="h-full bg-[#008080] w-[100%] rounded-full shadow-sm"></div>
+                        </div>
+                     </div>
+                     <button className="w-full bg-[#1a2233] text-white py-5 rounded-[2rem] font-black text-xs uppercase tracking-widest shadow-xl shadow-[#1a2233]/10 hover:scale-[1.02] active:scale-95 transition-all">
+                        Full Diagnostics Hub
+                     </button>
+                  </div>
               </div>
 
-              {/* Health Stats */}
-              <div className="bg-[#1E2A4F] rounded-[2.5rem] p-8 text-white shadow-2xl relative overflow-hidden">
-                 <div className="absolute -right-10 -bottom-10 w-40 h-40 bg-[#3bbdbf] opacity-10 rounded-full blur-3xl"></div>
-                 <h3 className="text-lg font-bold flex items-center gap-2 mb-6">
-                    <CheckCircle2 size={20} className="text-[#3bbdbf]" />
-                    Streak Tracking
-                 </h3>
-                 <div className="space-y-6">
-                    <div>
-                       <p className="text-white/50 text-xs font-bold uppercase tracking-widest mb-1">Current Streak</p>
-                       <p className="text-3xl font-black">12 Days</p>
-                    </div>
-                    <div>
-                       <p className="text-white/50 text-xs font-bold uppercase tracking-widest mb-1">Total Doses Managed</p>
-                       <p className="text-3xl font-black">{data.weekly.reduce((s: any, w: any) => s + w.taken, 0) + 142}</p>
-                    </div>
-                 </div>
+              {/* Achievement/Streak Card */}
+              <div className="bg-[#1a2233] rounded-[3rem] p-10 text-white shadow-2xl relative overflow-hidden group">
+                  <div className="absolute bottom-0 left-0 w-full h-1 bg-linear-to-r from-transparent via-[#008080] to-transparent"></div>
+                  <h3 className="text-sm font-black flex items-center gap-2 mb-10 text-[#3bbdbf] tracking-[1px] uppercase">
+                     <Clock size={16} /> Regimen Persistence
+                  </h3>
+                  
+                  <div className="space-y-10">
+                     <div className="flex items-center gap-6">
+                        <div className="w-14 h-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-[#3bbdbf]">
+                           <Zap size={28} />
+                        </div>
+                        <div>
+                           <p className="text-3xl font-black text-white">12 Days</p>
+                           <p className="text-[10px] font-black text-white/40 uppercase tracking-widest">Active Streak</p>
+                        </div>
+                     </div>
+
+                     <div className="flex items-center gap-6">
+                        <div className="w-14 h-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-[#3bbdbf]">
+                           <ShieldCheck size={28} />
+                        </div>
+                        <div>
+                           <p className="text-3xl font-black text-white">{data.weekly.reduce((s:any, w:any) => s + w.taken, 0) + 142}</p>
+                           <p className="text-[10px] font-black text-white/40 uppercase tracking-widest">Archive Total</p>
+                        </div>
+                     </div>
+                  </div>
               </div>
 
            </div>
         </div>
-      </div>
+      </main>
     </div>
   )
 }

@@ -1,4 +1,4 @@
-'use client';
+"use client"
 
 import { useState, useEffect } from 'react';
 import { 
@@ -16,7 +16,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription, CardFooter } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import Navbar from '@/components/Navbar';
+import Sidebar from '@/components/Sidebar';
 import { decryptData } from "@/lib/crypto";
 import { useRouter } from "next/navigation";
 import { 
@@ -29,12 +29,16 @@ import {
   Loader2,
   X,
   CheckCircle2,
-  AlertCircle
+  AlertCircle,
+  Sparkles,
+  ArrowRight,
+  ShieldCheck
 } from 'lucide-react';
 import { format } from 'date-fns';
-import { Plus_Jakarta_Sans } from "next/font/google";
+import { Plus_Jakarta_Sans, Merriweather } from "next/font/google";
 
 const jakarta = Plus_Jakarta_Sans({ subsets: ['latin'] })
+const merriweather = Merriweather({ weight: ['400', '700', '900'], subsets: ['latin'] });
 
 export default function MedicationsPage() {
   const router = useRouter();
@@ -60,12 +64,16 @@ export default function MedicationsPage() {
   useEffect(() => {
     if (typeof window !== "undefined") {
       const encryptedUser = localStorage.getItem("user")
-      if (!encryptedUser) {
+      if (!encryptedUser || encryptedUser === 'undefined') {
         router.push("/login")
       } else {
         const decryptedUser = decryptData(encryptedUser)
-        setUser(decryptedUser)
-        fetchData();
+        if (!decryptedUser) {
+           router.push("/login")
+        } else {
+           setUser(decryptedUser)
+           fetchData();
+        }
       }
     }
   }, [router]);
@@ -75,12 +83,12 @@ export default function MedicationsPage() {
       setLoading(true);
       const [medsRes, riskRes] = await Promise.all([
         listMedications(),
-        getRiskLevel()
+        getRiskLevel().catch(() => null)
       ]);
       if (medsRes.success) setMedications(medsRes.data);
-      if (riskRes.success) setRisk(riskRes.data);
+      if (riskRes?.success) setRisk(riskRes.data);
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Error connecting to server');
+      setError('Connection to medication database interrupted.');
     } finally {
       setLoading(false);
     }
@@ -97,7 +105,7 @@ export default function MedicationsPage() {
         fetchData();
       }
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to create medication');
+      setError(err.response?.data?.message || 'Conflict detected in regimen policy.');
     } finally {
       setLoading(false);
     }
@@ -116,14 +124,14 @@ export default function MedicationsPage() {
         fetchData();
       }
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to update medication');
+      setError(err.response?.data?.message || 'Update failed. Check clinic logs.');
     } finally {
       setLoading(false);
     }
   };
 
   const handleDeactivate = async (id: string) => {
-    if (!confirm('Are you sure you want to deactivate this medication?')) return;
+    if (!confirm('Proceed with regimen deactivation? History will be preserved.')) return;
     try {
       setLoading(true);
       const response = await deactivateMedication(id);
@@ -131,7 +139,7 @@ export default function MedicationsPage() {
         fetchData();
       }
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to deactivate medication');
+      setError('Deactivation policy violation.');
     } finally {
       setLoading(false);
     }
@@ -167,200 +175,236 @@ export default function MedicationsPage() {
   };
 
   return (
-    <div className={`min-h-screen bg-[#f8faff] text-[#2b3654] ${jakarta.className}`}>
+    <div className={`min-h-screen bg-[#fcfdfd] text-[#1a2233] flex ${jakarta.className}`}>
       
-      <Navbar user={user} riskLevel={risk?.riskLevel} />
+      <Sidebar user={user} riskLevel={risk?.riskLevel} />
 
-      <div className="w-full mx-auto p-6 md:p-10 space-y-8">
+      <main className="ml-72 flex-1 p-10 max-w-[1400px] w-full">
         
-        {/* Header Section */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        {/* Professional Header Section */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
           <div>
-            <h1 className="text-3xl font-bold text-[#2b3654]">Medicine Cabinet</h1>
-            <p className="text-[#7b8ea6]">Manage your active medications and reminders</p>
+            <h1 className={`${merriweather.className} text-4xl font-black text-[#008080] mb-2`}>
+               Medicine Cabinet
+            </h1>
+            <p className="text-gray-500 font-bold uppercase text-[11px] tracking-[2px]">
+               Clinical Regimen Management & Scheduling
+            </p>
           </div>
           
-          <Button 
+          <button 
             onClick={() => { setIsAdding(true); resetForm(); }}
-            className="bg-[#3bbdbf] hover:bg-[#2b7a8c] text-white rounded-xl px-6 py-6 h-auto shadow-lg shadow-[#3bbdbf]/20"
+            className="bg-[#008080] text-white px-8 py-4 rounded-[2rem] font-black flex items-center gap-2 shadow-xl shadow-[#008080]/15 hover:scale-105 active:scale-95 transition-all"
           >
-            <Plus className="mr-2" size={20} />
-            Add Medication
-          </Button>
+            <Plus size={20} />
+            REGISTER NEW MEDICATION
+          </button>
         </div>
 
         {error && (
-          <div className="bg-red-50 border border-red-100 rounded-2xl p-4 flex items-center gap-3 text-red-600 animate-in fade-in slide-in-from-top-2">
-            <AlertCircle size={20} />
-            <p className="font-medium text-sm">{error}</p>
-            <button onClick={() => setError(null)} className="ml-auto opacity-50 hover:opacity-100">
-              <X size={16} />
+          <div className="bg-red-50 border border-red-100 rounded-2xl p-5 flex items-center gap-4 text-red-600 mb-8 animate-in slide-in-from-top-4">
+            <AlertCircle size={22} />
+            <p className="font-bold text-sm tracking-tight flex-1">{error}</p>
+            <button onClick={() => setError(null)} className="p-1 hover:bg-black/5 rounded-full transition-colors">
+              <X size={18} />
             </button>
           </div>
         )}
 
-        {/* List Section */}
+        {/* Global Summary Card */}
+        <div className="bg-[#008080] p-10 rounded-[3rem] text-white shadow-2xl mb-12 relative overflow-hidden">
+           <div className="absolute right-0 top-0 w-80 h-80 bg-white/5 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/2"></div>
+           <div className="relative z-10 grid grid-cols-12 gap-8 items-center">
+              <div className="col-span-12 md:col-span-8">
+                 <div className="bg-white/10 backdrop-blur-md px-4 py-1.5 rounded-full inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest mb-6 border border-white/10">
+                    <ShieldCheck size={14} className="text-[#3bbdbf]" />
+                    Centralized Cabinet Synchronized
+                 </div>
+                 <h2 className={`${merriweather.className} text-4xl font-bold mb-4`}>
+                    Regimen Integrity Report
+                 </h2>
+                 <p className="text-white/70 text-lg max-w-xl leading-relaxed mb-0 font-medium">
+                    You currently have {medications.length} active clinical pathways registered. Maintaining accurate start dates and dosage units ensures reliable AI insights.
+                 </p>
+              </div>
+              <div className="hidden md:flex col-span-4 justify-end">
+                 <div className="w-40 h-40 bg-white/5 rounded-[3rem] flex flex-col items-center justify-center border border-white/10">
+                    <span className="text-[10px] font-black uppercase opacity-60 mb-1">Total Active</span>
+                    <span className="text-5xl font-black text-white">{medications.filter(m=>m.isActive).length}</span>
+                    <span className="text-[10px] font-black uppercase opacity-60 mt-1">Regimens</span>
+                 </div>
+              </div>
+           </div>
+        </div>
+
+        {/* List Grid Section */}
         {loading && medications.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-24">
-            <Loader2 className="animate-spin text-[#3bbdbf] mb-4" size={40} />
-            <p className="text-[#7b8ea6] font-medium">Scanning medicine records...</p>
+          <div className="py-32 flex flex-col items-center justify-center text-center">
+            <Loader2 className="animate-spin text-[#008080] mb-4" size={48} />
+            <p className="text-gray-400 font-black uppercase tracking-widest text-xs">Scanning clinical records...</p>
           </div>
         ) : medications.length === 0 ? (
-          <div className="bg-white border-2 border-dashed border-gray-100 rounded-[2.5rem] py-24 flex flex-col items-center justify-center text-center">
-            <div className="bg-[#e6fcfa] p-6 rounded-[2rem] mb-6 text-[#3bbdbf]">
-              <Activity size={48} />
+          <div className="bg-white border-2 border-dashed border-gray-100 rounded-[3rem] py-32 flex flex-col items-center justify-center text-center">
+            <div className="bg-[#e6f2f2] p-8 rounded-[2.5rem] mb-6 text-[#008080] shadow-sm">
+              <Plus size={52} strokeWidth={2.5} />
             </div>
-            <h3 className="text-2xl font-bold text-[#2b3654] mb-2">No Medications Linked</h3>
-            <p className="text-[#7b8ea6] max-w-sm mb-8">
-              Start adding your daily medications to generate smart alerts and track your health metrics.
+            <h3 className={`${merriweather.className} text-2xl font-bold text-[#1a2233] mb-3`}>Cabinet Empty</h3>
+            <p className="text-gray-400 font-bold max-w-sm mb-10 leading-relaxed">
+              No clinical regimens found. Add your primary medications to begin smart adherence monitoring.
             </p>
-            <Button onClick={() => setIsAdding(true)} className="bg-[#3bbdbf] hover:bg-[#2b7a8c] text-white rounded-xl">
-              <Plus size={20} className="mr-2" /> Add medication
-            </Button>
+            <button 
+              onClick={() => setIsAdding(true)} 
+              className="bg-[#008080] text-white px-10 py-5 rounded-[2rem] font-black shadow-xl shadow-[#008080]/15 flex items-center gap-2"
+            >
+              <Plus size={20} /> REGISTER FIRST MEDICATION
+            </button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {medications.map((med, i) => (
-              <Card 
-                key={`med-card-${med.id || (med as any)._id || i}-${i}`} 
-                className={`bg-white border-gray-100 shadow-sm rounded-3xl group hover:shadow-md transition-all duration-300 ${!med.isActive ? 'opacity-60 grayscale' : ''}`}
+              <div 
+                key={`med-card-${med.id || (med as any)._id || i}`} 
+                className={`bg-white border border-gray-100 shadow-sm rounded-[2.5rem] p-8 group hover:shadow-xl hover:border-[#008080]/20 transition-all duration-500 relative overflow-hidden flex flex-col ${!med.isActive ? 'opacity-50 grayscale' : ''}`}
               >
-                <CardHeader>
-                  <div className="flex justify-between items-start">
-                    <div className="bg-[#f0f4ff] p-3 rounded-2xl mb-4 group-hover:scale-110 transition-transform text-[#4a7ae6]">
-                      <Activity size={24} />
+                <div className="flex justify-between items-start mb-6">
+                    <div className="bg-[#e6f2f2] p-4 rounded-2xl text-[#008080] group-hover:bg-[#008080] group-hover:text-white transition-all duration-500 transform group-hover:rotate-12 shadow-sm">
+                      <Activity size={28} />
                     </div>
-                    <div className="flex gap-1">
-                      <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400 hover:text-[#2b3654]" onClick={() => startEdit(med)}>
-                        <Pencil size={14} />
-                      </Button>
-                      <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400 hover:text-red-500" onClick={() => handleDeactivate(med.id || (med as any)._id)}>
-                        <Trash2 size={14} />
-                      </Button>
+                    <div className="flex gap-2">
+                       <button onClick={() => startEdit(med)} className="p-2.5 rounded-xl hover:bg-[#e6f2f2] text-gray-400 hover:text-[#008080] transition-colors shadow-xs">
+                          <Pencil size={18} />
+                       </button>
+                       <button onClick={() => handleDeactivate(med.id || (med as any)._id)} className="p-2.5 rounded-xl hover:bg-red-50 text-gray-400 hover:text-red-500 transition-colors shadow-xs">
+                          <Trash2 size={18} />
+                       </button>
                     </div>
-                  </div>
-                  <CardTitle className="text-xl font-bold text-[#2b3654] group-hover:text-[#3bbdbf] transition-colors">
-                    {med.name}
-                  </CardTitle>
-                  <CardDescription className="text-gray-500 font-medium">
-                    {med.dosage} {med.unit} • {med.frequency.charAt(0).toUpperCase() + med.frequency.slice(1)}
-                  </CardDescription>
-                </CardHeader>
-                
-                <CardContent className="space-y-4">
-                  <div className="flex flex-wrap gap-2">
-                    {med.scheduleTimes.map((time, i) => (
-                      <div key={`${med.id}-time-${i}`} className="flex items-center gap-1.5 bg-gray-50 border border-gray-100 text-gray-600 text-xs font-bold px-3 py-1.5 rounded-full">
-                        <Clock size={12} className="text-[#3bbdbf]" />
-                        {time}
-                      </div>
-                    ))}
-                  </div>
-                  
-                  <div className="flex items-center gap-2 text-xs text-gray-400 font-medium">
-                    <Calendar size={12} />
-                    Started {format(new Date(med.startDate), 'MMM dd, yyyy')}
-                  </div>
+                </div>
 
-                  {med.notes && (
-                    <div className="bg-[#f8faff] rounded-2xl p-4 text-sm text-[#7b8ea6] border border-gray-100 italic">
-                      "{med.notes}"
-                    </div>
-                  )}
-                </CardContent>
+                <h3 className={`${merriweather.className} text-xl font-bold text-[#1a2233] group-hover:text-[#008080] transition-colors mb-2`}>
+                   {med.name}
+                </h3>
+                <div className="flex items-center gap-2 mb-6">
+                   <span className="text-[10px] font-black uppercase px-2.5 py-1 bg-gray-50 text-gray-400 rounded-lg tracking-widest border border-gray-100">
+                      {med.dosage} {med.unit}
+                   </span>
+                   <span className="text-[10px] font-black uppercase px-2.5 py-1 bg-[#e6f2f2] text-[#008080] rounded-lg tracking-widest border border-[#008080]/10">
+                      {med.frequency}
+                   </span>
+                </div>
 
-                <CardFooter className="pt-2">
-                   <div className="w-full flex items-center justify-between text-xs font-bold uppercase tracking-wider">
-                      <span className="flex items-center gap-1.5 text-green-600">
-                         <CheckCircle2 size={14} />
-                         Synced
-                      </span>
-                      {med.isActive && (
-                        <div className="h-2 w-2 rounded-full bg-[#3bbdbf] shadow-[0_0_8px_rgba(59,130,246,0.5)]" />
-                      )}
+                <div className="space-y-4 mb-8 flex-1">
+                   <div className="flex flex-wrap gap-2">
+                      {med.scheduleTimes.map((time, i) => (
+                        <div key={`${med.id}-time-${i}`} className="flex items-center gap-1.5 bg-[#fcfdfd] border border-gray-100 text-gray-500 text-[10px] font-black px-4 py-2 rounded-xl group-hover:bg-[#e6f2f2] transition-colors">
+                           <Clock size={12} className="text-[#008080]" />
+                           {time}
+                        </div>
+                      ))}
                    </div>
-                </CardFooter>
-              </Card>
+                   
+                   <p className="text-[10px] font-black text-gray-400 uppercase tracking-tighter flex items-center gap-2">
+                      <Calendar size={12} />
+                      PATHWAY INITIATED {format(new Date(med.startDate), 'dd MMM yyyy')}
+                   </p>
+
+                   {med.notes && (
+                      <div className="bg-gray-50 rounded-2xl p-4 text-[11px] font-bold text-gray-500 border border-gray-100 italic leading-relaxed">
+                         "{med.notes}"
+                      </div>
+                   )}
+                </div>
+
+                <div className="pt-6 border-t border-gray-50 flex items-center justify-between">
+                   <span className="flex items-center gap-2 text-[10px] font-black text-[#008080] uppercase tracking-[1px]">
+                      <CheckCircle2 size={16} /> Regimen Valid
+                   </span>
+                   {med.isActive && <div className="w-2.5 h-2.5 rounded-full bg-green-500 shadow-lg shadow-green-500/20"></div>}
+                </div>
+              </div>
             ))}
           </div>
         )}
-      </div>
+      </main>
 
-      {/* Form Dialog/Overlay */}
+      {/* Modern High-End Overlay Form */}
       {isAdding && (
-        <div className="fixed inset-0 bg-[#2b3654]/40 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-in fade-in duration-300">
-          <Card className="w-full max-w-lg bg-white border-none shadow-2xl rounded-[2.5rem] overflow-hidden animate-in zoom-in-95">
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-md z-[100] flex items-center justify-center p-8 animate-in fade-in duration-500">
+          <div className="w-full max-w-2xl bg-white rounded-[3.5rem] shadow-3xl overflow-hidden animate-in zoom-in-95 duration-500 border border-white/20">
             <form onSubmit={editingId ? handleUpdate : handleCreate}>
-              <div className="p-8 border-b border-gray-50 flex items-center justify-between">
-                <h3 className="text-2xl font-bold text-[#2b3654]">
-                  {editingId ? 'Edit Medication' : 'Add Medication'}
-                </h3>
-                <Button variant="ghost" size="icon" onClick={() => setIsAdding(false)} type="button" className="rounded-full hover:bg-gray-50">
-                  <X size={24} className="text-gray-400" />
-                </Button>
+              <div className="p-10 border-b border-gray-50 flex items-center justify-between bg-gray-50/50">
+                <div>
+                   <h3 className={`${merriweather.className} text-3xl font-bold text-[#008080]`}>
+                     {editingId ? 'Edit Regimen' : 'Register Med'}
+                   </h3>
+                   <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-1">Configure Clinical Schedule</p>
+                </div>
+                <button type="button" onClick={() => setIsAdding(false)} className="bg-white p-3 rounded-2xl text-gray-400 hover:text-red-500 hover:rotate-90 transition-all shadow-sm">
+                  <X size={24} />
+                </button>
               </div>
               
-              <div className="p-8 space-y-6 max-h-[60vh] overflow-y-auto">
-                <div className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="col-span-2 space-y-2">
-                      <label className="text-sm font-bold text-[#2b3654]">Medication Name</label>
-                      <Input 
-                        required
-                        placeholder="e.g. Paracetamol"
-                        className="rounded-xl border-gray-100 focus:border-[#3bbdbf] focus:ring-[#3bbdbf]"
-                        value={formData.name}
-                        onChange={e => setFormData({...formData, name: e.target.value})}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-sm font-bold text-[#2b3654]">Dosage</label>
-                      <Input 
-                        required
-                        type="number"
-                        placeholder="500"
-                        className="rounded-xl border-gray-100"
-                        value={formData.dosage}
-                        onChange={e => setFormData({...formData, dosage: e.target.value})}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-sm font-bold text-[#2b3654]">Unit</label>
-                      <Input 
-                        required
-                        placeholder="mg"
-                        className="rounded-xl border-gray-100"
-                        value={formData.unit}
-                        onChange={e => setFormData({...formData, unit: e.target.value})}
-                      />
-                    </div>
+              <div className="p-10 space-y-8 max-h-[65vh] overflow-y-auto custom-scrollbar">
+                  <div className="grid grid-cols-12 gap-8">
+                     <div className="col-span-12 space-y-3">
+                        <label className="text-[11px] font-black text-[#008080] uppercase tracking-widest">Medication Clinical Name</label>
+                        <input 
+                          required
+                          placeholder="e.g. Meta-Metoprolol"
+                          className="w-full h-16 bg-gray-50 border border-gray-100 rounded-2xl px-6 text-sm font-black focus:outline-none focus:ring-2 focus:ring-[#008080] focus:bg-white transition-all"
+                          value={formData.name}
+                          onChange={e => setFormData({...formData, name: e.target.value})}
+                        />
+                     </div>
+                     <div className="col-span-6 space-y-3">
+                        <label className="text-[11px] font-black text-[#008080] uppercase tracking-widest">Dosage Amount</label>
+                        <input 
+                          required
+                          type="number"
+                          placeholder="500"
+                          className="w-full h-16 bg-gray-50 border border-gray-100 rounded-2xl px-6 text-sm font-black focus:outline-none focus:ring-2 focus:ring-[#008080]"
+                          value={formData.dosage}
+                          onChange={e => setFormData({...formData, dosage: e.target.value})}
+                        />
+                     </div>
+                     <div className="col-span-6 space-y-3">
+                        <label className="text-[11px] font-black text-[#008080] uppercase tracking-widest">Clinical Unit</label>
+                        <input 
+                          required
+                          placeholder="mg / ml"
+                          className="w-full h-16 bg-gray-50 border border-gray-100 rounded-2xl px-6 text-sm font-black focus:outline-none focus:ring-2 focus:ring-[#008080]"
+                          value={formData.unit}
+                          onChange={e => setFormData({...formData, unit: e.target.value})}
+                        />
+                     </div>
+                     <div className="col-span-12 space-y-3">
+                        <label className="text-[11px] font-black text-[#008080] uppercase tracking-widest">Dispatch Frequency</label>
+                        <div className="grid grid-cols-4 gap-3">
+                           {[FrequencyType.DAILY, FrequencyType.WEEKLY, FrequencyType.MONTHLY, FrequencyType.CUSTOM].map(f => (
+                              <button
+                                key={f}
+                                type="button"
+                                onClick={() => setFormData({...formData, frequency: f})}
+                                className={`h-14 rounded-2xl border text-[10px] font-black uppercase tracking-tighter transition-all ${
+                                   formData.frequency === f 
+                                   ? 'bg-[#008080] border-[#008080] text-white shadow-lg' 
+                                   : 'bg-white border-gray-100 text-gray-400 hover:bg-gray-50'
+                                }`}
+                              >
+                                {f}
+                              </button>
+                           ))}
+                        </div>
+                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 gap-4">
-                    <div className="space-y-2">
-                      <label className="text-sm font-bold text-[#2b3654]">Frequency</label>
-                      <select 
-                        required
-                        className="w-full h-12 rounded-xl border-gray-100 bg-[#f8faff] px-4 text-sm font-medium focus:ring-2 focus:ring-[#3bbdbf] focus:outline-none appearance-none"
-                        value={formData.frequency}
-                        onChange={e => setFormData({...formData, frequency: e.target.value as FrequencyType})}
-                      >
-                        <option value={FrequencyType.DAILY}>Daily</option>
-                        <option value={FrequencyType.WEEKLY}>Weekly</option>
-                        <option value={FrequencyType.MONTHLY}>Monthly</option>
-                        <option value={FrequencyType.CUSTOM}>Custom / As Needed</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  <div className="space-y-3">
-                    <label className="text-sm font-bold text-[#2b3654]">Schedule Times</label>
-                    <div className="grid grid-cols-1 gap-3">
+                  <div className="space-y-4">
+                    <label className="text-[11px] font-black text-[#008080] uppercase tracking-widest">Intake Time Slots</label>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {formData.scheduleTimes?.map((time, idx) => (
-                        <div key={`form-time-slot-${idx}`} className="flex gap-2 animate-in slide-in-from-left-2">
-                          <Input 
+                        <div key={`form-time-${idx}`} className="flex gap-3 group">
+                          <input 
                             type="time"
-                            className="rounded-xl border-gray-100 py-6"
+                            className="flex-1 h-14 bg-gray-50 border border-gray-100 rounded-2xl px-6 text-sm font-black focus:outline-none focus:ring-2 focus:ring-[#008080]"
                             value={time}
                             onChange={e => {
                               const newTimes = [...(formData.scheduleTimes || [])];
@@ -369,60 +413,56 @@ export default function MedicationsPage() {
                             }}
                           />
                           {idx > 0 && (
-                            <Button 
-                              variant="ghost" 
-                              size="icon" 
+                            <button 
                               onClick={() => setFormData({...formData, scheduleTimes: formData.scheduleTimes?.filter((_, i) => i !== idx)})}
-                              className="text-red-400 hover:bg-red-50 rounded-xl h-12 w-12"
+                              className="w-14 h-14 bg-red-50 text-red-400 hover:bg-red-500 hover:text-white rounded-2xl flex items-center justify-center transition-all shadow-sm"
                               type="button"
                             >
-                              <Trash2 size={20} />
-                            </Button>
+                              <X size={20} />
+                            </button>
                           )}
                         </div>
                       ))}
                     </div>
-                    <Button 
-                      variant="ghost" 
+                    <button 
                       onClick={() => setFormData({...formData, scheduleTimes: [...(formData.scheduleTimes || []), '08:00']})}
                       type="button"
-                      className="w-full border-2 border-dashed border-gray-100 rounded-xl text-[#3bbdbf] font-bold py-6 hover:bg-cyan-50/50"
+                      className="w-full h-16 border-2 border-dashed border-gray-100 rounded-[1.5rem] text-[#008080] font-black text-[11px] uppercase tracking-widest hover:bg-[#e6f2f2] hover:border-[#008080]/30 transition-all flex items-center justify-center gap-2"
                     >
-                      + Add another time slot
-                    </Button>
+                      <Plus size={18} /> ADD CLINICAL TIME SLOT
+                    </button>
                   </div>
 
-                  <div className="space-y-2">
-                    <label className="text-sm font-bold text-[#2b3654]">Clinical Notes</label>
+                  <div className="space-y-3">
+                    <label className="text-[11px] font-black text-[#008080] uppercase tracking-widest">Therapeutic Notes</label>
                     <textarea 
-                      className="w-full bg-[#f8faff] border border-gray-100 rounded-2xl p-4 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#3bbdbf] min-h-[100px]"
-                      placeholder="Take after breakfast..."
+                      className="w-full bg-gray-50 border border-gray-100 rounded-3xl p-6 text-sm font-bold text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#008080] min-h-[120px] transition-all"
+                      placeholder="Special instructions for clinical adherence..."
                       value={formData.notes}
                       onChange={e => setFormData({...formData, notes: e.target.value})}
                     />
                   </div>
-                </div>
               </div>
 
-              <div className="p-8 border-t border-gray-50 bg-[#fefdfd] flex gap-4">
-                <Button 
-                  variant="outline" 
-                  className="flex-1 rounded-xl py-6 font-bold text-gray-500"
+              <div className="p-10 bg-gray-50 flex gap-6">
+                <button 
                   onClick={() => setIsAdding(false)}
                   type="button"
+                  className="flex-1 h-16 bg-white border border-gray-100 text-gray-400 font-black rounded-2xl hover:bg-white/80 transition-all text-xs uppercase tracking-widest"
                 >
-                  Cancel
-                </Button>
-                <Button 
-                  className="flex-1 bg-[#2b3654] hover:bg-[#1E2A4F] text-white rounded-xl py-6 font-bold shadow-xl shadow-[#2b3654]/10"
+                  ABORT
+                </button>
+                <button 
                   disabled={loading}
                   type="submit"
+                  className="flex-1 h-16 bg-[#008080] text-white font-black rounded-2xl shadow-xl shadow-[#008080]/20 hover:scale-[1.02] active:scale-95 transition-all text-xs uppercase tracking-widest flex items-center justify-center gap-2"
                 >
-                  {loading ? <Loader2 className="animate-spin" /> : 'Save Medication'}
-                </Button>
+                  {loading ? <Loader2 className="animate-spin" /> : <span>FINALIZE REGIMEN</span>}
+                  {!loading && <ArrowRight size={18} />}
+                </button>
               </div>
             </form>
-          </Card>
+          </div>
         </div>
       )}
     </div>
