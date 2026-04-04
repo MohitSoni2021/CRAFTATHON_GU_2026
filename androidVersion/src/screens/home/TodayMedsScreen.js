@@ -17,6 +17,7 @@ import { format, parseISO } from 'date-fns';
 import { getTodayDosesService, markDoseAsTakenService } from '../../services/medicationService';
 import { getAdherenceScoreService } from '../../services/adherenceService';
 import { useAuthStore } from '../../store/authStore';
+import { cancelAllMedicationNotifications, scheduleMedicationReminder } from '../../services/localNotificationService';
 
 const TIME_RANGES = [
   { key: 'Morning', start: 5, end: 12 },
@@ -129,6 +130,25 @@ export default function TodayMedsScreen({ navigation }) {
     fetchData();
   }, []);
 
+  const scheduleTodayDoseNotifications = useCallback(async (doses) => {
+    await cancelAllMedicationNotifications();
+    const now = new Date();
+
+    await Promise.all(
+      doses
+        .filter((dose) => dose.status !== 'taken')
+        .map((dose) => {
+          const scheduledDate = new Date(dose.scheduledTime);
+          return scheduledDate > now ? scheduleMedicationReminder(dose) : null;
+        })
+    );
+  }, []);
+
+  useEffect(() => {
+    if (!loading && todayDoses.length > 0) {
+      scheduleTodayDoseNotifications(todayDoses);
+    }
+  }, [loading, todayDoses, scheduleTodayDoseNotifications]);
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);

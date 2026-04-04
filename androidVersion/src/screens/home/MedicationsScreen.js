@@ -16,6 +16,7 @@ import { Ionicons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { format } from 'date-fns';
 import { listMedicationsService, createMedicationService } from '../../services/medicationService';
+import { getNotificationPermissionStatus, initializeNotificationChannel, requestNotificationPermission, scheduleMedicationReminder } from '../../services/localNotificationService';
 
 const FREQUENCIES = [
   { label: 'Daily', value: 'daily' },
@@ -28,6 +29,7 @@ export default function MedicationsScreen({ navigation }) {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [notificationStatus, setNotificationStatus] = useState('loading');
 
   // Form State
   const [name, setName] = useState('');
@@ -43,9 +45,14 @@ export default function MedicationsScreen({ navigation }) {
     try {
       if (!refreshing) setLoading(true);
       const res = await listMedicationsService();
-      if (res.success) setMeds(res.data);
+      if (res?.success) {
+        setMeds(res.data ?? []);
+      } else {
+        setMeds([]);
+      }
     } catch (e) {
-      console.error(e);
+      console.error('Failed to load medications', e);
+      setMeds([]);
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -54,7 +61,40 @@ export default function MedicationsScreen({ navigation }) {
 
   useEffect(() => {
     fetchMeds();
+    const fetchNotificationStatus = async () => {
+      const status = await getNotificationPermissionStatus();
+      setNotificationStatus(status ?? 'undetermined');
+    };
+
+    fetchNotificationStatus();
   }, []);
+
+  const handleNotificationPermission = async () => {
+    const granted = await requestNotificationPermission();
+    setNotificationStatus(granted ? 'granted' : 'denied');
+    if (granted) {
+      await initializeNotificationChannel();
+    }
+  };
+
+  const scheduleReminderForMedication = async (med) => {
+    if (!med) return null;
+
+    const now = new Date();
+    const scheduleDate = new Date(selectedTime ?? new Date());
+    scheduleDate.setFullYear(now.getFullYear(), now.getMonth(), now.getDate());
+    if (scheduleDate <= now) {
+      scheduleDate.setDate(scheduleDate.getDate() + 1);
+    }
+
+    return scheduleMedicationReminder({
+      medicationId: med.id || med._id || `med-${Date.now()}`,
+      medicationName: med.name ?? 'Medication',
+      dosage: `${med.dosage ?? ''} ${med.unit ?? unit}`.trim(),
+      scheduledTime: scheduleDate.toISOString(),
+      status: 'pending',
+    });
+  };
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
@@ -80,7 +120,16 @@ export default function MedicationsScreen({ navigation }) {
       };
 
       const res = await createMedicationService(payload);
-      if (res.success) {
+      if (res?.success) {
+        if (notificationStatus === 'granted') {
+          await scheduleReminderForMedication({
+            id: res?.data?.id || res?.data?._id,
+            name,
+            dosage,
+            unit,
+          });
+        }
+
         Alert.alert('Success', 'Medication added successfully');
         setShowAddModal(false);
         setName('');
@@ -125,6 +174,23 @@ export default function MedicationsScreen({ navigation }) {
           <Ionicons name="add" size={24} color="white" />
         </TouchableOpacity>
       </View>
+
+      {notificationStatus !== 'granted' && notificationStatus !== 'loading' && (
+        <View className="mx-6 mt-4 rounded-3xl border border-amber-100 bg-amber-50 px-4 py-4 flex-row items-center justify-between">
+          <View className="flex-1 pr-3">
+            <Text className="text-amber-900 font-semibold">Enable medication reminders</Text>
+            <Text className="text-amber-700 text-sm">
+              Turn on notifications so your medication reminders arrive at the right time.
+            </Text>
+          </View>
+          <TouchableOpacity
+            onPress={handleNotificationPermission}
+            className="bg-amber-400 rounded-2xl px-4 py-3"
+          >
+            <Text className="text-black font-bold">Enable</Text>
+          </TouchableOpacity>
+        </View>
+      )}
 
       <ScrollView
         className="flex-1 px-6 pt-6"
