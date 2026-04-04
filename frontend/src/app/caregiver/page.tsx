@@ -156,7 +156,7 @@ export default function CaregiverPage() {
       
       <Sidebar user={user} />
 
-      <main className="ml-72 flex-1 p-10 max-w-[1400px] w-full">
+      <main className="ml-[30rem] flex-1 p-10 max-w-[1400px] w-full">
         
         {/* Professional Header Section */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">

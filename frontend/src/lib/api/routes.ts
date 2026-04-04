@@ -46,8 +46,8 @@ export const deactivateMedication = async (id: string) => {
   return response.data;
 };
 
-export const getAdherenceScore = async () => {
-  const response = await api.get('/adherence/score');
+export const getAdherenceScore = async (patientId?: string) => {
+  const response = await api.get('/adherence/score', { params: { patientId } });
   return response.data;
 };
 
@@ -61,8 +61,8 @@ export const updateProfile = async (data: any) => {
   return response.data;
 };
 
-export const getRiskLevel = async () => {
-  const response = await api.get('/adherence/risk');
+export const getRiskLevel = async (patientId?: string) => {
+  const response = await api.get('/adherence/risk', { params: { patientId } });
   return response.data;
 };
 
@@ -131,8 +131,8 @@ export const markAllNotificationsRead = async () => {
   return response.data;
 };
 
-export const getTodayDoses = async () => {
-  const response = await api.get('/dose-logs/today');
+export const getTodayDoses = async (patientId?: string) => {
+  const response = await api.get('/dose-logs/today', { params: { patientId } });
   return response.data;
 };
 

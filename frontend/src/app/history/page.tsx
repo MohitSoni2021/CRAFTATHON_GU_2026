@@ -117,11 +117,11 @@ export default function HistoryPage() {
   }
 
   return (
-    <div className={`min-h-screen bg-[#fcfdfd] text-[#1a2233] flex ${poppins.className}`}>
+    <div className={`min-h-screen bg-[#f8fafb] text-[#1a2233] flex no-scrollbar overflow-x-hidden ${poppins.className}`}>
       
       <Sidebar user={user} riskLevel={risk?.riskLevel} />
 
-      <main className="ml-72 flex-1 p-10 max-w-[1400px] w-full">
+      <main className="ml-[30rem] flex-1 p-10 max-w-[1800px] w-full no-scrollbar">
         
         {/* Professional Header Section */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
@@ -253,7 +253,7 @@ export default function HistoryPage() {
                    </div>
                 ) : filteredLogs.length === 0 ? (
                   <div className="py-32 flex flex-col items-center justify-center text-center px-10">
-                    <div className="w-24 h-24 bg-gray-50 rounded-[2rem] flex items-center justify-center mb-8 shadow-sm">
+                    <div className="w-24 h-24 bg-[#f8fafb] rounded-[2rem] flex items-center justify-center mb-8 shadow-sm">
                        <HelpCircle size={40} className="text-gray-200" />
                     </div>
                     <h3 className={`${merriweather.className} text-2xl font-bold text-[#1a2233] mb-3`}>No Records Found</h3>
@@ -274,7 +274,7 @@ export default function HistoryPage() {
                       const isDelayed = (log.delayMinutes || 0) > 0 || status === 'delayed'
                       
                       return (
-                        <div key={log._id || `${log.medicationId}_${log.scheduledTime}`} className={`p-8 hover:bg-gray-50/30 transition-all flex flex-col md:flex-row md:items-center justify-between gap-8 group ${isTaken ? 'opacity-80' : ''}`}>
+                        <div key={log._id || `${log.medicationId}_${log.scheduledTime}`} className={`p-8 hover:bg-[#f8fafb]/30 transition-all flex flex-col md:flex-row md:items-center justify-between gap-8 group ${isTaken ? 'opacity-80' : ''}`}>
                           <div className="flex items-center gap-8">
                              <div className={`w-16 h-16 rounded-[1.75rem] flex items-center justify-center shrink-0 shadow-sm border transition-transform group-hover:scale-110 ${
                                isTaken && !isDelayed ? 'bg-emerald-50 border-emerald-100 text-emerald-500 shadow-xl shadow-[#008080]/5' : 

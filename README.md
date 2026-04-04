@@ -1,61 +1,66 @@
-# Hackathon Gandhi Nagar - Full-Stack Monorepo
+# MedTrack: Clinical Adherence & Patient Hub
 
-A modern, scalable full-stack monorepo built with pnpm workspaces, Next.js, Express, and MongoDB.
+**MedTrack** is a high-fidelity, proactive medication management and clinical adherence platform designed to bridge the gap between patients, caregivers, and medical professionals. This repository contains the complete implementation of a production-ready HealthTech system, built with **Next.js 15**, **FastAPI (Python)**, and **Node.js**.
 
-## Tech Stack
-- **Package Manager:** [pnpm](https://pnpm.io/)
-- **Frontend:** Next.js 15 (App Router), Tailwind CSS, shadcn/ui
-- **Backend:** Node.js, Express, TypeScript
-- **Database:** MongoDB (via Mongoose)
-- **Shared:** Zod (Single Source of Truth for schemas & types)
-- **API Docs:** Swagger UI (auto-generated from Zod schemas)
+---
 
-## Project Structure
-- `/frontend`: Next.js application
-- `/backend`: Express API server
-- `/shared`: Shared Zod schemas and TypeScript types
+## 🚀 Live Implemented Features
 
-## Setup & Installation
+### 1. **Clinical Authentication Hub**
+*   **Multi-Role Access**: Secure registration and login for **Patients**, **Doctors (Physicians)**, and **Caregivers**.
+*   **SSO Integration**: Google OAuth 2.0 implementation for streamlined clinical node registration.
+*   **Encrypted Identity**: Client-side AES-256 encryption for session and profile data.
 
-### 1. Prerequisites
-Ensure you have Node.js (>=20.0.0) and pnpm (>=9.0.0) installed.
+### 2. **Patient Dashboard (The Health Node)**
+*   **Adherence Core Scoring**: Real-time percentage tracking of adherence using historical intake data.
+*   **Adaptive Condition Engine**: Dynamic Triage/Risk assessment (**Low**, **Medium**, **High**) based on medication logs.
+*   **Session Stats**: Daily summaries of successful logs, delayed intakes, and critical misses.
+*   **Live Care Network**: Integrated view of authorized clinical nodes (Physicians) currently linked to the patient.
 
-### 2. Install Dependencies
-Run from the root directory:
-```bash
-pnpm install
-```
+### 3. **Dynamic Regimen Control (Today's Meds)**
+*   **Phase-Based Scheduling**: Intakes automatically grouped by **Morning**, **Afternoon**, and **Evening** phases.
+*   **Audit-Ready Logging**: One-click dose logging with millisecond-precision synchronization.
+*   **Automatic Delay Detection**: Intelligent calculation of medication delay windows (`+X min late`).
+*   **Gamified Adherence**: Persistent streak tracking and visual celebration (`Confetti`) for clinical targets.
 
-### 3. Environment Variables
-Copy `.env.example` to `.env` in the root directory (already done for you if using the provided setup):
-```bash
-cp .env.example .env
-```
-Update the `MONGODB_URI` with your connection string.
+### 4. **Verified Care Network (Caregiver Support)**
+*   **Secure Invitations**: Email-based caregiver/patient linking requests.
+*   **Request Management**: Dedicated interface for accepting or declining care connection nodes.
+*   **Shared Monitoring**: Real-time visibility into the patient's adherence score and risk level for authorized family members.
 
-### 4. Running the Project
+### 5. **Physician Command Hub (Doctor View)**
+*   **Population Diagnostics**: Searchable portfolio of all linked patients with at-a-glance health metrics.
+*   **Prioritization Engine**: Flagging system to prioritize "High Risk" or critical follow-ups.
+*   **Data Vault Access**: "View-As" functionality to deep-dive into a patient's historical adherence logs.
+*   **Automated Analytics**: Generate and download **Clinical Analysis PDFs** for specific patients.
 
-#### Run all services in development mode:
-```bash
-pnpm dev
-```
+### 6. **Global Archive (Clinical History)**
+*   **Comprehensive Log Explorer**: Full vertical history of all therapeutic events.
+*   **Granular Filtering**: Filter records by status (**Successful**, **Delayed**, **Missed**).
+*   **Date Navigation**: Chronological navigation across sessions to analyze long-term patterns.
 
-#### Run services individually:
-- **Backend:** `cd backend && pnpm dev` (Runs at http://localhost:5000)
-- **Frontend:** `cd frontend && pnpm dev` (Runs at http://localhost:3000)
-- **Shared:** `cd shared && pnpm dev` (Watches for changes and compiles TS)
+### 7. **Smart Adherence AI (Python RAG Engine)**
+*   **Knowledge Integration**: Python-driven **RAG (Retrieval-Augmented Generation)** chatbot for health insights.
+*   **Clinical Dataset**: Integrated knowledge base (`medtrack_dataset.csv`) for context-aware medical suggestions.
+*   **Real-time Assistance**: Interactive AI chat focused on behavior pattern improvement.
 
-### 5. API Documentation
-The Swagger UI is available at:
-[http://localhost:5000/api-docs](http://localhost:5000/api-docs)
+---
 
-## Features
-- **Shared Types:** Frontend and Backend share the exact same Zod schemas for validation and TypeScript interfaces.
-- **Auto-generated Docs:** API documentation is automatically generated based on the Zod schemas in `@shared`.
-- **Axios Configuration:** Centralized Axios instance in the frontend with environment-aware base URL.
-- **Modular Backend:** Clean structure in the backend with modular controllers and routes.
-- **Premium UI:** Custom-built UI components following shadcn design patterns for a premium look.
+## 🎨 Premium Visual Architecture
+MedTrack implements a state-of-the-art **"Floating Board"** design system:
+*   **Floating Sidebar**: Fixed `3.5rem` rounded sidebar with a high-fidelity shadow (`50px blur`).
+*   **Spacious Canvas**: Large `28rem` content margin for maximum structural breathing room.
+*   **Clinical Teal Palette**: Modern HealthTech branding using `#008080` and clinical mint tints.
+*   **Hydration Maturity**: Fully guarded Next.js 15 client-side rendering to ensure therapeutic data accuracy.
 
-## Database Information
-- **Database Name:** `hackathon_gandhinagar_testing`
-- **URI:** Provided in the request and configured in `.env`
+---
+
+## 🛠️ Technical Implementation
+*   **Frontend**: Next.js 15 (App Router), Tailwind CSS, Lucide React Icons.
+*   **Backend (Clinical API)**: Node.js/TypeScript with MongoDB persistence.
+*   **Backend (AI Node)**: FastAPI (Python), LangChain, RAG implementation.
+*   **Synchronization**: Real-time Socket.io listeners for low-latency adherence updates.
+*   **Storage**: Segmented clinical records with multi-layer authorization.
+
+---
+*MedTrack: Advancing Clinical Precision through Digital Synchronization.*
