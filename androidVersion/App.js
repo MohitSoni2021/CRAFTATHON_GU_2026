@@ -16,9 +16,13 @@ export default function App() {
     hydrate();
 
     const setupNotifications = async () => {
-      const allowed = await requestNotificationPermission();
-      if (allowed) {
-        await initializeNotificationChannel();
+      try {
+        const allowed = await requestNotificationPermission();
+        if (allowed) {
+          await initializeNotificationChannel();
+        }
+      } catch (error) {
+        console.warn('Notification setup failed', error);
       }
     };
 
