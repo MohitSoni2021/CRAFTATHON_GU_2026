@@ -1,26 +1,31 @@
 "use client"
 
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { GoogleLogin } from "@react-oauth/google"
 import { LoginSchema } from "@hackgu/shared"
 import { encryptData } from "@/lib/crypto"
 import { loginUser, googleLogin } from "@/lib/api/routes"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { APP_NAME } from "@/constants"
-import { Plus_Jakarta_Sans } from "next/font/google"
-import { Activity } from "lucide-react"
+import { Merriweather, Plus_Jakarta_Sans, Poppins } from "next/font/google"
+import { Activity, ArrowRight, ShieldCheck, HeartPulse } from "lucide-react"
+import styles from './login.module.css'
 
-const jakarta = Plus_Jakarta_Sans({ subsets: ['latin'] })
+const merriweather = Merriweather({ weight: ['400', '700', '900'], subsets: ['latin'] });
+const jakarta = Plus_Jakarta_Sans({ subsets: ['latin'] });
+const poppins = Poppins({ weight: ['300', '400', '500', '600', '700', '800', '900'], subsets: ['latin'] });
 
 export default function LoginPage() {
   const router = useRouter()
+  const [mounted, setMounted] = useState(false)
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -49,7 +54,7 @@ export default function LoginPage() {
         router.push("/dashboard")
       }
     } catch (err: any) {
-      setError(err.response?.data?.message || "Invalid email or password.")
+      setError(err.response?.data?.message || "Invalid credentials. Manual entry required.")
     } finally {
       setLoading(false)
     }
@@ -71,131 +76,131 @@ export default function LoginPage() {
         router.push("/dashboard")
       }
     } catch (err: any) {
-      setError(err.response?.data?.message || "Google login failed.")
+      setError(err.response?.data?.message || "Google handshake failed.")
     } finally {
       setLoading(false)
     }
   }
 
   const handleGoogleError = () => {
-    setError("Google login failed. Please try again.")
+    setError("Google authentication service down.")
   }
 
+  if (!mounted) return null;
+
   return (
-    <div className={`min-h-screen flex text-[#2b3654] ${jakarta.className}`}>
-      {/* Left pane - Visual Theme */}
-      <div className="hidden lg:flex flex-col relative w-1/2 p-12 overflow-hidden justify-between" style={{ background: 'linear-gradient(135deg, #2b7a8c 0%, #3bbdbf 100%)' }}>
-        {/* Subtle background overlay */}
-        <div className="absolute inset-0 opacity-10 mix-blend-overlay" style={{ backgroundImage: 'url("https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&w=2000&q=80")', backgroundSize: 'cover', backgroundPosition: 'center' }}></div>
-        
-        <div className="relative z-10 flex items-center gap-2 text-white font-bold text-2xl">
-          <Activity size={32} />
-          {APP_NAME}
-        </div>
-        
-        <div className="relative z-10">
-          <div className="bg-white/20 backdrop-blur-xl border border-white/30 p-8 rounded-3xl text-white shadow-2xl">
-             <h2 className="text-3xl font-bold mb-4 leading-tight">Welcome back to better adherence.</h2>
-             <p className="text-lg opacity-90">Login to your dashboard to monitor tracking, view proactive alerts, and manage your health safely.</p>
-          </div>
+    <div className={`${styles.container} ${poppins.className}`}>
+      
+      {/* Left Panel: Clinical Branding */}
+      <div className={styles.leftPanel}>
+        <img 
+          src="/login-bg.png" 
+          alt="Medical Background" 
+          className={styles.bgImage}
+        />
+        <div className={styles.leftContent}>
+            <div className="flex items-center gap-3 mb-10 bg-white/10 backdrop-blur-md px-5 py-2.5 rounded-2xl border border-white/10 w-fit">
+               <ShieldCheck size={20} className="text-[#3bbdbf]" />
+               <span className="text-xs font-black uppercase tracking-[2px]">Clinical Access Level 1</span>
+            </div>
+            <h1 className={merriweather.className}>
+               Advanced Health <br /> 
+               <span className="text-[#3bbdbf]">Monitoring </span> Hub
+            </h1>
+            <p>
+              Access the clinical medication adherence engine. Your session is protected by state-of-the-art pharmacological encryption and HIPAA compliance.
+            </p>
         </div>
       </div>
 
-      {/* Right pane - Login Form */}
-      <div className="flex-1 flex flex-col justify-center items-center p-8 bg-[#fcfdfd]">
-        <div className="w-full max-w-md space-y-8">
-          
-          {/* Mobile Logo */}
-          <div className="lg:hidden flex justify-center items-center gap-2 text-[#3bbdbf] font-bold text-2xl mb-8">
-            <Activity size={32} />
-            {APP_NAME}
-          </div>
+      {/* Right Panel: Identity Verification */}
+      <div className={styles.rightPanel}>
+        <Link href="/" className={styles.logo}>
+            <Activity size={32} className={styles.logoIcon} />
+            <span className={merriweather.className}>MedTrack</span>
+        </Link>
+        
+        <div className={styles.formWrapper}>
+            <div className={styles.formHeader}>
+                <h2 className={merriweather.className}>Sign In</h2>
+                <p>Verify your medical identity to continue</p>
+            </div>
 
-          <div className="text-center space-y-2">
-            <h1 className="text-3xl font-bold tracking-tight text-[#2b3654]">Welcome back</h1>
-            <p className="text-[#7b8ea6]">Enter your email and password to access your account</p>
-          </div>
+            <form onSubmit={handleSubmit} className={styles.form}>
+                {error && (
+                    <div className={styles.error}>
+                        {error}
+                    </div>
+                )}
+                
+                <div className={styles.inputGroup}>
+                    <label className={styles.inputLabel} htmlFor="email">Email identifier</label>
+                    <input
+                        id="email"
+                        className={styles.input}
+                        placeholder="doctor@medtrack.org"
+                        type="email"
+                        autoCapitalize="none"
+                        autoComplete="email"
+                        disabled={loading}
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
+                    />
+                </div>
 
-          <form onSubmit={handleSubmit} className="space-y-5 mt-8">
-            {error && (
-              <div className="p-3 text-sm font-medium text-red-600 bg-red-50 rounded-lg border border-red-100 flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                {error}
-              </div>
-            )}
-            
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <label className="text-sm font-semibold text-[#2b3654]" htmlFor="email">Email</label>
-                <Input
-                  id="email"
-                  placeholder="name@example.com"
-                  type="email"
-                  autoCapitalize="none"
-                  autoComplete="email"
-                  disabled={loading}
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  className="rounded-xl border-gray-200 focus:border-[#3bbdbf] focus:ring-[#3bbdbf] py-6"
+                <div className={styles.inputGroup}>
+                    <div className={styles.labelRow}>
+                        <label className={styles.inputLabel} htmlFor="password">Passphrase</label>
+                        <Link href="#" className={styles.forgotLink}>Reset Access</Link>
+                    </div>
+                    <input
+                        id="password"
+                        className={styles.input}
+                        placeholder="••••••••"
+                        type="password"
+                        disabled={loading}
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                    />
+                </div>
+
+                <button disabled={loading} className={styles.submitBtn}>
+                    {loading ? (
+                        <span>Validating Hub Access...</span>
+                    ) : (
+                        <>
+                            <span>Establish Session</span>
+                            <ArrowRight size={20} />
+                        </>
+                    )}
+                </button>
+            </form>
+
+            <div className={styles.divider}>
+                <div className={styles.dividerLine}></div>
+                <span className={styles.dividerText}>OAuth Gateway</span>
+            </div>
+
+            <div className={styles.googleBtnWrap}>
+                <GoogleLogin
+                    onSuccess={handleGoogleSuccess}
+                    onError={handleGoogleError}
+                    theme="outline"
+                    shape="square"
+                    size="large"
+                    width="100%"
+                    logo_alignment="center"
                 />
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-semibold text-[#2b3654]" htmlFor="password">Password</label>
-                <Input
-                  id="password"
-                  placeholder="••••••••"
-                  type="password"
-                  disabled={loading}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  className="rounded-xl border-gray-200 focus:border-[#3bbdbf] focus:ring-[#3bbdbf] py-6"
-                />
-              </div>
             </div>
 
-            <Button 
-              disabled={loading} 
-              className="w-full bg-[#3bbdbf] hover:bg-[#2b7a8c] text-white py-6 rounded-xl font-bold text-md shadow-lg shadow-[#3bbdbf]/20 transition-all hover:-translate-y-0.5"
-            >
-              {loading && (
-                <svg className="mr-2 h-4 w-4 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-              )}
-              Sign In
-            </Button>
-          </form>
-
-          <div className="relative my-8">
-            <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t border-gray-200" />
-            </div>
-            <div className="relative flex justify-center text-xs uppercase font-bold">
-              <span className="bg-[#fcfdfd] px-4 text-[#7b8ea6]">Or continue with</span>
-            </div>
-          </div>
-
-          <div className="flex justify-center">
-            <GoogleLogin
-              onSuccess={handleGoogleSuccess}
-              onError={handleGoogleError}
-              text="continue_with"
-              context="signin"
-              shape="pill"
-              size="large"
-              width="100%"
-            />
-          </div>
-
-          <p className="text-center text-sm font-medium text-[#7b8ea6] mt-8">
-            Don&apos;t have an account?{" "}
-            <Link href="/signup" className="text-[#3bbdbf] font-bold hover:underline underline-offset-4">
-              Create an account
-            </Link>
-          </p>
+            <p className={styles.prompt}>
+                Not registered in the network? 
+                <Link href="/signup" className={styles.promptLink}>
+                    Initialize Profile
+                </Link>
+            </p>
         </div>
       </div>
     </div>

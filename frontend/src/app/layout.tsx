@@ -26,7 +26,7 @@ export default function RootLayout({
       lang="en"
       className={`${poppins.variable} h-full antialiased`}
     >
-      <body className={`${poppins.className} min-h-full flex flex-col antialiased`}>
+      <body className={`${poppins.className} min-h-full flex flex-col antialiased no-scrollbar`}>
         <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || "1013424979439-rqq4uvrgp5bve5hah28gq5ava13cb1cn.apps.googleusercontent.com"}>
           <SocketProvider>
             {children}

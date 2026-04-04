@@ -42,7 +42,8 @@ export function initSocket(server: http.Server) {
     // Caregiver joins 'caregiver:{id}'
     const roleId = `${user.role}:${user.id}`;
     socket.join(roleId);
-    console.log(`📡 Socket connected & joined room: ${roleId}`);
+    socket.join(`user:${user.id}`); // Added for generic user events as per instructions
+    console.log(`📡 Socket connected & joined room: ${roleId} and user:${user.id}`);
 
     socket.on('disconnect', (reason) => {
       console.log(`🔌 Socket disconnected (${roleId}): ${reason}`);

@@ -1,0 +1,347 @@
+.container {
+  min-height: 100vh;
+  display: flex;
+  background: white;
+  color: #1a2233;
+  overflow: hidden;
+  position: relative;
+}
+
+.leftPanel {
+  flex: 1.2;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 5rem;
+  background: #008080;
+  color: white;
+}
+
+.leftPanel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0, 128, 128, 0.9), rgba(0, 128, 128, 0.2));
+  z-index: 1;
+}
+
+.bgImage {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.6;
+  z-index: 0;
+  transition: transform 10s ease-out;
+}
+
+.leftPanel:hover .bgImage {
+  transform: scale(1.1);
+}
+
+.leftContent {
+  position: relative;
+  z-index: 2;
+  max-width: 500px;
+}
+
+.leftContent h1 {
+  font-size: 3.5rem;
+  font-weight: 900;
+  line-height: 1.1;
+  margin-bottom: 1.5rem;
+  letter-spacing: -0.04em;
+}
+
+.leftContent p {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  opacity: 0.9;
+  font-weight: 500;
+}
+
+/* --- Right Panel --- */
+.rightPanel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 5rem;
+  background: #fff;
+  position: relative;
+}
+
+.logo {
+  position: absolute;
+  top: 4rem;
+  left: 4rem;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  font-weight: 900;
+  font-size: 1.5rem;
+  text-decoration: none;
+  color: #1a2233;
+  letter-spacing: -0.04em;
+  z-index: 10;
+}
+
+.logoIcon { 
+  color: #008080; 
+}
+
+.formWrapper {
+  width: 100%;
+  max-width: 440px;
+  animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.formHeader {
+  margin-bottom: 4rem;
+}
+
+.formHeader h2 {
+  font-size: 2.8rem;
+  font-weight: 900;
+  color: #1a2233;
+  margin-bottom: 0.8rem;
+  letter-spacing: -0.04em;
+}
+
+.formHeader p {
+  color: #5c6a85;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.form { 
+  display: flex; 
+  flex-direction: column; 
+  gap: 1.75rem; 
+}
+
+/* Role Selection Grid (for Signup) */
+.roleGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.roleBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem 0.5rem;
+  background: #f8fafb;
+  border: 1px solid #f0f3f5;
+  border-radius: 1.75rem;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  color: #8fa0ba;
+}
+
+.roleBtn:hover {
+  background: #fff;
+  border-color: #008080;
+  color: #008080;
+  box-shadow: 0 10px 30px rgba(0, 128, 128, 0.08);
+  transform: translateY(-2px);
+}
+
+.roleActive {
+  background: #e6f2f2;
+  border-color: #008080;
+  color: #008080;
+  box-shadow: 0 15px 40px rgba(0, 128, 128, 0.12);
+}
+
+.roleIcon { 
+  margin-bottom: 1rem; 
+  transition: transform 0.3s;
+}
+
+.roleLabel { 
+  font-size: 0.65rem; 
+  font-weight: 900; 
+  text-transform: uppercase; 
+  letter-spacing: 0.15em; 
+}
+
+.inputRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+}
+
+.inputGroup { 
+  display: flex; 
+  flex-direction: column; 
+  gap: 0.75rem; 
+}
+
+.labelRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.inputLabel {
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: #1a2233;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  opacity: 0.4;
+}
+
+.forgotLink {
+  font-size: 0.72rem;
+  color: #008080;
+  font-weight: 800;
+  text-decoration: none;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.input {
+  width: 100%;
+  height: 4rem;
+  background: #f8fafb;
+  border: 1px solid #f0f3f5;
+  border-radius: 1.25rem;
+  padding: 0 1.75rem;
+  font-size: 1rem;
+  color: #1a2233;
+  font-weight: 600;
+  transition: all 0.3s;
+}
+
+.input:focus {
+  outline: none;
+  background: #fff;
+  border-color: #008080;
+  box-shadow: 0 0 0 4px rgba(0, 128, 128, 0.05);
+}
+
+.submitBtn {
+  height: 4.2rem;
+  background: #008080;
+  color: #fff;
+  border: none;
+  border-radius: 1.25rem;
+  font-weight: 900;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.25rem;
+  cursor: pointer;
+  transition: all 0.4s;
+  margin-top: 1.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  box-shadow: 0 20px 40px rgba(0, 128, 128, 0.2);
+}
+
+.submitBtn:hover {
+  background: #006666;
+  transform: translateY(-2px);
+  box-shadow: 0 30px 60px rgba(0, 128, 128, 0.3);
+}
+
+.submitBtn:disabled {
+  opacity: 0.6;
+}
+
+.divider {
+  position: relative;
+  margin: 3.5rem 0;
+  text-align: center;
+}
+
+.dividerLine {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: #f0f3f5;
+}
+
+.dividerText {
+  position: relative;
+  background: #fff;
+  padding: 0 2rem;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  font-weight: 900;
+  color: #b0cbd3;
+  letter-spacing: 0.2em;
+}
+
+.googleBtnWrap {
+  border: 1px solid #f0f3f5;
+  border-radius: 1.25rem;
+  overflow: hidden;
+  transition: all 0.3s;
+  background: #fff;
+}
+
+.googleBtnWrap:hover {
+  border-color: #008080;
+}
+
+.error {
+  background: #fef2f2;
+  color: #b91c1c;
+  padding: 1.25rem;
+  border-radius: 1.25rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  border: 1px solid #fee2e2;
+  margin-bottom: 2.5rem;
+  text-align: center;
+}
+
+.prompt {
+  text-align: center;
+  margin-top: 4rem;
+  font-size: 0.95rem;
+  color: #5c6a85;
+  font-weight: 600;
+}
+
+.promptLink {
+  color: #008080;
+  font-weight: 900;
+  text-decoration: none;
+  margin-left: 0.5rem;
+}
+
+.promptLink:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 1100px) {
+  .leftPanel { display: none; }
+  .rightPanel { flex: 1; min-height: 100vh; padding: 2rem; }
+  .logo { left: 2rem; top: 2rem; }
+}
+
+@media (max-width: 600px) {
+  .rightPanel { padding: 1.5rem; }
+  .formHeader h2 { font-size: 2.2rem; }
+  .inputRow { grid-template-columns: 1fr; }
+}
