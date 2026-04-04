@@ -62,18 +62,40 @@ export default function MedicationsScreen({ navigation }) {
   useEffect(() => {
     fetchMeds();
     const fetchNotificationStatus = async () => {
-      const status = await getNotificationPermissionStatus();
-      setNotificationStatus(status ?? 'undetermined');
+      try {
+        const status = await getNotificationPermissionStatus();
+        setNotificationStatus(status ?? 'undetermined');
+      } catch (error) {
+        console.warn('[MedicationsScreen] fetchNotificationStatus failed', error);
+        setNotificationStatus('unsupported');
+      }
     };
 
     fetchNotificationStatus();
   }, []);
 
   const handleNotificationPermission = async () => {
-    const granted = await requestNotificationPermission();
-    setNotificationStatus(granted ? 'granted' : 'denied');
-    if (granted) {
-      await initializeNotificationChannel();
+    try {
+      const supportedStatus = await getNotificationPermissionStatus();
+      if (supportedStatus === 'unsupported') {
+        Alert.alert('Notifications not supported', 'Notifications are not supported in this app environment.');
+        setNotificationStatus('unsupported');
+        return;
+      }
+
+      const granted = await requestNotificationPermission();
+      if (granted) {
+        const initialized = await initializeNotificationChannel();
+        setNotificationStatus('granted');
+        Alert.alert('Notifications enabled', initialized ? 'Notification channel is ready.' : 'Permissions granted, but channel setup failed.');
+      } else {
+        setNotificationStatus('denied');
+        Alert.alert('Notifications unavailable', 'Could not enable notifications. Please check device settings or try again.');
+      }
+    } catch (error) {
+      console.warn('[MedicationsScreen] handleNotificationPermission failed', error);
+      Alert.alert('Error', 'Unable to enable notifications at this time.');
+      setNotificationStatus('unsupported');
     }
   };
 
@@ -178,14 +200,17 @@ export default function MedicationsScreen({ navigation }) {
       {notificationStatus !== 'granted' && notificationStatus !== 'loading' && (
         <View className="mx-6 mt-4 rounded-3xl border border-amber-100 bg-amber-50 px-4 py-4 flex-row items-center justify-between">
           <View className="flex-1 pr-3">
-            <Text className="text-amber-900 font-semibold">Enable medication reminders</Text>
+            <Text className="text-amber-900 font-semibold">Medication reminders</Text>
             <Text className="text-amber-700 text-sm">
-              Turn on notifications so your medication reminders arrive at the right time.
+              {notificationStatus === 'unsupported'
+                ? 'Notifications are not supported in this environment.'
+                : 'Turn on notifications so your medication reminders arrive at the right time.'}
             </Text>
           </View>
           <TouchableOpacity
             onPress={handleNotificationPermission}
-            className="bg-amber-400 rounded-2xl px-4 py-3"
+            disabled={notificationStatus === 'unsupported'}
+            className={`rounded-2xl px-4 py-3 ${notificationStatus === 'unsupported' ? 'bg-slate-200' : 'bg-amber-400'}`}
           >
             <Text className="text-black font-bold">Enable</Text>
           </TouchableOpacity>

@@ -1,18 +1,9 @@
+import * as Notifications from 'expo-notifications';
 import { Platform } from 'react-native';
 
-const getNotificationsModule = async () => {
-  try {
-    const Notifications = await import('expo-notifications');
-    return Notifications ?? null;
-  } catch (error) {
-    console.warn('expo-notifications module unavailable', error);
-    return null;
-  }
-};
-
-const isNotificationsAvailable = (Notifications) => {
+const isNotificationsAvailable = () => {
   return (
-    Notifications &&
+    !!Notifications &&
     typeof Notifications.getPermissionsAsync === 'function' &&
     typeof Notifications.requestPermissionsAsync === 'function' &&
     typeof Notifications.scheduleNotificationAsync === 'function'
@@ -20,21 +11,26 @@ const isNotificationsAvailable = (Notifications) => {
 };
 
 export const getNotificationPermissionStatus = async () => {
-  const Notifications = await getNotificationsModule();
-  if (!isNotificationsAvailable(Notifications)) return 'undetermined';
+  if (!isNotificationsAvailable()) {
+    console.warn('[localNotificationService] Notifications not available');
+    return 'unsupported';
+  }
 
   try {
     const { status } = await Notifications.getPermissionsAsync();
+    console.log('[localNotificationService] permission status', status);
     return status ?? 'undetermined';
   } catch (error) {
-    console.warn('Notification permission status check failed', error);
+    console.warn('[localNotificationService] Notification permission status check failed', error);
     return 'undetermined';
   }
 };
 
 export const requestNotificationPermission = async () => {
-  const Notifications = await getNotificationsModule();
-  if (!isNotificationsAvailable(Notifications)) return false;
+  if (!isNotificationsAvailable()) {
+    console.warn('[localNotificationService] requestNotificationPermission: not available');
+    return false;
+  }
 
   try {
     const { status: existingStatus } = await Notifications.getPermissionsAsync();
@@ -45,16 +41,19 @@ export const requestNotificationPermission = async () => {
       finalStatus = status;
     }
 
+    console.log('[localNotificationService] permission request result', finalStatus);
     return finalStatus === 'granted';
   } catch (error) {
-    console.warn('Requesting notification permission failed', error);
+    console.warn('[localNotificationService] requesting notification permission failed', error);
     return false;
   }
 };
 
 export const initializeNotificationChannel = async () => {
-  const Notifications = await getNotificationsModule();
-  if (!isNotificationsAvailable(Notifications)) return false;
+  if (!isNotificationsAvailable()) {
+    console.warn('[localNotificationService] initializeNotificationChannel: not available');
+    return false;
+  }
 
   try {
     if (Platform.OS === 'android' && typeof Notifications.setNotificationChannelAsync === 'function') {
@@ -67,38 +66,49 @@ export const initializeNotificationChannel = async () => {
         sound: 'default',
       });
     }
+
+    console.log('[localNotificationService] initializeNotificationChannel success');
     return true;
   } catch (error) {
-    console.warn('Initialize notification channel failed', error);
+    console.warn('[localNotificationService] initialize notification channel failed', error);
     return false;
   }
 };
 
 export const cancelAllMedicationNotifications = async () => {
-  const Notifications = await getNotificationsModule();
-  if (!isNotificationsAvailable(Notifications)) return false;
+  if (!isNotificationsAvailable()) {
+    console.warn('[localNotificationService] cancelAllMedicationNotifications: not available');
+    return false;
+  }
 
   try {
     await Notifications.cancelAllScheduledNotificationsAsync();
+    console.log('[localNotificationService] cancelAllMedicationNotifications success');
     return true;
   } catch (error) {
-    console.warn('Cancel all notifications failed', error);
+    console.warn('[localNotificationService] cancel all notifications failed', error);
     return false;
   }
 };
 
 export const scheduleMedicationReminder = async (dose) => {
-  const Notifications = await getNotificationsModule();
-  if (!isNotificationsAvailable(Notifications)) return null;
+  if (!isNotificationsAvailable()) {
+    console.warn('[localNotificationService] scheduleMedicationReminder: not available');
+    return null;
+  }
 
   const scheduledTime = new Date(dose?.scheduledTime ?? null);
-  if (!scheduledTime || isNaN(scheduledTime.getTime())) return null;
+  if (!scheduledTime || Number.isNaN(scheduledTime.getTime())) {
+    console.warn('[localNotificationService] invalid scheduledTime', dose?.scheduledTime);
+    return null;
+  }
+
   if (dose?.status === 'taken' || scheduledTime <= new Date()) {
     return null;
   }
 
   try {
-    return await Notifications.scheduleNotificationAsync({
+    const result = await Notifications.scheduleNotificationAsync({
       content: {
         title: 'Medication Reminder',
         body: `Time to take ${dose?.medicationName || 'your medicine'} (${dose?.dosage || 'dose'}).`,
@@ -110,8 +120,11 @@ export const scheduleMedicationReminder = async (dose) => {
       trigger: scheduledTime,
       channelId: 'medication-reminders',
     });
+
+    console.log('[localNotificationService] scheduled notification', result);
+    return result;
   } catch (error) {
-    console.warn('Schedule medication reminder failed', error);
+    console.warn('[localNotificationService] schedule medication reminder failed', error);
     return null;
   }
 };

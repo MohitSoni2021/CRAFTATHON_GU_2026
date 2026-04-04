@@ -39,7 +39,7 @@
 
 ### The Core Mission
 
-> _Ensure every patient takes the right medicine, at the right time, every time — and alert the right person when they don't._
+> *Ensure every patient takes the right medicine, at the right time, every time — and alert the right person when they don't.*
 
 MedTrack goes beyond a simple pill reminder app. It is a **health intelligence platform** that:
 
@@ -58,22 +58,22 @@ MedTrack goes beyond a simple pill reminder app. It is a **health intelligence p
 
 Medication adherence — the degree to which a patient correctly follows prescribed medication schedules — is one of the most critical yet consistently underperformed aspects of modern healthcare.
 
-| Statistic                                                                  | Source |
-| -------------------------------------------------------------------------- | ------ |
-| Only **50% of chronic illness patients** adhere to medication plans        | WHO    |
-| India's adherence rates for Diabetes/TB patients: **30–40%**               | ICMR   |
+| Statistic | Source |
+|-----------|--------|
+| Only **50% of chronic illness patients** adhere to medication plans | WHO |
+| India's adherence rates for Diabetes/TB patients: **30–40%** | ICMR |
 | Non-adherence costs the global healthcare system **$500 billion annually** | Lancet |
-| **21% of preventable deaths** in India linked to medication non-adherence  | Lancet |
+| **21% of preventable deaths** in India linked to medication non-adherence | Lancet |
 
 ### 2.2 The Indian Healthcare Context
 
-| Factor                              | Impact                                                      |
-| ----------------------------------- | ----------------------------------------------------------- |
-| 77+ million diabetic patients       | 2nd largest diabetic population in the world                |
-| 220+ million hypertensive patients  | Majority poorly controlled due to missed medications        |
-| 2.8 million active TB cases/year    | Non-adherence → drug-resistant TB (MDR-TB)                  |
-| Overburdened hospitals              | Doctors cannot track individual patient adherence           |
-| Large elderly population            | Cognitive decline makes self-management nearly impossible   |
+| Factor | Impact |
+|--------|--------|
+| 77+ million diabetic patients | 2nd largest diabetic population in the world |
+| 220+ million hypertensive patients | Majority poorly controlled due to missed medications |
+| 2.8 million active TB cases/year | Non-adherence → drug-resistant TB (MDR-TB) |
+| Overburdened hospitals | Doctors cannot track individual patient adherence |
+| Large elderly population | Cognitive decline makes self-management nearly impossible |
 | Low digital literacy in rural areas | Existing solutions don't reach the most at-risk populations |
 
 ### 2.3 Root Causes of Non-Adherence
@@ -81,7 +81,7 @@ Medication adherence — the degree to which a patient correctly follows prescri
 1. **No Centralized Tracking** — Patients rely on paper prescriptions, verbal reminders, or memory
 2. **No Real-Time Visibility for Caregivers** — Family members have no remote monitoring capability
 3. **Reactive, Not Proactive Care** — Non-adherence only detected when complications arise
-4. **No Pattern Intelligence** — No system identifies _why_ patients miss doses
+4. **No Pattern Intelligence** — No system identifies *why* patients miss doses
 5. **Generic Reminder Systems Are Insufficient** — Alarms can't verify if a dose was actually taken
 6. **Fragmented Data** — Medical history is scattered across pharmacy receipts, handwritten logs, and app silos
 7. **Drug Conflict Blindspots** — Doctors are often unaware of patient allergies or conflicting medications
@@ -90,20 +90,17 @@ Medication adherence — the degree to which a patient correctly follows prescri
 ### 2.4 Who Is Affected?
 
 **Primary — Patients:**
-
 - Elderly patients managing polypharmacy (multiple chronic conditions)
 - Working adults with hypertension, diabetes, or mental health conditions
 - Post-surgery patients on temporary but critical medication plans
 - Rural patients with limited hospital access who need self-management tools
 
 **Secondary — Caregivers:**
-
 - Family members who are geographically separated from the patient
 - Home nurses managing multiple patients simultaneously
 - NGO health workers tracking TB/diabetes patients across large areas
 
 **Systemic — Healthcare Providers:**
-
 - Doctors who prescribe medications but have zero insight into compliance
 - Hospitals repeatedly admitting the same chronic disease patients
 - Health insurance companies paying for preventable complications
@@ -153,24 +150,24 @@ Medication adherence — the degree to which a patient correctly follows prescri
 
 ### 4.1 ✅ Implemented Features
 
-| Feature             | Description                                            | Status  |
-| ------------------- | ------------------------------------------------------ | ------- |
-| User Authentication | Email/Password + Google OAuth, JWT-based               | ✅ Done |
-| Medication CRUD     | Full create/read/update/delete with scheduling         | ✅ Done |
-| Dose Logging        | Mark doses as Taken / Missed / Delayed with timestamps | ✅ Done |
-| Adherence Scoring   | Rolling 30-day score with risk classification          | ✅ Done |
-| Pattern Detection   | Identifies night-miss, weekend slippage, streak breaks | ✅ Done |
-| Caregiver Linking   | Invite-based patient–caregiver relationship            | ✅ Done |
-| Caregiver Dashboard | Multi-patient adherence overview                       | ✅ Done |
-| Notification System | In-app reminder inbox with read/unread state           | ✅ Done |
-| Push Notifications  | Web Push API (VAPID) for browser notifications         | ✅ Done |
-| Real-time Updates   | Socket.io for live dashboard refresh                   | ✅ Done |
-| Android App         | Expo React Native app with full feature parity         | ✅ Done |
-| RAG AI Assistant    | Ollama + Qdrant for medication Q&A                     | ✅ Done |
-| Analytics Pipeline  | FastAPI + Pandas for population-level data export      | ✅ Done |
-| Doctor Portal       | Doctor-facing view for patient history                 | ✅ Done |
-| Swagger API Docs    | Full OpenAPI 3.0 documentation                         | ✅ Done |
-| PDF Export          | Patient profile/report export via PDFKit               | ✅ Done |
+| Feature | Description | Status |
+|---------|-------------|--------|
+| User Authentication | Email/Password + Google OAuth, JWT-based | ✅ Done |
+| Medication CRUD | Full create/read/update/delete with scheduling | ✅ Done |
+| Dose Logging | Mark doses as Taken / Missed / Delayed with timestamps | ✅ Done |
+| Adherence Scoring | Rolling 30-day score with risk classification | ✅ Done |
+| Pattern Detection | Identifies night-miss, weekend slippage, streak breaks | ✅ Done |
+| Caregiver Linking | Invite-based patient–caregiver relationship | ✅ Done |
+| Caregiver Dashboard | Multi-patient adherence overview | ✅ Done |
+| Notification System | In-app reminder inbox with read/unread state | ✅ Done |
+| Push Notifications | Web Push API (VAPID) for browser notifications | ✅ Done |
+| Real-time Updates | Socket.io for live dashboard refresh | ✅ Done |
+| Android App | Expo React Native app with full feature parity | ✅ Done |
+| RAG AI Assistant | Ollama + Qdrant for medication Q&A | ✅ Done |
+| Analytics Pipeline | FastAPI + Pandas for population-level data export | ✅ Done |
+| Doctor Portal | Doctor-facing view for patient history | ✅ Done |
+| Swagger API Docs | Full OpenAPI 3.0 documentation | ✅ Done |
+| PDF Export | Patient profile/report export via PDFKit | ✅ Done |
 
 ### 4.2 🚀 Unique Innovation Points
 
@@ -188,85 +185,85 @@ Medication adherence — the degree to which a patient correctly follows prescri
 
 ### 5.1 Node.js Backend (`@hackgu/backend`)
 
-| Technology                     | Version | Purpose                                |
-| ------------------------------ | ------- | -------------------------------------- |
-| Express.js                     | ^4.19   | REST API framework                     |
-| TypeScript                     | ^5.4    | Type safety                            |
-| Mongoose                       | ^8.3    | MongoDB ODM                            |
-| Zod                            | ^3.23   | Input validation                       |
-| JSON Web Token                 | ^9.0    | Stateless authentication               |
-| bcryptjs                       | ^3.0    | Password hashing                       |
-| node-cron                      | ^4.2    | Reminder & missed-dose cron jobs       |
-| Socket.io                      | ^4.8    | Real-time push to web clients          |
-| web-push                       | ^3.6    | VAPID Web Push notifications           |
-| google-auth-library            | ^10.6   | Google OAuth token verification        |
-| swagger-ui-express             | ^5.0    | API documentation UI                   |
-| @asteasolutions/zod-to-openapi | ^7.0    | Auto-generate OpenAPI from Zod schemas |
-| PDFKit                         | ^0.18   | PDF report generation                  |
-| morgan                         | ^1.10   | HTTP request logging                   |
+| Technology | Version | Purpose |
+|-----------|---------|---------|
+| Express.js | ^4.19 | REST API framework |
+| TypeScript | ^5.4 | Type safety |
+| Mongoose | ^8.3 | MongoDB ODM |
+| Zod | ^3.23 | Input validation |
+| JSON Web Token | ^9.0 | Stateless authentication |
+| bcryptjs | ^3.0 | Password hashing |
+| node-cron | ^4.2 | Reminder & missed-dose cron jobs |
+| Socket.io | ^4.8 | Real-time push to web clients |
+| web-push | ^3.6 | VAPID Web Push notifications |
+| google-auth-library | ^10.6 | Google OAuth token verification |
+| swagger-ui-express | ^5.0 | API documentation UI |
+| @asteasolutions/zod-to-openapi | ^7.0 | Auto-generate OpenAPI from Zod schemas |
+| PDFKit | ^0.18 | PDF report generation |
+| morgan | ^1.10 | HTTP request logging |
 
 ### 5.2 Next.js Frontend (`@hackgu/frontend`)
 
-| Technology             | Version | Purpose                                  |
-| ---------------------- | ------- | ---------------------------------------- |
-| Next.js                | 15.1.0  | SSR, App Router, React Server Components |
-| React                  | ^19.0   | UI framework                             |
-| TypeScript             | ^5.0    | Type safety                              |
-| Tailwind CSS           | latest  | Utility-first styling                    |
-| Axios                  | ^1.7    | HTTP client with interceptors            |
-| Socket.io-client       | ^4.8    | Real-time updates                        |
-| Lucide React           | ^0.400  | Icon library                             |
-| crypto-js              | ^4.2    | Encrypted localStorage for sessions      |
-| date-fns               | ^4.1    | Date manipulation                        |
-| @react-oauth/google    | ^0.13   | Google Sign-In button                    |
-| @radix-ui/react-dialog | ^1.1    | Accessible modal dialogs                 |
-| Zod                    | ^3.23   | Shared schema validation                 |
+| Technology | Version | Purpose |
+|-----------|---------|---------|
+| Next.js | 15.1.0 | SSR, App Router, React Server Components |
+| React | ^19.0 | UI framework |
+| TypeScript | ^5.0 | Type safety |
+| Tailwind CSS | latest | Utility-first styling |
+| Axios | ^1.7 | HTTP client with interceptors |
+| Socket.io-client | ^4.8 | Real-time updates |
+| Lucide React | ^0.400 | Icon library |
+| crypto-js | ^4.2 | Encrypted localStorage for sessions |
+| date-fns | ^4.1 | Date manipulation |
+| @react-oauth/google | ^0.13 | Google Sign-In button |
+| @radix-ui/react-dialog | ^1.1 | Accessible modal dialogs |
+| Zod | ^3.23 | Shared schema validation |
 
 ### 5.3 Android App (`expo-auth-frontend`)
 
-| Technology                             | Version | Purpose                           |
-| -------------------------------------- | ------- | --------------------------------- |
-| Expo                                   | ~54.0   | React Native development platform |
-| React Native                           | 0.81.5  | Mobile UI framework               |
-| React Navigation                       | ^7.0    | Stack + Bottom Tab navigation     |
-| Zustand                                | ^5.0    | Lightweight state management      |
-| NativeWind                             | ^4.1    | Tailwind CSS for React Native     |
-| Axios                                  | ^1.7    | API communication                 |
-| expo-notifications                     | ~0.18   | Local push notifications          |
-| expo-auth-session                      | ~7.0    | OAuth 2.0 for Expo Go             |
-| @react-native-async-storage            | 2.2.0   | Persistent local storage          |
-| @react-native-community/datetimepicker | ^8.4    | Native date/time picker           |
-| date-fns                               | ^4.1    | Date utilities                    |
+| Technology | Version | Purpose |
+|-----------|---------|---------|
+| Expo | ~54.0 | React Native development platform |
+| React Native | 0.81.5 | Mobile UI framework |
+| React Navigation | ^7.0 | Stack + Bottom Tab navigation |
+| Zustand | ^5.0 | Lightweight state management |
+| NativeWind | ^4.1 | Tailwind CSS for React Native |
+| Axios | ^1.7 | API communication |
+| expo-notifications | ~0.18 | Local push notifications |
+| expo-auth-session | ~7.0 | OAuth 2.0 for Expo Go |
+| @react-native-async-storage | 2.2.0 | Persistent local storage |
+| @react-native-community/datetimepicker | ^8.4 | Native date/time picker |
+| date-fns | ^4.1 | Date utilities |
 
 ### 5.4 Python AI Backend (`pythonBackend`)
 
-| Technology    | Version | Purpose                         |
-| ------------- | ------- | ------------------------------- |
-| FastAPI       | 0.111.1 | Async API framework             |
-| Uvicorn       | 0.24.0  | ASGI server                     |
-| Motor         | 3.7.1   | Async MongoDB driver            |
-| Pydantic      | 2.8.0   | Data validation/serialization   |
-| Pandas        | 2.3.2   | Data aggregation and CSV export |
-| LangChain     | 0.1.0   | LLM orchestration framework     |
-| Qdrant Client | 1.8.0   | Vector database for RAG         |
-| Requests      | 2.31.0  | HTTP calls to Ollama            |
+| Technology | Version | Purpose |
+|-----------|---------|---------|
+| FastAPI | 0.111.1 | Async API framework |
+| Uvicorn | 0.24.0 | ASGI server |
+| Motor | 3.7.1 | Async MongoDB driver |
+| Pydantic | 2.8.0 | Data validation/serialization |
+| Pandas | 2.3.2 | Data aggregation and CSV export |
+| LangChain | 0.1.0 | LLM orchestration framework |
+| Qdrant Client | 1.8.0 | Vector database for RAG |
+| Requests | 2.31.0 | HTTP calls to Ollama |
 
 ### 5.5 Shared Package (`@hackgu/shared`)
 
-| Technology | Purpose                                                     |
-| ---------- | ----------------------------------------------------------- |
-| TypeScript | Type-safe shared contracts                                  |
-| Zod        | Shared validation schemas used by both frontend and backend |
+| Technology | Purpose |
+|-----------|---------|
+| TypeScript | Type-safe shared contracts |
+| Zod | Shared validation schemas used by both frontend and backend |
 
 ### 5.6 External Services
 
-| Service          | Purpose                                               |
-| ---------------- | ----------------------------------------------------- |
-| MongoDB Atlas    | Cloud-hosted NoSQL database                           |
-| Qdrant           | Self-hosted vector database for RAG embeddings        |
-| Ollama           | Local LLM runtime (`qwen2.5:7b` + `nomic-embed-text`) |
-| Google OAuth     | Social login for web and mobile                       |
-| Web Push (VAPID) | Browser push notification delivery                    |
+| Service | Purpose |
+|---------|---------|
+| MongoDB Atlas | Cloud-hosted NoSQL database |
+| Qdrant | Self-hosted vector database for RAG embeddings |
+| Ollama | Local LLM runtime (`qwen2.5:7b` + `nomic-embed-text`) |
+| Google OAuth | Social login for web and mobile |
+| Web Push (VAPID) | Browser push notification delivery |
 
 ---
 
@@ -379,7 +376,6 @@ GUJARAT HACKATHON/                      ← Monorepo Root
 ### 7.4 Adherence Module (`/api/adherence`)
 
 **Scoring Formula:**
-
 ```
 adherence_score = (doses_taken / total_scheduled_doses) × 100
 
@@ -390,7 +386,6 @@ Risk Thresholds:
 ```
 
 **Pattern Detection (3 rules):**
-
 1. **Night Doses Missed** — >60% of missed doses fall between 20:00–23:59
 2. **Weekend Slippage** — Weekend adherence < (Weekday adherence − 20%)
 3. **Streak Break** — 3+ consecutive missed doses for the same medication
@@ -407,12 +402,12 @@ Endpoints: `/score`, `/daily`, `/weekly`, `/patterns`, `/risk`
 
 ### 7.6 Cron Jobs (`reminder.job.ts`)
 
-| Job                  | Schedule         | Action                                                           |
-| -------------------- | ---------------- | ---------------------------------------------------------------- |
-| Reminder sender      | Every 5 min      | Check medications due in next 15 min → create notification       |
-| Missed dose detector | Every 10 min     | Find overdue PENDING doses → mark MISSED → alert caregiver       |
-| Daily stub generator | Daily at 23:59   | Pre-generate PENDING dose log entries for next day               |
-| ReminderLog dedup    | Before each send | Prevent duplicate reminder notifications per dose window per day |
+| Job | Schedule | Action |
+|-----|----------|--------|
+| Reminder sender | Every 5 min | Check medications due in next 15 min → create notification |
+| Missed dose detector | Every 10 min | Find overdue PENDING doses → mark MISSED → alert caregiver |
+| Daily stub generator | Daily at 23:59 | Pre-generate PENDING dose log entries for next day |
+| ReminderLog dedup | Before each send | Prevent duplicate reminder notifications per dose window per day |
 
 ### 7.7 Notifications Module (`/api/notifications`)
 
@@ -439,20 +434,20 @@ Endpoints: `/score`, `/daily`, `/weekly`, `/patterns`, `/risk`
 
 ### 8.1 Pages
 
-| Route              | Page           | Description                                             |
-| ------------------ | -------------- | ------------------------------------------------------- |
-| `/`                | Landing        | Redirect to dashboard or login                          |
-| `/login`           | Login          | Email/password + Google OAuth                           |
-| `/signup`          | Register       | Multi-field registration form                           |
-| `/dashboard`       | Dashboard      | Adherence ring + risk badge + today's doses + quick log |
-| `/medications`     | Medications    | List all medications with search/filter/toggle          |
-| `/medications/new` | Add Medication | Form to create a new medication schedule                |
-| `/today`           | Today's Doses  | Timeline view of all scheduled doses for today          |
-| `/adherence`       | Reports        | Line charts, bar charts, pie chart (Recharts)           |
-| `/history`         | Dose History   | Historical log with filters by date, status, medication |
-| `/caregiver`       | Caregiver      | Link caregivers, view patient list (role-based)         |
-| `/doctor`          | Doctor Portal  | Doctor view of patient adherence                        |
-| `/profile`         | User Profile   | Edit profile, view adherence stats, logout              |
+| Route | Page | Description |
+|-------|------|-------------|
+| `/` | Landing | Redirect to dashboard or login |
+| `/login` | Login | Email/password + Google OAuth |
+| `/signup` | Register | Multi-field registration form |
+| `/dashboard` | Dashboard | Adherence ring + risk badge + today's doses + quick log |
+| `/medications` | Medications | List all medications with search/filter/toggle |
+| `/medications/new` | Add Medication | Form to create a new medication schedule |
+| `/today` | Today's Doses | Timeline view of all scheduled doses for today |
+| `/adherence` | Reports | Line charts, bar charts, pie chart (Recharts) |
+| `/history` | Dose History | Historical log with filters by date, status, medication |
+| `/caregiver` | Caregiver | Link caregivers, view patient list (role-based) |
+| `/doctor` | Doctor Portal | Doctor view of patient adherence |
+| `/profile` | User Profile | Edit profile, view adherence stats, logout |
 
 ### 8.2 Key Components
 
@@ -477,15 +472,15 @@ Endpoints: `/score`, `/daily`, `/weekly`, `/patterns`, `/risk`
 
 ### 9.1 Screens
 
-| Screen                    | Description                                                             |
-| ------------------------- | ----------------------------------------------------------------------- |
-| `LoginScreen`             | Email/password login + Google OAuth via expo-auth-session               |
-| `SignupScreen`            | Full registration form                                                  |
-| `HomeScreen`              | Quick overview: pending dose count, healthy streak, sign-out            |
-| `TodayMedsScreen`         | Today's schedule with real-time status, tap-to-mark, pull-to-refresh    |
-| `MedicationCabinetScreen` | Full medication list with add/edit/delete and frequency selection       |
-| `CaregiverScreen`         | Role-based: patients see caregiver connections; caregivers see patients |
-| `InsightsScreen`          | Adherence score, risk card, weekly trend, pattern-based guidance        |
+| Screen | Description |
+|--------|-------------|
+| `LoginScreen` | Email/password login + Google OAuth via expo-auth-session |
+| `SignupScreen` | Full registration form |
+| `HomeScreen` | Quick overview: pending dose count, healthy streak, sign-out |
+| `TodayMedsScreen` | Today's schedule with real-time status, tap-to-mark, pull-to-refresh |
+| `MedicationCabinetScreen` | Full medication list with add/edit/delete and frequency selection |
+| `CaregiverScreen` | Role-based: patients see caregiver connections; caregivers see patients |
+| `InsightsScreen` | Adherence score, risk card, weekly trend, pattern-based guidance |
 
 ### 9.2 Services Layer
 
@@ -529,11 +524,11 @@ App
 
 Runs on port **8000** with Uvicorn. Endpoints:
 
-| Endpoint            | Method | Description                                                    |
-| ------------------- | ------ | -------------------------------------------------------------- |
-| `/generate-dataset` | GET    | Run full analytics aggregation → returns JSON rows + summaries |
-| `/export-csv`       | GET    | Generate dataset and return as downloadable CSV                |
-| `/rag/query`        | GET    | Query the RAG system with a natural language question          |
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/generate-dataset` | GET | Run full analytics aggregation → returns JSON rows + summaries |
+| `/export-csv` | GET | Generate dataset and return as downloadable CSV |
+| `/rag/query` | GET | Query the RAG system with a natural language question |
 
 All endpoints support optional `start` / `end` date filters (YYYY-MM-DD format).
 
@@ -549,7 +544,6 @@ Uses **Motor** (async MongoDB driver) + **Pandas** to:
 6. Export result to `medtrack_dataset.csv` for ML pipeline input
 
 **Output Schemas (Pydantic):**
-
 - `DatasetRowSchema` — One row per (user, medication, date)
 - `PerUserSummarySchema` — Aggregated totals per user
 - `OverallSummarySchema` — Dataset-wide stats (total users, doses, adherence %)
@@ -562,123 +556,103 @@ All collections reside in **MongoDB Atlas**. Mongoose ODM is used in the Node.js
 
 ### 11.1 Users Collection
 
-| Field            | Type   | Notes                                                       |
-| ---------------- | ------ | ----------------------------------------------------------- |
-| `name`           | String | Required                                                    |
-| `email`          | String | Unique, required                                            |
-| `password`       | String | bcrypt hash, optional (Google OAuth users may not have one) |
-| `role`           | Enum   | `PATIENT` / `CAREGIVER` / `DOCTOR`                          |
-| `phone`          | String | Optional                                                    |
-| `timezone`       | String | Default: `Asia/Kolkata`                                     |
-| `adherenceScore` | Number | Cached score, optional                                      |
+| Field | Type | Notes |
+|-------|------|-------|
+| `name` | String | Required |
+| `email` | String | Unique, required |
+| `password` | String | bcrypt hash, optional (Google OAuth users may not have one) |
+| `role` | Enum | `PATIENT` / `CAREGIVER` / `DOCTOR` |
+| `phone` | String | Optional |
+| `timezone` | String | Default: `Asia/Kolkata` |
+| `adherenceScore` | Number | Cached score, optional |
 
 ### 11.2 Medications Collection
 
-| Field           | Type            | Notes                     |
-| --------------- | --------------- | ------------------------- |
-| `userId`        | ObjectId → User | Indexed                   |
-| `name`          | String          | Medication name           |
-| `dosage`        | String          | e.g., "500mg"             |
-| `unit`          | String          | mg / ml / tablet          |
-| `frequency`     | Enum            | DAILY / CUSTOM            |
-| `scheduleTimes` | [String]        | Array of "HH:MM" strings  |
-| `startDate`     | Date            | Required                  |
-| `endDate`       | Date            | Optional                  |
-| `isActive`      | Boolean         | Soft-delete flag, indexed |
-| `notes`         | String          | Optional                  |
+| Field | Type | Notes |
+|-------|------|-------|
+| `userId` | ObjectId → User | Indexed |
+| `name` | String | Medication name |
+| `dosage` | String | e.g., "500mg" |
+| `unit` | String | mg / ml / tablet |
+| `frequency` | Enum | DAILY / CUSTOM |
+| `scheduleTimes` | [String] | Array of "HH:MM" strings |
+| `startDate` | Date | Required |
+| `endDate` | Date | Optional |
+| `isActive` | Boolean | Soft-delete flag, indexed |
+| `notes` | String | Optional |
 
 ### 11.3 Dose Logs Collection
 
-| Field          | Type                  | Notes                              |
-| -------------- | --------------------- | ---------------------------------- |
-| `userId`       | ObjectId → User       | Required                           |
-| `medicationId` | ObjectId → Medication | Indexed                            |
-| `scheduledAt`  | Date                  | When this dose was due             |
-| `takenAt`      | Date                  | When user actually took it         |
-| `status`       | Enum                  | PENDING / TAKEN / MISSED / DELAYED |
-| `delayMinutes` | Number                | Auto-computed if delayed           |
-| `notes`        | String                | Optional                           |
+| Field | Type | Notes |
+|-------|------|-------|
+| `userId` | ObjectId → User | Required |
+| `medicationId` | ObjectId → Medication | Indexed |
+| `scheduledAt` | Date | When this dose was due |
+| `takenAt` | Date | When user actually took it |
+| `status` | Enum | PENDING / TAKEN / MISSED / DELAYED |
+| `delayMinutes` | Number | Auto-computed if delayed |
+| `notes` | String | Optional |
 
 **Indexes:** Compound `{ userId, scheduledAt }` for efficient date-range queries.
 
 ### 11.4 Caregiver Links Collection
 
-| Field            | Type            | Notes                               |
-| ---------------- | --------------- | ----------------------------------- |
-| `patientId`      | ObjectId → User | Indexed                             |
-| `caregiverId`    | ObjectId → User | Optional (filled on acceptance)     |
-| `caregiverEmail` | String          | Required (used for invite matching) |
-| `relationship`   | String          | e.g., "Spouse", "Child"             |
-| `status`         | Enum            | PENDING / ACCEPTED / REJECTED       |
-| `permissions`    | [String]        | `VIEW_ADHERENCE`, `RECEIVE_ALERTS`  |
-| `invitedAt`      | Date            | Timestamp of invite                 |
-| `respondedAt`    | Date            | Timestamp of response               |
+| Field | Type | Notes |
+|-------|------|-------|
+| `patientId` | ObjectId → User | Indexed |
+| `caregiverId` | ObjectId → User | Optional (filled on acceptance) |
+| `caregiverEmail` | String | Required (used for invite matching) |
+| `relationship` | String | e.g., "Spouse", "Child" |
+| `status` | Enum | PENDING / ACCEPTED / REJECTED |
+| `permissions` | [String] | `VIEW_ADHERENCE`, `RECEIVE_ALERTS` |
+| `invitedAt` | Date | Timestamp of invite |
+| `respondedAt` | Date | Timestamp of response |
 
 **Unique Index:** `{ patientId, caregiverEmail }` — prevents duplicate invites.
 
 ### 11.5 Notifications Collection
 
-| Field          | Type                  | Notes                                    |
-| -------------- | --------------------- | ---------------------------------------- |
-| `userId`       | ObjectId → User       | Required                                 |
-| `type`         | Enum                  | REMINDER / MISSED_DOSE / CAREGIVER_ALERT |
-| `medicationId` | ObjectId → Medication | Optional                                 |
-| `message`      | String                | Notification text                        |
-| `isRead`       | Boolean               | Default: false                           |
-| `scheduledAt`  | Date                  | Indexed                                  |
-| `sentAt`       | Date                  | When actually delivered                  |
+| Field | Type | Notes |
+|-------|------|-------|
+| `userId` | ObjectId → User | Required |
+| `type` | Enum | REMINDER / MISSED_DOSE / CAREGIVER_ALERT |
+| `medicationId` | ObjectId → Medication | Optional |
+| `message` | String | Notification text |
+| `isRead` | Boolean | Default: false |
+| `scheduledAt` | Date | Indexed |
+| `sentAt` | Date | When actually delivered |
 
 ### 11.6 Push Subscriptions Collection
 
-| Field         | Type            | Notes                 |
-| ------------- | --------------- | --------------------- |
-| `userId`      | ObjectId → User | Unique                |
-| `endpoint`    | String          | Browser push endpoint |
-| `keys.p256dh` | String          | Encryption key        |
-| `keys.auth`   | String          | Auth secret           |
+| Field | Type | Notes |
+|-------|------|-------|
+| `userId` | ObjectId → User | Unique |
+| `endpoint` | String | Browser push endpoint |
+| `keys.p256dh` | String | Encryption key |
+| `keys.auth` | String | Auth secret |
 
 ### 11.7 Reminder Logs Collection
 
 Prevents duplicate reminders from being sent within the same dose window.
 
-| Field           | Type     | Notes                  |
-| --------------- | -------- | ---------------------- |
-| `userId`        | ObjectId | Required               |
-| `medicationId`  | ObjectId | Required               |
-| `scheduledTime` | String   | "HH:MM"                |
-| `dateKey`       | String   | "YYYY-MM-DD"           |
-| `sentAt`        | Date     | When reminder was sent |
+| Field | Type | Notes |
+|-------|------|-------|
+| `userId` | ObjectId | Required |
+| `medicationId` | ObjectId | Required |
+| `scheduledTime` | String | "HH:MM" |
+| `dateKey` | String | "YYYY-MM-DD" |
+| `sentAt` | Date | When reminder was sent |
 
 **Unique Index:** `{ userId, medicationId, scheduledTime, dateKey }`
 
 ### 11.8 Shared Enums (`@hackgu/shared`)
 
 ```typescript
-export enum UserRole {
-  PATIENT = "PATIENT",
-  CAREGIVER = "CAREGIVER",
-  DOCTOR = "DOCTOR",
-}
-export enum DoseStatus {
-  TAKEN = "TAKEN",
-  MISSED = "MISSED",
-  DELAYED = "DELAYED",
-  PENDING = "PENDING",
-}
-export enum FrequencyType {
-  DAILY = "DAILY",
-  CUSTOM = "CUSTOM",
-}
-export enum RiskLevel {
-  LOW = "low",
-  MEDIUM = "medium",
-  HIGH = "high",
-}
-export enum NotifType {
-  REMINDER = "reminder",
-  MISSED_DOSE = "missed_dose",
-  CAREGIVER_ALERT = "caregiver_alert",
-}
+export enum UserRole      { PATIENT = 'PATIENT', CAREGIVER = 'CAREGIVER', DOCTOR = 'DOCTOR' }
+export enum DoseStatus    { TAKEN = 'TAKEN', MISSED = 'MISSED', DELAYED = 'DELAYED', PENDING = 'PENDING' }
+export enum FrequencyType { DAILY = 'DAILY', CUSTOM = 'CUSTOM' }
+export enum RiskLevel     { LOW = 'low', MEDIUM = 'medium', HIGH = 'high' }
+export enum NotifType     { REMINDER = 'reminder', MISSED_DOSE = 'missed_dose', CAREGIVER_ALERT = 'caregiver_alert' }
 ```
 
 ---
@@ -688,79 +662,71 @@ export enum NotifType {
 Full Swagger UI available at: `http://localhost:5000/api-docs`
 
 ### Auth Endpoints
-
-| Method | Route                | Auth | Description              |
-| ------ | -------------------- | ---- | ------------------------ |
-| POST   | `/api/auth/register` | ❌   | Register new user        |
-| POST   | `/api/auth/login`    | ❌   | Login, returns JWT       |
-| POST   | `/api/auth/google`   | ❌   | Google OAuth login       |
-| GET    | `/api/auth/me`       | ✅   | Get current user profile |
-| PATCH  | `/api/auth/me`       | ✅   | Update user profile      |
+| Method | Route | Auth | Description |
+|--------|-------|------|-------------|
+| POST | `/api/auth/register` | ❌ | Register new user |
+| POST | `/api/auth/login` | ❌ | Login, returns JWT |
+| POST | `/api/auth/google` | ❌ | Google OAuth login |
+| GET | `/api/auth/me` | ✅ | Get current user profile |
+| PATCH | `/api/auth/me` | ✅ | Update user profile |
 
 ### Medications Endpoints
-
-| Method | Route                  | Auth | Description            |
-| ------ | ---------------------- | ---- | ---------------------- |
-| POST   | `/api/medications`     | ✅   | Create medication      |
-| GET    | `/api/medications`     | ✅   | List all medications   |
-| GET    | `/api/medications/:id` | ✅   | Get medication by ID   |
-| PUT    | `/api/medications/:id` | ✅   | Update medication      |
-| DELETE | `/api/medications/:id` | ✅   | Soft-delete medication |
+| Method | Route | Auth | Description |
+|--------|-------|------|-------------|
+| POST | `/api/medications` | ✅ | Create medication |
+| GET | `/api/medications` | ✅ | List all medications |
+| GET | `/api/medications/:id` | ✅ | Get medication by ID |
+| PUT | `/api/medications/:id` | ✅ | Update medication |
+| DELETE | `/api/medications/:id` | ✅ | Soft-delete medication |
 
 ### Dose Log Endpoints
-
-| Method | Route                  | Auth | Description             |
-| ------ | ---------------------- | ---- | ----------------------- |
-| POST   | `/api/dose-logs`       | ✅   | Log a dose              |
-| GET    | `/api/dose-logs`       | ✅   | Get logs with filters   |
-| GET    | `/api/dose-logs/today` | ✅   | Today's scheduled doses |
-| PUT    | `/api/dose-logs/:id`   | ✅   | Update a dose log       |
+| Method | Route | Auth | Description |
+|--------|-------|------|-------------|
+| POST | `/api/dose-logs` | ✅ | Log a dose |
+| GET | `/api/dose-logs` | ✅ | Get logs with filters |
+| GET | `/api/dose-logs/today` | ✅ | Today's scheduled doses |
+| PUT | `/api/dose-logs/:id` | ✅ | Update a dose log |
 
 ### Adherence Endpoints
-
-| Method | Route                     | Auth | Description                  |
-| ------ | ------------------------- | ---- | ---------------------------- |
-| GET    | `/api/adherence/score`    | ✅   | Overall score (30-day)       |
-| GET    | `/api/adherence/daily`    | ✅   | Day-by-day breakdown         |
-| GET    | `/api/adherence/weekly`   | ✅   | Week-by-week trend           |
-| GET    | `/api/adherence/patterns` | ✅   | Detected patterns            |
-| GET    | `/api/adherence/risk`     | ✅   | Risk level (LOW/MEDIUM/HIGH) |
+| Method | Route | Auth | Description |
+|--------|-------|------|-------------|
+| GET | `/api/adherence/score` | ✅ | Overall score (30-day) |
+| GET | `/api/adherence/daily` | ✅ | Day-by-day breakdown |
+| GET | `/api/adherence/weekly` | ✅ | Week-by-week trend |
+| GET | `/api/adherence/patterns` | ✅ | Detected patterns |
+| GET | `/api/adherence/risk` | ✅ | Risk level (LOW/MEDIUM/HIGH) |
 
 ### Caregiver Endpoints
-
-| Method | Route                          | Auth | Description               |
-| ------ | ------------------------------ | ---- | ------------------------- |
-| POST   | `/api/caregiver/invite`        | ✅   | Send caregiver invite     |
-| POST   | `/api/caregiver/respond`       | ✅   | Accept or reject invite   |
-| GET    | `/api/caregiver/invites`       | ✅   | List pending invites      |
-| GET    | `/api/caregiver/my-caregivers` | ✅   | List my caregivers        |
-| GET    | `/api/caregiver/patients`      | ✅   | List caregiver's patients |
-| DELETE | `/api/caregiver/link/:id`      | ✅   | Unlink caregiver          |
+| Method | Route | Auth | Description |
+|--------|-------|------|-------------|
+| POST | `/api/caregiver/invite` | ✅ | Send caregiver invite |
+| POST | `/api/caregiver/respond` | ✅ | Accept or reject invite |
+| GET | `/api/caregiver/invites` | ✅ | List pending invites |
+| GET | `/api/caregiver/my-caregivers` | ✅ | List my caregivers |
+| GET | `/api/caregiver/patients` | ✅ | List caregiver's patients |
+| DELETE | `/api/caregiver/link/:id` | ✅ | Unlink caregiver |
 
 ### Notifications Endpoints
-
-| Method | Route                         | Auth | Description              |
-| ------ | ----------------------------- | ---- | ------------------------ |
-| GET    | `/api/notifications`          | ✅   | Get unread notifications |
-| PUT    | `/api/notifications/:id/read` | ✅   | Mark one as read         |
-| PUT    | `/api/notifications/read-all` | ✅   | Mark all as read         |
+| Method | Route | Auth | Description |
+|--------|-------|------|-------------|
+| GET | `/api/notifications` | ✅ | Get unread notifications |
+| PUT | `/api/notifications/:id/read` | ✅ | Mark one as read |
+| PUT | `/api/notifications/read-all` | ✅ | Mark all as read |
 
 ### Push Notification Endpoints
-
-| Method | Route                   | Auth | Description                    |
-| ------ | ----------------------- | ---- | ------------------------------ |
-| POST   | `/api/push/subscribe`   | ✅   | Save browser push subscription |
-| POST   | `/api/push/unsubscribe` | ✅   | Remove push subscription       |
-| GET    | `/api/push/status`      | ✅   | Check subscription status      |
-| POST   | `/api/push/test`        | ✅   | Send a test push notification  |
+| Method | Route | Auth | Description |
+|--------|-------|------|-------------|
+| POST | `/api/push/subscribe` | ✅ | Save browser push subscription |
+| POST | `/api/push/unsubscribe` | ✅ | Remove push subscription |
+| GET | `/api/push/status` | ✅ | Check subscription status |
+| POST | `/api/push/test` | ✅ | Send a test push notification |
 
 ### Python Analytics Endpoints (Port 8000)
-
-| Method | Route               | Auth | Description                 |
-| ------ | ------------------- | ---- | --------------------------- |
-| GET    | `/generate-dataset` | ❌   | Full adherence dataset JSON |
-| GET    | `/export-csv`       | ❌   | Download dataset as CSV     |
-| GET    | `/rag/query?q=...`  | ❌   | Query the RAG AI assistant  |
+| Method | Route | Auth | Description |
+|--------|-------|------|-------------|
+| GET | `/generate-dataset` | ❌ | Full adherence dataset JSON |
+| GET | `/export-csv` | ❌ | Download dataset as CSV |
+| GET | `/rag/query?q=...` | ❌ | Query the RAG AI assistant |
 
 ---
 
@@ -802,14 +768,14 @@ Answer returned to user
 
 ### 13.4 LLM Configuration
 
-| Parameter       | Value                                                                       |
-| --------------- | --------------------------------------------------------------------------- |
-| Embedding Model | `nomic-embed-text:latest`                                                   |
-| Chat Model      | `qwen2.5:7b`                                                                |
-| LLM Temperature | `0.0` (deterministic, factual)                                              |
-| Top-K retrieval | 5 passages                                                                  |
-| Context window  | Retrieved CSV row texts                                                     |
-| System Prompt   | "Answer medicine and drug information questions using the provided context" |
+| Parameter | Value |
+|-----------|-------|
+| Embedding Model | `nomic-embed-text:latest` |
+| Chat Model | `qwen2.5:7b` |
+| LLM Temperature | `0.0` (deterministic, factual) |
+| Top-K retrieval | 5 passages |
+| Context window | Retrieved CSV row texts |
+| System Prompt | "Answer medicine and drug information questions using the provided context" |
 
 ### 13.5 Use Cases
 
@@ -821,7 +787,6 @@ Answer returned to user
 ### 13.6 Drug Conflict Warning (Planned Extension)
 
 The RAG system is the foundation for the **drug conflict warning feature**:
-
 1. User uploads prescription/medical report → system extracts current medications
 2. When user attempts to add a new medication, RAG is queried for interactions
 3. If conflict/allergy risk is detected → user is warned **before adding the medication**
@@ -837,16 +802,16 @@ The RAG system is the foundation for the **drug conflict warning feature**:
 
 ### 14.2 Implementation Principles
 
-| Principle                  | Implementation                                                                  |
-| -------------------------- | ------------------------------------------------------------------------------- |
-| **Minimal decisions**      | Critical actions (Mark Taken) are primary buttons; everything else is secondary |
-| **Large tap targets**      | All interactive elements ≥ 48×48dp (Android minimum accessibility standard)     |
-| **High contrast**          | Dark background with bright accent colors; WCAG AA compliant                    |
-| **Clear iconography**      | Lucide icons paired with text labels — never icon-only                          |
-| **Progressive disclosure** | Show only what matters now; hide advanced settings behind settings screens      |
-| **No jargon**              | "Take your medicine" not "Log a dose event for medication ID..."                |
-| **Error prevention**       | Confirmation dialogs before destructive actions (delete, unlink)                |
-| **Pull-to-refresh**        | No complex state management for users — just pull down to refresh               |
+| Principle | Implementation |
+|-----------|---------------|
+| **Minimal decisions** | Critical actions (Mark Taken) are primary buttons; everything else is secondary |
+| **Large tap targets** | All interactive elements ≥ 48×48dp (Android minimum accessibility standard) |
+| **High contrast** | Dark background with bright accent colors; WCAG AA compliant |
+| **Clear iconography** | Lucide icons paired with text labels — never icon-only |
+| **Progressive disclosure** | Show only what matters now; hide advanced settings behind settings screens |
+| **No jargon** | "Take your medicine" not "Log a dose event for medication ID..." |
+| **Error prevention** | Confirmation dialogs before destructive actions (delete, unlink) |
+| **Pull-to-refresh** | No complex state management for users — just pull down to refresh |
 
 ### 14.3 Mobile-First for Elderly
 
@@ -864,12 +829,12 @@ The RAG system is the foundation for the **drug conflict warning feature**:
 
 MedTrack uses **three parallel notification channels** to ensure medication reminders reach users:
 
-| Channel              | Technology               | Target                                       |
-| -------------------- | ------------------------ | -------------------------------------------- |
-| In-app Notifications | MongoDB + React State    | Web and Mobile                               |
-| Web Push             | VAPID + Browser Push API | Web browsers (even when app closed)          |
-| Local Notifications  | expo-notifications       | Android device (even when app in background) |
-| Real-time updates    | Socket.io                | Instant delivery when app is open            |
+| Channel | Technology | Target |
+|---------|-----------|--------|
+| In-app Notifications | MongoDB + React State | Web and Mobile |
+| Web Push | VAPID + Browser Push API | Web browsers (even when app closed) |
+| Local Notifications | expo-notifications | Android device (even when app in background) |
+| Real-time updates | Socket.io | Instant delivery when app is open |
 
 ### 15.2 Alarm-Theme Reminders with Snooze
 
@@ -883,10 +848,10 @@ The notification UX follows an **alarm-like pattern** familiar to elderly users:
 
 ### 15.3 Notification Types
 
-| Type            | Color    | Trigger                                   |
-| --------------- | -------- | ----------------------------------------- |
-| REMINDER        | 🔵 Blue  | 15 min before scheduled dose              |
-| MISSED_DOSE     | 🔴 Red   | Dose window passed without logging        |
+| Type | Color | Trigger |
+|------|-------|---------|
+| REMINDER | 🔵 Blue | 15 min before scheduled dose |
+| MISSED_DOSE | 🔴 Red | Dose window passed without logging |
 | CAREGIVER_ALERT | 🟡 Amber | Escalated to caregiver on repeated misses |
 
 ### 15.4 Deduplication
@@ -939,11 +904,11 @@ Each user has a **structured health profile** containing:
 
 ### 17.3 Sharing Mechanisms
 
-| Method                | How                                                         |
-| --------------------- | ----------------------------------------------------------- |
+| Method | How |
+|--------|-----|
 | **Direct share link** | Patient generates a time-limited URL that a doctor can open |
-| **PDF export**        | Generate a formatted PDF via PDFKit and download/email it   |
-| **Doctor Portal**     | Doctor with an account can access shared patient profiles   |
+| **PDF export** | Generate a formatted PDF via PDFKit and download/email it |
+| **Doctor Portal** | Doctor with an account can access shared patient profiles |
 | **QR code** (planned) | Patient shows QR at clinic; doctor scans to pull up profile |
 
 ### 17.4 Privacy & Access Control
@@ -990,22 +955,22 @@ ML/Research Pipeline Input
 
 Each row in the exported dataset represents one (user, medication, date) combination:
 
-| Column                  | Description                              |
-| ----------------------- | ---------------------------------------- |
-| `user_id`               | Anonymized user identifier               |
-| `user_name`             | Patient name                             |
-| `email`                 | Contact email                            |
-| `timezone`              | Patient's timezone                       |
-| `medication_id`         | Medication identifier                    |
-| `medication_name`       | Drug name                                |
-| `dosage`                | Dosage amount                            |
-| `frequency`             | DAILY / CUSTOM                           |
-| `date`                  | Calendar date (patient's local timezone) |
-| `total_scheduled_doses` | How many doses were scheduled            |
-| `doses_taken`           | How many were actually taken             |
-| `doses_missed`          | How many were missed                     |
-| `adherence_percentage`  | (taken/scheduled) × 100                  |
-| `avg_delay_minutes`     | Average delay for taken doses            |
+| Column | Description |
+|--------|-------------|
+| `user_id` | Anonymized user identifier |
+| `user_name` | Patient name |
+| `email` | Contact email |
+| `timezone` | Patient's timezone |
+| `medication_id` | Medication identifier |
+| `medication_name` | Drug name |
+| `dosage` | Dosage amount |
+| `frequency` | DAILY / CUSTOM |
+| `date` | Calendar date (patient's local timezone) |
+| `total_scheduled_doses` | How many doses were scheduled |
+| `doses_taken` | How many were actually taken |
+| `doses_missed` | How many were missed |
+| `adherence_percentage` | (taken/scheduled) × 100 |
+| `avg_delay_minutes` | Average delay for taken doses |
 
 ### 18.4 Research Value
 
@@ -1053,7 +1018,6 @@ Caregiver can now view patient's adherence data
 ### 19.3 Role-Based UI
 
 Both web and mobile apps detect the user's role (`PATIENT` or `CAREGIVER`) and show different UI:
-
 - **Patient view**: Manage their own medications, see their own caregivers list
 - **Caregiver view**: See all linked patients and their adherence metrics
 
@@ -1136,13 +1100,13 @@ curl -X POST http://localhost:8000/rag/ingest
 
 ### 21.1 Differentiation from Existing Solutions
 
-| Existing Solution      | Limitation                                     | MedTrack's Advantage                                  |
-| ---------------------- | ---------------------------------------------- | ----------------------------------------------------- |
-| Medisafe / MyTherapy   | No caregiver dashboard, no AI, no analytics    | Full caregiver system + RAG AI + population analytics |
-| Hospital EMR systems   | Doctor-facing only, no patient self-management | Patient-first UI with caregiver and doctor bridges    |
-| Generic alarm apps     | Can't verify dose taken, no data logging       | Active confirmation + missed dose detection           |
-| WhatsApp family groups | Unstructured, manual, no history               | Structured real-time alerts with historical context   |
-| Pharmacy apps          | Focus on ordering, not adherence               | Focused on dose compliance and health outcomes        |
+| Existing Solution | Limitation | MedTrack's Advantage |
+|------------------|------------|----------------------|
+| Medisafe / MyTherapy | No caregiver dashboard, no AI, no analytics | Full caregiver system + RAG AI + population analytics |
+| Hospital EMR systems | Doctor-facing only, no patient self-management | Patient-first UI with caregiver and doctor bridges |
+| Generic alarm apps | Can't verify dose taken, no data logging | Active confirmation + missed dose detection |
+| WhatsApp family groups | Unstructured, manual, no history | Structured real-time alerts with historical context |
+| Pharmacy apps | Focus on ordering, not adherence | Focused on dose compliance and health outcomes |
 
 ### 21.2 Social Impact
 
@@ -1155,16 +1119,16 @@ curl -X POST http://localhost:8000/rag/ingest
 
 ### 21.3 Success Metrics
 
-| Metric                     | Target                                |
-| -------------------------- | ------------------------------------- |
-| Dose logging response time | < 2 seconds end-to-end                |
-| Adherence score accuracy   | 100% match against manual calculation |
-| Reminder delivery latency  | Within 5 minutes of scheduled time    |
-| Caregiver alert trigger    | < 10 minutes after dose miss          |
-| Dashboard data freshness   | Real-time (< 30 second lag)           |
-| Mobile usability           | Fully functional on screens ≥ 320px   |
+| Metric | Target |
+|--------|--------|
+| Dose logging response time | < 2 seconds end-to-end |
+| Adherence score accuracy | 100% match against manual calculation |
+| Reminder delivery latency | Within 5 minutes of scheduled time |
+| Caregiver alert trigger | < 10 minutes after dose miss |
+| Dashboard data freshness | Real-time (< 30 second lag) |
+| Mobile usability | Fully functional on screens ≥ 320px |
 
 ---
 
-_This document is the complete single source of truth for MedTrack — Gujarat Hackathon 2026._
-_Built with ❤️ for better healthcare accessibility in India._
+*This document is the complete single source of truth for MedTrack — Gujarat Hackathon 2026.*
+*Built with ❤️ for better healthcare accessibility in India.*
