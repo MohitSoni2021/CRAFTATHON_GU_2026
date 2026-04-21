@@ -25,11 +25,11 @@ export default function NewLabReportPage() {
     const [showPricingModal, setShowPricingModal] = useState(false);
     const [limitMessage, setLimitMessage] = useState('');
     const loadingMessages = [
-        "Analyzing lab report...",
-        "Extracting test results...",
+        "Analyzing diagnostic data...",
+        "Extracting laboratory metrics...",
         "Summarizing clinical findings...",
-        "Uploading to secure storage...",
-        "Finalizing report..."
+        "Securing diagnostic record...",
+        "Finalizing clinical report..."
     ];
 
     const [aiResponse, setAiResponse] = useState<any>(null);
@@ -80,19 +80,16 @@ export default function NewLabReportPage() {
                 const data = resultAction.payload;
                 setAiResponse(data);
 
-                // Auto-fill fields
                 if (data.labReport?.reportDate) {
                     setDate(new Date(data.labReport.reportDate).toISOString().split('T')[0]);
                 }
 
-                // Determine test type
                 let type = "General Lab Report";
                 if (data.tests && data.tests.length > 0) {
                     type = data.tests[0].testCategory || data.tests[0].testName || type;
                 }
                 setTestType(type);
 
-                // Fill results
                 if (data.tests && data.tests.length > 0) {
                     const newResults = data.tests.map((test: any) => ({
                         key: test.testName,
@@ -101,13 +98,11 @@ export default function NewLabReportPage() {
                     setResults(newResults);
                 }
 
-                // Add summary to notes
                 if (data.summary) {
                     const summaryText = `Total Tests: ${data.summary.totalTests}, Abnormal: ${data.summary.abnormalTests}. ${data.summary.criticalFindings ? 'CRITICAL FINDINGS DETECTED.' : ''}`;
                     setNotes(prev => prev ? `${prev}\n\nAI Analysis: ${summaryText}` : `AI Analysis: ${summaryText}`);
                 }
             } else {
-                // Handle Rejection
                 const payload = resultAction.payload as any;
                 if (payload?.isLimitReached) {
                     setLimitMessage(payload.message);
@@ -132,14 +127,16 @@ export default function NewLabReportPage() {
         }
 
         try {
-            const resultAction = await dispatch(analyzeLabReport({
-                image: fileUrl,
-                notes: notes,
+            const resultAction = await dispatch(createLabReport({
+                userId: user.id,
                 reportDate: date,
-                testType: testType
+                testType: testType,
+                notes: notes,
+                fileUrl: fileUrl,
+                parsedResults: aiResponse || { results: results.filter(r => r.key) }
             }));
 
-            if (analyzeLabReport.fulfilled.match(resultAction)) {
+            if (createLabReport.fulfilled.match(resultAction)) {
                 router.push('/lab-reports');
             } else {
                 alert("Failed to save report. Please try again.");
@@ -159,120 +156,142 @@ export default function NewLabReportPage() {
                     message={limitMessage}
                 />
 
-                <header className="flex items-center mb-8">
-                    <button
-                        onClick={() => router.back()}
-                        className="mr-4 p-2 hover:bg-gray-100 rounded-full transition"
-                    >
-                        <FaArrowLeft />
-                    </button>
-                    <h1 className="text-2xl font-bold text-gray-800">Add Lab Report</h1>
+                <header className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-10">
+                    <div className="flex items-center">
+                        <button
+                            onClick={() => router.back()}
+                            className="w-10 h-10 flex items-center justify-center text-tertiary/40 hover:text-primary hover:bg-primary/5 rounded-xl transition-all group mr-5"
+                        >
+                            <FaArrowLeft className="group-hover:-translate-x-0.5 transition-transform" />
+                        </button>
+                        <div>
+                            <p className="text-tertiary text-[11px] font-bold uppercase tracking-[0.1em] opacity-80 mb-1">
+                                Clinical Archive • Diagnostic Upload
+                            </p>
+                            <h1 className="text-3xl md:text-4xl font-extrabold text-[#2c3436] leading-tight">
+                                Add Lab <span className="text-primary">Report</span>
+                            </h1>
+                        </div>
+                    </div>
                 </header>
 
-                <div className="max-w-2xl mx-auto bg-white p-8 rounded-2xl shadow-lg border border-gray-100 relative overflow-hidden">
+                <div className="max-w-3xl mx-auto bg-white p-10 rounded-xl shadow-ambient border border-gray-100 relative overflow-hidden group">
+                    <div className="absolute top-0 right-0 w-40 h-40 bg-primary/5 rounded-full -mr-20 -mt-20 transition-transform duration-700 group-hover:scale-110"></div>
 
                     {/* Loading Overlay */}
                     {(loading || analyzing) && (
-                        <div className="absolute inset-0 bg-white/80 backdrop-blur-sm z-50 flex flex-col items-center justify-center">
-                            <div className="bg-white p-8 rounded-2xl shadow-2xl border border-gray-100 flex flex-col items-center max-w-sm w-full mx-4">
-                                <div className="relative w-16 h-16 mb-6">
-                                    <div className="absolute inset-0 border-4 border-blue-100 rounded-full"></div>
-                                    <div className="absolute inset-0 border-4 border-blue-600 rounded-full border-t-transparent animate-spin"></div>
-                                    <FaMagic className="absolute inset-0 m-auto text-blue-600 text-xl animate-pulse" />
+                        <div className="absolute inset-0 bg-white/90 backdrop-blur-md z-50 flex flex-col items-center justify-center">
+                            <div className="flex flex-col items-center max-w-sm w-full mx-4">
+                                <div className="relative w-20 h-20 mb-8">
+                                    <div className="absolute inset-0 border-4 border-primary/10 rounded-xl"></div>
+                                    <div className="absolute inset-0 border-4 border-primary rounded-xl border-t-transparent animate-spin"></div>
+                                    <FaMagic className="absolute inset-0 m-auto text-primary text-2xl animate-pulse" />
                                 </div>
-                                <h3 className="text-xl font-bold text-gray-800 mb-2">Processing Report</h3>
-                                <p className="text-gray-500 text-center animate-pulse transition-all duration-500">
+                                <h3 className="text-2xl font-extrabold text-[#2c3436] mb-2 tracking-tight">Processing Analysis</h3>
+                                <p className="text-tertiary/60 font-medium text-center animate-pulse transition-all duration-500">
                                     {loadingMessages[loadingMessageIndex]}
                                 </p>
                             </div>
                         </div>
                     )}
 
-                    <form onSubmit={handleSubmit} className={`space-y-6 transition-all duration-300 ${(loading || analyzing) ? 'opacity-50 blur-sm pointer-events-none' : ''}`}>
+                    <form onSubmit={handleSubmit} className={`space-y-8 relative z-10 transition-all duration-300 ${(loading || analyzing) ? 'opacity-30 blur-sm pointer-events-none' : ''}`}>
 
                         {/* File Upload & Analysis */}
-                        <div className="bg-blue-50 p-6 rounded-xl border border-blue-100">
-                            <label className="block text-sm font-medium text-blue-900 mb-3">Upload Report (Image/PDF)</label>
-                            <div className="flex items-center space-x-4">
-                                <div className="relative flex-grow">
-                                    <input
-                                        type="file"
-                                        accept="image/*,application/pdf"
-                                        onChange={handleFileChange}
-                                        className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200"
-                                    />
+                        <div className="bg-surface-container-low p-8 rounded-xl border-2 border-dashed border-gray-100 hover:border-primary/20 transition-colors">
+                            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                                <div className="flex-grow">
+                                    <label className="block text-[10px] font-black text-tertiary/40 uppercase tracking-[0.2em] mb-4">Diagnostic Source</label>
+                                    <div className="relative">
+                                        <input
+                                            type="file"
+                                            accept="image/*,application/pdf"
+                                            onChange={handleFileChange}
+                                            className="w-full text-xs text-tertiary/60 file:mr-6 file:py-2.5 file:px-6 file:rounded-xl file:border-0 file:text-[10px] file:font-black file:uppercase file:tracking-widest file:bg-primary file:text-white hover:file:bg-primary/90 transition file:cursor-pointer"
+                                        />
+                                    </div>
                                 </div>
                                 <button
                                     type="button"
                                     onClick={handleAnalyze}
                                     disabled={!fileUrl || analyzing}
-                                    className={`flex items-center space-x-2 px-4 py-2 rounded-lg font-medium transition ${!fileUrl || analyzing
-                                        ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                                        : 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white hover:shadow-md'
+                                    className={`flex items-center justify-center space-x-3 px-6 py-3.5 rounded-xl text-[10px] font-black uppercase tracking-[0.15em] transition-all duration-300 ${!fileUrl || analyzing
+                                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed shadow-none'
+                                        : 'bg-gradient-to-r from-primary to-tertiary text-white shadow-lg shadow-primary/20 hover:-translate-y-0.5'
                                         }`}
                                 >
-                                    <FaMagic />
-                                    <span>Analyze with AI</span>
+                                    <FaMagic className="text-base" />
+                                    <span>AI Analysis</span>
                                 </button>
                             </div>
+                            
                             {fileUrl && (
-                                <div className="mt-3">
+                                <div className="mt-8 flex items-center p-4 bg-white rounded-xl border border-gray-100">
                                     {fileUrl.startsWith('data:image') ? (
-                                        <img src={fileUrl} alt="Preview" className="h-32 object-contain rounded-lg border border-gray-200 bg-white" />
+                                        <div className="flex items-center space-x-4">
+                                            <div className="w-16 h-16 rounded-lg overflow-hidden border border-gray-100">
+                                                <img src={fileUrl} alt="Preview" className="w-full h-full object-cover" />
+                                            </div>
+                                            <div>
+                                                <p className="text-xs font-extrabold text-[#2c3436]">Visual Capture Ready</p>
+                                                <p className="text-[10px] text-tertiary/40 font-bold uppercase tracking-widest mt-0.5">High resolution input detected</p>
+                                            </div>
+                                        </div>
                                     ) : (
-                                        <div className="text-sm text-gray-600 flex items-center">
-                                            <FaCloudUploadAlt className="mr-2" /> File selected
+                                        <div className="flex items-center space-x-3 text-primary">
+                                            <FaCloudUploadAlt className="text-xl" />
+                                            <span className="text-[10px] font-black uppercase tracking-widest">Document format selected</span>
                                         </div>
                                     )}
                                 </div>
                             )}
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">Report Date</label>
+                                <label className="block text-[10px] font-black text-tertiary/40 uppercase tracking-widest mb-3">Consultation Date</label>
                                 <input
                                     type="date"
                                     value={date}
                                     onChange={(e) => setDate(e.target.value)}
-                                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className="w-full px-5 py-4 bg-surface-container-low border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-bold text-[#2c3436]"
                                     required
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">Test Type</label>
+                                <label className="block text-[10px] font-black text-tertiary/40 uppercase tracking-widest mb-3">Diagnostic Category</label>
                                 <input
                                     type="text"
                                     value={testType}
                                     onChange={(e) => setTestType(e.target.value)}
-                                    placeholder={fileUrl ? "Auto-assigned by AI" : "e.g. Lipid Profile, CBC"}
-                                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    placeholder={fileUrl ? "Identifying..." : "e.g. Lipid Profile, CBC"}
+                                    className="w-full px-5 py-4 bg-surface-container-low border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-bold text-[#2c3436]"
                                 />
                             </div>
                         </div>
 
                         {/* Dynamic Results Section */}
-                        <div className="p-6 bg-gray-50 rounded-xl">
-                            <div className="flex justify-between items-center mb-4">
-                                <label className="block text-sm font-semibold text-gray-700">Key Results</label>
-                                <button type="button" onClick={handleAddResult} className="text-sm text-blue-600 hover:text-blue-800 font-medium">+ Add Row</button>
+                        <div className="p-8 bg-surface-container-low rounded-xl border border-gray-50">
+                            <div className="flex justify-between items-center mb-6">
+                                <label className="text-[10px] font-black text-tertiary/40 uppercase tracking-widest">Laboratory Metrics</label>
+                                <button type="button" onClick={handleAddResult} className="text-[10px] font-black text-primary uppercase tracking-[0.2em] hover:text-primary/70 transition-colors">+ Add Parameter</button>
                             </div>
-                            <div className="space-y-3">
+                            <div className="space-y-4">
                                 {results.map((item, index) => (
-                                    <div key={index} className="flex space-x-3">
+                                    <div key={index} className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <input
                                             type="text"
-                                            placeholder="Parameter"
+                                            placeholder="Test Parameter"
                                             value={item.key}
                                             onChange={(e) => handleResultChange(index, 'key', e.target.value)}
-                                            className="flex-1 px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                                            className="px-4 py-3 bg-white border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/10 text-sm font-bold text-[#2c3436] placeholder:text-tertiary/20"
                                         />
                                         <input
                                             type="text"
-                                            placeholder="Value"
+                                            placeholder="Value (e.g. 14.2 g/dL)"
                                             value={item.value}
                                             onChange={(e) => handleResultChange(index, 'value', e.target.value)}
-                                            className="flex-1 px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                                            className="px-4 py-3 bg-white border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/10 text-sm font-bold text-[#2c3436] placeholder:text-tertiary/20"
                                         />
                                     </div>
                                 ))}
@@ -280,32 +299,34 @@ export default function NewLabReportPage() {
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">Clinical Notes</label>
+                            <label className="block text-[10px] font-black text-tertiary/40 uppercase tracking-widest mb-3">Clinical Annotations</label>
                             <textarea
                                 value={notes}
                                 onChange={(e) => setNotes(e.target.value)}
-                                placeholder="Doctor's comments or your observations..."
-                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 h-24 resize-none"
+                                placeholder="Additional clinician comments or patient observations..."
+                                className="w-full px-5 py-4 bg-surface-container-low border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 h-32 resize-none transition-all font-medium text-tertiary/70 placeholder:text-tertiary/20"
                             />
                         </div>
 
                         <button
                             type="submit"
                             disabled={loading || analyzing}
-                            className="w-full py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-bold shadow-lg hover:shadow-xl transition transform hover:scale-[1.02] disabled:opacity-50"
+                            className="btn-primary !rounded-xl w-full py-5 !text-xs shadow-xl shadow-primary/20 hover:-translate-y-0.5"
                         >
-                            {loading ? 'Saving...' : 'Save Report'}
+                            {loading ? 'ARCHIVING RECORD...' : 'SAVE TO CLINICAL ARCHIVE'}
                         </button>
                     </form>
 
                     {/* AI Analysis Response Section */}
                     {aiResponse && (
-                        <div className={`mt-8 pt-8 border-t border-gray-100 transition-all duration-300 ${(loading || analyzing) ? 'opacity-50 blur-sm pointer-events-none' : ''}`}>
-                            <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center">
-                                <FaMagic className="text-purple-500 mr-2" />
-                                AI Analysis Result
+                        <div className={`mt-10 pt-10 border-t border-gray-50 transition-all duration-300 ${(loading || analyzing) ? 'opacity-30 blur-sm pointer-events-none' : ''}`}>
+                            <h3 className="text-[11px] font-black text-[#2c3436] uppercase tracking-[0.2em] mb-6 flex items-center">
+                                <div className="w-8 h-8 rounded-lg bg-tertiary/5 flex items-center justify-center mr-3 text-tertiary">
+                                    <FaMagic className="text-sm" />
+                                </div>
+                                Clinical Intelligence Output
                             </h3>
-                            <div className="bg-gray-900 text-gray-100 p-6 rounded-xl overflow-x-auto text-sm font-mono shadow-inner">
+                            <div className="bg-surface-container-low p-6 rounded-xl overflow-x-auto text-[10px] font-mono text-tertiary/60 border border-gray-50 shadow-inner">
                                 <pre>{JSON.stringify(aiResponse, null, 2)}</pre>
                             </div>
                         </div>
