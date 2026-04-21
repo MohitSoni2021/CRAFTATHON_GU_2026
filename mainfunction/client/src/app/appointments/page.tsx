@@ -4,10 +4,12 @@ import DashboardLayout from '@/components/DashboardLayout';
 import axios from 'axios';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/store/store';
-import { FaCalendarAlt, FaUserMd, FaFlask, FaPlus, FaTimes, FaTrash, FaCheckCircle, FaFileUpload } from 'react-icons/fa';
+import { FaCalendarAlt, FaUserMd, FaFlask, FaPlus, FaTimes, FaTrash, FaCheckCircle, FaFileUpload, FaClock } from 'react-icons/fa';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import BookingModal from '@/components/BookingModal';
+
+import AppointmentsSkeleton from '@/components/dashboard/AppointmentsSkeleton';
 
 interface Appointment {
     _id: string;
@@ -98,93 +100,102 @@ const AppointmentsPage = () => {
 
     return (
         <DashboardLayout>
-            <div className="max-w-7xl mx-auto">
-                <header className="mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div className="w-full">
+                <header className="mb-8 flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
                     <div>
-                        <h1 className="text-xl font-bold text-gray-900">Appointments</h1>
-                        <p className="text-gray-600 mt-2">Manage your doctor visits and lab tests.</p>
+                        <p className="text-tertiary text-[11px] font-bold uppercase tracking-[0.1em] opacity-80 mb-1">
+                            Clinical Management • Schedules
+                        </p>
+                        <h1 className="text-3xl md:text-4xl font-extrabold text-[#2c3436] leading-tight">
+                            Your <span className="text-primary">Appointments</span>
+                        </h1>
+                        <p className="text-tertiary/70 text-sm font-medium mt-1">Manage your doctor visits and lab tests curated for your health.</p>
                     </div>
                     <button
                         onClick={() => setShowModal(true)}
-                        className="w-full md:w-auto bg-[#3AAFA9] text-white px-6 py-3 rounded-xl font-bold shadow-lg hover:bg-[#2B7A78] transition-colors flex items-center justify-center space-x-2"
+                        className="btn-primary !rounded-xl"
                     >
-                        <FaPlus /> <span>Book Appointment</span>
+                        <FaPlus className="mr-2" /> <span>Book Appointment</span>
                     </button>
                 </header>
 
                 {loading ? (
-                    <div className="flex justify-center items-center h-64">
-                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#3AAFA9]"></div>
-                    </div>
+                    <AppointmentsSkeleton />
                 ) : appointments.length === 0 ? (
-                    <div className="text-center py-16 bg-white rounded-2xl shadow-sm border border-gray-100">
-                        <FaCalendarAlt className="mx-auto text-6xl text-gray-200 mb-4" />
-                        <h3 className="text-lg font-bold text-gray-800 mb-2">No Appointments Scheduled</h3>
-                        <p className="text-gray-500">Book your first appointment to get started.</p>
+                    <div className="text-center py-20 bg-white rounded-xl shadow-ambient border border-gray-100">
+                        <FaCalendarAlt className="mx-auto text-6xl text-gray-100 mb-6" />
+                        <h3 className="text-xl font-bold text-[#2c3436]">No Appointments Scheduled</h3>
+                        <p className="text-tertiary/60 mt-2 font-medium">Book your first clinical session to begin your health journey.</p>
                     </div>
                 ) : (
                     <div className="grid gap-6">
                         {appointments.map((app) => (
-                            <div key={app._id} className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col md:flex-row justify-between items-start md:items-center hover:shadow-md transition-shadow">
-                                <div className="flex items-start space-x-4">
-                                    <div className={`p-4 rounded-xl ${app.type === 'Doctor' ? 'bg-blue-50 text-blue-600' : 'bg-purple-50 text-purple-600'}`}>
+                            <div key={app._id} className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col md:flex-row justify-between items-start md:items-center hover:shadow-ambient hover:border-primary/20 transition-all duration-300 group">
+                                <div className="flex items-start space-x-6">
+                                    <div className={`p-5 rounded-xl transition-colors duration-300 ${app.type === 'Doctor' ? 'bg-primary/5 text-primary' : 'bg-tertiary/5 text-tertiary'}`}>
                                         {app.type === 'Doctor' ? <FaUserMd className="text-2xl" /> : <FaFlask className="text-2xl" />}
                                     </div>
                                     <div>
-                                        <div className="flex items-center space-x-2 mb-1">
-                                            <Link href={`/appointments/${app._id}`} className="hover:underline">
-                                                <h3 className="text-base font-bold text-gray-900">{app.providerName}</h3>
+                                        <div className="flex items-center space-x-3 mb-2">
+                                            <Link href={`/appointments/${app._id}`} className="group-hover:text-primary transition-colors">
+                                                <h3 className="text-lg font-bold text-[#2c3436]">{app.providerName}</h3>
                                             </Link>
-                                            <span className={`text-xs font-bold px-2 py-1 rounded-full ${app.status === 'Scheduled' ? 'bg-green-100 text-green-700' :
-                                                app.status === 'Completed' ? 'bg-gray-100 text-gray-600' :
-                                                    'bg-red-100 text-red-700'
+                                            <span className={`text-[10px] font-black px-3 py-1 rounded-lg uppercase tracking-widest ${app.status === 'Scheduled' ? 'bg-green-50 text-green-600' :
+                                                app.status === 'Completed' ? 'bg-surface-container-high text-tertiary/50' :
+                                                    'bg-red-50 text-red-600'
                                                 }`}>
                                                 {app.status}
                                             </span>
                                         </div>
-                                        <p className="text-gray-500 text-sm flex items-center space-x-4">
-                                            <span>{new Date(app.date).toLocaleDateString()}</span>
-                                            <span>•</span>
-                                            <span>{app.time}</span>
-                                        </p>
-                                        {app.notes && <p className="text-gray-400 text-sm mt-2 italic">"{app.notes}"</p>}
+                                        <div className="flex items-center space-x-4 text-tertiary/60 text-xs font-bold uppercase tracking-wider">
+                                            <div className="flex items-center">
+                                                <FaCalendarAlt className="mr-2 text-primary/40" />
+                                                <span>{new Date(app.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                                            </div>
+                                            <span className="opacity-30">•</span>
+                                            <div className="flex items-center">
+                                                <FaClock className="mr-2 text-primary/40" />
+                                                <span>{app.time}</span>
+                                            </div>
+                                        </div>
+                                        {app.notes && <p className="text-tertiary/40 text-[11px] mt-3 font-medium italic">"{app.notes}"</p>}
                                     </div>
                                 </div>
 
-                                <div className="mt-4 md:mt-0 flex items-center space-x-3">
+                                <div className="mt-6 md:mt-0 flex items-center space-x-2">
                                     {app.status === 'Scheduled' && (
                                         <>
                                             <button
                                                 onClick={() => handleStatusUpdate(app._id, 'Completed')}
-                                                className="p-2 text-green-600 hover:bg-green-50 rounded-lg tooltip"
+                                                className="w-10 h-10 flex items-center justify-center text-green-600 bg-green-50 hover:bg-green-600 hover:text-white rounded-xl transition-all duration-300"
                                                 title="Mark as Completed"
                                             >
-                                                <FaCheckCircle className="text-xl" />
+                                                <FaCheckCircle />
                                             </button>
                                             <button
                                                 onClick={() => handleStatusUpdate(app._id, 'Cancelled')}
-                                                className="p-2 text-orange-500 hover:bg-orange-50 rounded-lg tooltip"
+                                                className="w-10 h-10 flex items-center justify-center text-orange-500 bg-orange-50 hover:bg-orange-500 hover:text-white rounded-xl transition-all duration-300"
                                                 title="Cancel Appointment"
                                             >
-                                                <FaTimes className="text-xl" />
+                                                <FaTimes />
                                             </button>
                                         </>
                                     )}
                                     {app.status === 'Completed' && (
                                         <Link
                                             href={`/doctor-reports/new?date=${app.date}&doctor=${encodeURIComponent(app.providerName)}`}
-                                            className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg tooltip"
+                                            className="w-10 h-10 flex items-center justify-center text-primary bg-primary/5 hover:bg-primary hover:text-white rounded-xl transition-all duration-300"
                                             title="Create Report"
                                         >
-                                            <FaFileUpload className="text-xl" />
+                                            <FaFileUpload />
                                         </Link>
                                     )}
                                     <button
                                         onClick={() => handleDelete(app._id)}
-                                        className="p-2 text-red-500 hover:bg-red-50 rounded-lg tooltip"
+                                        className="w-10 h-10 flex items-center justify-center text-red-500 bg-red-50 hover:bg-red-500 hover:text-white rounded-xl transition-all duration-300"
                                         title="Delete"
                                     >
-                                        <FaTrash className="text-xl" />
+                                        <FaTrash />
                                     </button>
                                 </div>
                             </div>

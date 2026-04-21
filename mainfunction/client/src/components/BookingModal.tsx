@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { FaTimes } from 'react-icons/fa';
+import { FaTimes, FaCalendarCheck, FaUserMd, FaClock, FaClipboardList } from 'react-icons/fa';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/store/store';
 
@@ -61,8 +61,6 @@ const BookingModal: React.FC<BookingModalProps> = ({ onClose, onSuccess, prefill
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        // Validate future date/time
-        // Note: For slot selection, date/time are usually strictly controlled, but explicit future check is good safe guard
         const selectedDateTime = new Date(`${formData.date}T${formData.time}`);
         if (selectedDateTime <= new Date()) {
             alert('Please select a future date and time for your appointment.');
@@ -85,128 +83,158 @@ const BookingModal: React.FC<BookingModalProps> = ({ onClose, onSuccess, prefill
     };
 
     return (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
-            <div className="bg-white rounded-2xl w-full max-w-md p-8 shadow-2xl animate-fade-in-up">
-                <div className="flex flex-col mb-6">
-                    <div className="flex justify-between items-center">
-                        <h2 className="text-lg font-bold text-gray-900">Book Appointment</h2>
-                        <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
-                            <FaTimes className="text-xl" />
+        <div className="fixed inset-0 bg-[#2c3436]/60 z-50 flex items-center justify-center p-4 backdrop-blur-md transition-all duration-500 animate-in fade-in">
+            <div className="bg-white rounded-xl w-full max-w-lg overflow-hidden shadow-2xl border border-gray-100 animate-in zoom-in-95 duration-300">
+                <div className="p-1 bg-gradient-primary"></div>
+                
+                <div className="p-8 md:p-10">
+                    <header className="flex justify-between items-start mb-8">
+                        <div>
+                            <div className="flex items-center space-x-3 text-primary text-[10px] font-black uppercase tracking-widest mb-2">
+                                <FaCalendarCheck className="text-sm" /> <span>Consultation Booking</span>
+                            </div>
+                            <h2 className="text-2xl font-extrabold text-[#2c3436]">Reserve your <span className="text-primary">Session</span></h2>
+                            {availabilityDays.length > 0 && (
+                                <p className="text-xs text-tertiary/50 mt-2 font-bold uppercase tracking-wider">Available: {availabilityDays.join(', ')}</p>
+                            )}
+                        </div>
+                        <button 
+                            onClick={onClose} 
+                            className="w-10 h-10 flex items-center justify-center text-tertiary/40 hover:text-primary hover:bg-primary/5 rounded-xl transition-all"
+                        >
+                            <FaTimes className="text-lg" />
                         </button>
-                    </div>
-                    {availabilityDays.length > 0 && (
-                        <p className="text-sm text-gray-500 mt-1">Available on: <span className="font-medium text-[#3AAFA9]">{availabilityDays.join(', ')}</span></p>
-                    )}
-                </div>
+                    </header>
 
-                <form onSubmit={handleSubmit} className="space-y-4">
-                    <div>
-                        <label className="block text-xs font-bold text-gray-700 mb-1">Provider Name</label>
-                        <input
-                            type="text"
-                            required
-                            readOnly={!!prefilledDoctorName}
-                            placeholder="Dr. Smith or City Lab"
-                            className={`w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-[#3AAFA9] focus:ring-2 focus:ring-[#3AAFA9]/20 outline-none transition-all ${prefilledDoctorName ? 'bg-gray-50' : ''}`}
-                            value={formData.providerName}
-                            onChange={(e) => setFormData({ ...formData, providerName: e.target.value })}
-                        />
-                    </div>
+                    <form onSubmit={handleSubmit} className="space-y-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="md:col-span-2">
+                                <label className="block text-[11px] font-black text-tertiary/40 uppercase tracking-widest mb-2">Healthcare Provider</label>
+                                <div className="relative">
+                                    <div className="absolute left-4 top-1/2 -translate-y-1/2 text-primary/40">
+                                        <FaUserMd />
+                                    </div>
+                                    <input
+                                        type="text"
+                                        required
+                                        readOnly={!!prefilledDoctorName}
+                                        placeholder="Provider name or clinical center"
+                                        className={`w-full pl-11 pr-4 py-4 rounded-xl border border-gray-100 bg-surface-container-low text-[#2c3436] font-bold outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all ${prefilledDoctorName ? 'opacity-70' : ''}`}
+                                        value={formData.providerName}
+                                        onChange={(e) => setFormData({ ...formData, providerName: e.target.value })}
+                                    />
+                                </div>
+                            </div>
 
-                    <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <label className="block text-xs font-bold text-gray-700 mb-1">Type</label>
-                            <select
-                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-[#3AAFA9] focus:ring-2 focus:ring-[#3AAFA9]/20 outline-none transition-all"
-                                value={formData.type}
-                                onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-                            >
-                                <option value="Doctor">Doctor</option>
-                                <option value="Lab">Lab</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label className="block text-xs font-bold text-gray-700 mb-1">Mode</label>
-                            <select
-                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-[#3AAFA9] focus:ring-2 focus:ring-[#3AAFA9]/20 outline-none transition-all"
-                                value={formData.mode}
-                                onChange={(e) => setFormData({ ...formData, mode: e.target.value })}
-                            >
-                                <option value="Online">Online Consultation</option>
-                                <option value="Offline">In-Person Visit</option>
-                            </select>
-                        </div>
-                    </div>
+                            <div>
+                                <label className="block text-[11px] font-black text-tertiary/40 uppercase tracking-widest mb-2">Service Type</label>
+                                <select
+                                    className="w-full px-4 py-4 rounded-xl border border-gray-100 bg-surface-container-low text-[#2c3436] font-bold outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all appearance-none"
+                                    value={formData.type}
+                                    onChange={(e) => setFormData({ ...formData, type: e.target.value })}
+                                >
+                                    <option value="Doctor">Clinical Doctor</option>
+                                    <option value="Lab">Lab Diagnostic</option>
+                                </select>
+                            </div>
 
-                    <div>
-                        <label className="block text-xs font-bold text-gray-700 mb-1">Date</label>
-                        <input
-                            type="date"
-                            required
-                            readOnly={!!prefilledDate}
-                            className={`w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-[#3AAFA9] focus:ring-2 focus:ring-[#3AAFA9]/20 outline-none transition-all ${prefilledDate ? 'bg-gray-50' : ''}`}
-                            value={formData.date}
-                            onChange={(e) => setFormData({ ...formData, date: e.target.value, time: '' })}
-                        />
-                    </div>
+                            <div>
+                                <label className="block text-[11px] font-black text-tertiary/40 uppercase tracking-widest mb-2">Interaction Mode</label>
+                                <select
+                                    className="w-full px-4 py-4 rounded-xl border border-gray-100 bg-surface-container-low text-[#2c3436] font-bold outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all appearance-none"
+                                    value={formData.mode}
+                                    onChange={(e) => setFormData({ ...formData, mode: e.target.value })}
+                                >
+                                    <option value="Online">Virtual Call</option>
+                                    <option value="Offline">In-Clinic Visit</option>
+                                </select>
+                            </div>
 
-                    {/* Slot Selection - Only show if time is NOT prefilled */}
-                    {availableSlots.length > 0 && !prefilledTime && (
-                        <div>
-                            <label className="block text-xs font-bold text-gray-700 mb-2">Available Slots</label>
-                            <div className="grid grid-cols-3 gap-2 max-h-48 overflow-y-auto custom-scrollbar">
-                                {availableSlots.map((slot) => (
-                                    <button
-                                        key={slot.time}
-                                        type="button"
-                                        disabled={!slot.available}
-                                        onClick={() => setFormData({ ...formData, time: slot.time })}
-                                        className={`
-                                            px-2 py-2 text-sm rounded-lg border transition-all
-                                            ${!slot.available
-                                                ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed decoration-slice'
-                                                : formData.time === slot.time
-                                                    ? 'bg-[#3AAFA9] text-white border-[#3AAFA9]'
-                                                    : 'bg-white text-gray-600 border-gray-200 hover:border-[#3AAFA9]'}
-                                        `}
-                                    >
-                                        {slot.time}
-                                    </button>
-                                ))}
+                            <div>
+                                <label className="block text-[11px] font-black text-tertiary/40 uppercase tracking-widest mb-2">Appointment Date</label>
+                                <input
+                                    type="date"
+                                    required
+                                    readOnly={!!prefilledDate}
+                                    className={`w-full px-4 py-4 rounded-xl border border-gray-100 bg-surface-container-low text-[#2c3436] font-bold outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all ${prefilledDate ? 'opacity-70' : ''}`}
+                                    value={formData.date}
+                                    min={new Date().toISOString().split('T')[0]}
+                                    onChange={(e) => setFormData({ ...formData, date: e.target.value, time: '' })}
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-[11px] font-black text-tertiary/40 uppercase tracking-widest mb-2">Preferred Time</label>
+                                <div className="relative">
+                                    <div className="absolute left-4 top-1/2 -translate-y-1/2 text-primary/40">
+                                        <FaClock />
+                                    </div>
+                                    <input
+                                        type="time"
+                                        required
+                                        readOnly={!!prefilledDoctorId || !!prefilledTime}
+                                        className={`w-full pl-11 pr-4 py-4 rounded-xl border border-gray-100 bg-surface-container-low text-[#2c3436] font-bold outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all ${!!prefilledDoctorId || !!prefilledTime ? 'opacity-70' : ''}`}
+                                        value={formData.time}
+                                        onChange={(e) => setFormData({ ...formData, time: e.target.value })}
+                                    />
+                                </div>
                             </div>
                         </div>
-                    )}
 
-                    <div>
-                        <label className="block text-xs font-bold text-gray-700 mb-1">Time</label>
-                        <input
-                            type="time"
-                            required
-                            readOnly={!!prefilledDoctorId || !!prefilledTime}
-                            className={`w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 outline-none transition-all ${!!prefilledDoctorId || !!prefilledTime ? 'cursor-not-allowed opacity-70' : ''}`}
-                            value={formData.time}
-                            onChange={(e) => setFormData({ ...formData, time: e.target.value })}
-                        />
-                        {(!!prefilledDoctorId && !prefilledTime) && <p className="text-xs text-gray-500 mt-1">Please select a slot from above.</p>}
-                    </div>
+                        {/* Slot Selection */}
+                        {availableSlots.length > 0 && !prefilledTime && (
+                            <div className="pt-2">
+                                <label className="block text-[11px] font-black text-tertiary/40 uppercase tracking-widest mb-3">Available Time Slots</label>
+                                <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 max-h-40 overflow-y-auto p-1 custom-scrollbar">
+                                    {availableSlots.map((slot) => (
+                                        <button
+                                            key={slot.time}
+                                            type="button"
+                                            disabled={!slot.available}
+                                            onClick={() => setFormData({ ...formData, time: slot.time })}
+                                            className={`
+                                                py-3 px-1 text-xs rounded-xl border transition-all font-bold
+                                                ${!slot.available
+                                                    ? 'bg-surface-container-low text-tertiary/20 border-transparent cursor-not-allowed'
+                                                    : formData.time === slot.time
+                                                        ? 'bg-primary text-white border-primary shadow-lg shadow-primary/20'
+                                                        : 'bg-white text-[#2c3436] border-gray-100 hover:border-primary hover:text-primary'}
+                                            `}
+                                        >
+                                            {slot.time}
+                                        </button>
+                                    ))}
+                                </div>
+                                {(!!prefilledDoctorId && !formData.time) && (
+                                    <p className="text-[10px] text-primary font-bold uppercase tracking-widest mt-2 flex items-center">
+                                        <span className="w-1.5 h-1.5 rounded-full bg-primary mr-2 animate-pulse"></span>
+                                        Action required: Select a slot
+                                    </p>
+                                )}
+                            </div>
+                        )}
 
-                    <div>
-                        <label className="block text-xs font-bold text-gray-700 mb-1">Notes (Optional)</label>
-                        <textarea
-                            rows={3}
-                            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-[#3AAFA9] focus:ring-2 focus:ring-[#3AAFA9]/20 outline-none transition-all resize-none"
-                            value={formData.notes}
-                            onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                        />
-                    </div>
+                        <div>
+                            <label className="block text-[11px] font-black text-tertiary/40 uppercase tracking-widest mb-2 flex items-center">
+                                <FaClipboardList className="mr-2" /> Clinical Notes <span className="ml-1 opacity-50 lowercase italic">(optional)</span>
+                            </label>
+                            <textarea
+                                rows={2}
+                                placeholder="Any specific symptoms or health history..."
+                                className="w-full px-4 py-4 rounded-xl border border-gray-100 bg-surface-container-low text-[#2c3436] font-medium outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all resize-none"
+                                value={formData.notes}
+                                onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                            />
+                        </div>
 
-                    <button
-                        type="submit"
-                        className="w-full bg-[#3AAFA9] text-white py-3 rounded-xl font-bold shadow-lg hover:bg-[#2B7A78] transition-colors mt-2"
-                    >
-                        Confirm Booking
-                    </button>
-                </form>
+                        <button
+                            type="submit"
+                            className="btn-primary !rounded-xl w-full py-5 !text-sm shadow-xl shadow-primary/20"
+                        >
+                            Confirm Clinical Reservation
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
     );
