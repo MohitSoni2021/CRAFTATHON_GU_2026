@@ -1,8 +1,9 @@
 'use client';
+
 import React, { useEffect, useState } from 'react';
 import DashboardLayout from '@/components/DashboardLayout';
 import axios from 'axios';
-import { FaBookmark, FaRegBookmark, FaImage } from 'react-icons/fa';
+import { FaBookmark, FaRegBookmark, FaImage, FaChevronRight, FaRegNewspaper, FaClock, FaGlobe, FaBolt } from 'react-icons/fa';
 import PremiumLock from '@/components/PremiumLock';
 
 interface Article {
@@ -20,20 +21,23 @@ const ArticleImage = ({ src, alt }: { src?: string, alt: string }) => {
 
     if (!src || hasError) {
         return (
-            <div className="h-48 bg-gray-200 flex items-center justify-center">
-                <FaImage className="text-4xl text-gray-400" />
+            <div className="h-56 bg-surface-container-low flex flex-col items-center justify-center border-b border-outline-variant relative overflow-hidden group">
+                <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <FaImage className="text-4xl text-gray-200 mb-2 relative z-10" />
+                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest relative z-10">Image Unavailable</p>
             </div>
         );
     }
 
     return (
-        <div className="h-48 overflow-hidden">
+        <div className="h-56 overflow-hidden border-b border-outline-variant relative group">
             <img
                 src={src}
                 alt={alt}
-                className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                 onError={() => setHasError(true)}
             />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
         </div>
     );
 };
@@ -56,7 +60,7 @@ const InsightsPage = () => {
                 if (newsRes.data.success) {
                     setArticles(newsRes.data.data);
                 } else {
-                    setError('Failed to fetch news');
+                    setError('Failed to fetch clinical insights');
                 }
 
                 if (savedRes.data && savedRes.data.success) {
@@ -64,7 +68,7 @@ const InsightsPage = () => {
                 }
             } catch (err) {
                 console.error(err);
-                setError('Error connecting to server');
+                setError('Error connecting to clinical database');
             } finally {
                 setLoading(false);
             }
@@ -77,7 +81,7 @@ const InsightsPage = () => {
         try {
             const token = localStorage.getItem('token');
             if (!token) {
-                alert("Please login to save articles.");
+                alert("Please login to synchronize your library.");
                 return;
             }
 
@@ -100,71 +104,102 @@ const InsightsPage = () => {
             }
         } catch (error) {
             console.error("Error toggling save:", error);
-            alert("Failed to update bookmark.");
+            alert("Protocol failure: Failed to update bookmark.");
         }
     };
 
     return (
         <DashboardLayout>
-            <div className="max-w-7xl mx-auto">
-                <header className="mb-8">
-                    <h1 className="text-xl font-bold text-gray-900">Health Insights</h1>
-                    <p className="text-gray-600 mt-2">Latest news and articles to keep you informed.</p>
+            <div className="flex flex-col min-h-screen bg-white">
+                <header className="mb-10 w-full max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+                    <div className="flex justify-between items-end">
+                        <div>
+                            <div className="inline-flex items-center space-x-2 bg-primary/5 px-3 py-1 rounded-lg text-primary text-[10px] font-bold mb-3 border border-primary/10 uppercase tracking-widest">
+                                <FaRegNewspaper /> <span>Medical Intelligence</span>
+                            </div>
+                            <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">
+                                Health Insights
+                            </h1>
+                            <p className="text-gray-500 text-sm font-medium mt-1">Curated global medical breakthroughs and wellness research.</p>
+                        </div>
+                    </div>
                 </header>
 
-                <PremiumLock
-                    title="Unlock Daily Health Insights"
-                    description="Get access to curated latest medical news, research summaries, and personalized wellness articles."
-                >
-                    {loading ? (
-                        <div className="flex justify-center items-center h-64">
-                            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-                        </div>
-                    ) : error ? (
-                        <div className="bg-red-50 text-red-600 p-4 rounded-lg">{error}</div>
-                    ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {articles.map((article) => (
-                                <div key={article._id} className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow overflow-hidden flex flex-col h-full">
-                                    <ArticleImage src={article.imageUrl} alt={article.title} />
-                                    <div className="p-5 flex-1 flex flex-col">
-                                        <div className="flex items-center justify-between mb-2">
-                                            <div className="flex items-center space-x-2">
-                                                <span className="text-xs font-semibold text-blue-600 bg-blue-50 px-2 py-1 rounded-full">
-                                                    {article.source || 'News'}
-                                                </span>
-                                                <span className="text-xs text-gray-400">
-                                                    {new Date(article.publishedAt).toLocaleDateString()}
+                <div className="w-full px-4 sm:px-6 lg:px-8 max-w-[1920px] mx-auto pb-20">
+                    <PremiumLock
+                        title="Unlock Diagnostic-Grade Insights"
+                        description="Access real-time clinical news, peer-reviewed summaries, and personalized AI health analysis."
+                    >
+                        {loading ? (
+                            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-8">
+                                {[1, 2, 3, 4, 5, 6, 7, 8].map(i => (
+                                    <div key={i} className="h-96 bg-surface-container-low rounded-xl animate-pulse"></div>
+                                ))}
+                            </div>
+                        ) : error ? (
+                            <div className="bg-red-50 text-red-600 p-8 rounded-xl border border-red-100 flex items-center gap-4">
+                                <FaBolt className="shrink-0" />
+                                <p className="font-bold uppercase tracking-widest text-xs">{error}</p>
+                            </div>
+                        ) : (
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                                {articles.map((article) => (
+                                    <div 
+                                        key={article._id} 
+                                        className="card-editorial bg-white rounded-xl border border-outline-variant shadow-ambient hover:shadow-2xl hover:border-primary/20 transition-all flex flex-col h-full group"
+                                    >
+                                        <div className="relative">
+                                            <ArticleImage src={article.imageUrl} alt={article.title} />
+                                            <div className="absolute top-4 left-4">
+                                                <span className="bg-white/90 backdrop-blur-md text-primary text-[10px] font-black px-3 py-1 rounded-lg shadow-sm uppercase tracking-widest border border-primary/10">
+                                                    {article.source || 'Clinical'}
                                                 </span>
                                             </div>
                                             <button
                                                 onClick={() => toggleSave(article._id)}
-                                                className={`p-2 rounded-full transition-colors ${savedArticleIds.has(article._id) ? 'text-blue-600 bg-blue-50' : 'text-gray-400 hover:text-blue-500 hover:bg-gray-50'}`}
-                                                title={savedArticleIds.has(article._id) ? "Unsave" : "Save"}
+                                                className={`absolute top-4 right-4 w-10 h-10 rounded-xl transition-all flex items-center justify-center shadow-lg border backdrop-blur-md ${savedArticleIds.has(article._id) ? 'bg-primary text-white border-primary' : 'bg-white/90 text-gray-400 border-white hover:text-primary'}`}
+                                                title={savedArticleIds.has(article._id) ? "Synchronized" : "Synchronize to Library"}
                                             >
-                                                {savedArticleIds.has(article._id) ? <FaBookmark /> : <FaRegBookmark />}
+                                                {savedArticleIds.has(article._id) ? <FaBookmark size={14} /> : <FaRegBookmark size={14} />}
                                             </button>
                                         </div>
-                                        <h3 className="text-base font-bold text-gray-900 mb-2 line-clamp-2">
-                                            {article.title}
-                                        </h3>
-                                        <p className="text-gray-600 text-sm mb-4 line-clamp-3 flex-1">
-                                            {article.description || 'No description available.'}
-                                        </p>
-                                        <a
-                                            href={article.url}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="mt-auto text-blue-600 font-medium text-sm hover:underline flex items-center"
-                                        >
-                                            Read full article &rarr;
-                                        </a>
+
+                                        <div className="p-6 flex-1 flex flex-col">
+                                            <div className="flex items-center gap-4 mb-4 text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em]">
+                                                <div className="flex items-center gap-1.5">
+                                                    <FaClock className="text-primary/40" />
+                                                    {new Date(article.publishedAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+                                                </div>
+                                                <div className="flex items-center gap-1.5">
+                                                    <FaGlobe className="text-primary/40" />
+                                                    Global Access
+                                                </div>
+                                            </div>
+
+                                            <h3 className="text-base font-extrabold text-gray-900 mb-3 line-clamp-2 group-hover:text-primary transition-colors leading-tight tracking-tight">
+                                                {article.title}
+                                            </h3>
+                                            
+                                            <p className="text-gray-500 text-xs font-medium mb-8 line-clamp-3 flex-1 leading-relaxed opacity-80">
+                                                {article.description || 'Verified clinical documentation pending overview.'}
+                                            </p>
+                                            
+                                            <a
+                                                href={article.url}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="mt-auto group/link flex items-center justify-between p-4 bg-surface-container-low rounded-xl border border-outline-variant hover:border-primary/20 transition-all"
+                                            >
+                                                <span className="text-[10px] font-black text-gray-900 uppercase tracking-widest">Examine Full Report</span>
+                                                <FaChevronRight size={10} className="text-primary group-hover/link:translate-x-1 transition-transform" />
+                                            </a>
+                                        </div>
                                     </div>
-                                </div>
-                            ))}
-                        </div>
-                    )}
-                </PremiumLock>
+                                ))}
+                            </div>
+                        )}
+                    </PremiumLock>
+                </div>
             </div>
         </DashboardLayout>
     );
