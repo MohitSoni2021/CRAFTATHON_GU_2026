@@ -1,150 +1,156 @@
-'use client';
-import { useState, useEffect } from 'react';
-import { FaLightbulb, FaNewspaper, FaChevronRight, FaExclamationCircle, FaArrowRight } from 'react-icons/fa';
-import axios from 'axios';
-import Link from 'next/link';
+"use client";
+import { useState, useEffect } from "react";
+import {
+  FaLightbulb,
+  FaNewspaper,
+  FaChevronRight,
+  FaExclamationCircle,
+  FaArrowRight,
+} from "react-icons/fa";
+import axios from "axios";
+import Link from "next/link";
 
 interface NewsItem {
-    _id: string;
-    title: string;
-    description: string;
-    source: string;
-    publishedAt: string;
-    url: string;
+  _id: string;
+  title: string;
+  description: string;
+  source: string;
+  publishedAt: string;
+  url: string;
 }
 
 const TIPS_MOCK = [
-    "Take a 5-minute stretch break every hour.",
-    "Replace soda with sparkling water and lemon.",
-    "Practice deep breathing for 2 minutes to reduce stress.",
-    "Eat a rainbow of vegetables daily.",
-    "Aim for 30 minutes of moderate activity."
+  "Take a 5-minute stretch break every hour.",
+  "Replace soda with sparkling water and lemon.",
+  "Practice deep breathing for 2 minutes to reduce stress.",
+  "Eat a rainbow of vegetables daily.",
+  "Aim for 30 minutes of moderate activity.",
 ];
 
 const HealthNewsWidget = () => {
-    const [tipIndex, setTipIndex] = useState(0);
-    const [news, setNews] = useState<NewsItem[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
+  const [tipIndex, setTipIndex] = useState(0);
+  const [news, setNews] = useState<NewsItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-    // Rotate tips every 10 seconds
-    useEffect(() => {
-        const interval = setInterval(() => {
-            setTipIndex((prev) => (prev + 1) % TIPS_MOCK.length);
-        }, 10000);
-        return () => clearInterval(interval);
-    }, []);
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTipIndex((prev) => (prev + 1) % TIPS_MOCK.length);
+    }, 10000);
+    return () => clearInterval(interval);
+  }, []);
 
-    // Fetch News
-    useEffect(() => {
-        const fetchNews = async () => {
-            try {
-                setLoading(true);
-                // Use port 5000 as per previous fix
-                const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-                const response = await axios.get(`${apiUrl}/news`);
-
-                if (response.data.success) {
-                    // Take only first 4 items
-                    setNews(response.data.data.slice(0, 4));
-                }
-            } catch (err) {
-                console.error("News Fetch Error", err);
-                setError("Unable to load latest news");
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchNews();
-    }, []);
-
-    const handleNewsClick = (link: string) => {
-        window.open(link, '_blank', 'noopener,noreferrer');
+  useEffect(() => {
+    const fetchNews = async () => {
+      try {
+        setLoading(true);
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+        const response = await axios.get(`${apiUrl}/news`);
+        if (response.data.success) {
+          setNews(response.data.data.slice(0, 4));
+        }
+      } catch (err) {
+        console.error("News Fetch Error", err);
+        setError("Unable to load latest news");
+      } finally {
+        setLoading(false);
+      }
     };
+    fetchNews();
+  }, []);
 
-    return (
-        <div className="space-y-6">
-            {/* Daily Tip Card */}
-            <div className="bg-gradient-to-r from-amber-50 to-orange-50 p-6 rounded-2xl border border-amber-100 relative overflow-hidden transition-all duration-500 hover:shadow-sm">
-                <div className="absolute top-0 right-0 p-4 opacity-10">
-                    <FaLightbulb className="text-6xl text-amber-500" />
-                </div>
-                <div className="relative z-10">
-                    <div className="flex items-center space-x-2 text-amber-600 font-bold text-sm mb-2 uppercase tracking-wide">
-                        <FaLightbulb /> <span>Daily Health Tip</span>
-                    </div>
-                    <p className="text-gray-800 font-medium text-sm leading-relaxed animate-fade-in">
-                        "{TIPS_MOCK[tipIndex]}"
-                    </p>
-                </div>
-            </div>
+  const handleNewsClick = (link: string) => {
+    window.open(link, "_blank", "noopener,noreferrer");
+  };
 
-            {/* News Feed */}
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 min-h-[300px] flex flex-col">
-                <div className="flex items-center justify-between mb-6">
-                    <h3 className="text-base font-bold text-gray-800 flex items-center gap-2">
-                        <FaNewspaper className="text-blue-500" /> Health News
-                    </h3>
-                    <div className="flex items-center gap-2">
-                        <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
-                        <span className="text-xs font-semibold text-gray-400 uppercase">Live</span>
-                    </div>
-                </div>
-
-                {loading ? (
-                    <div className="space-y-4 flex-1">
-                        {[1, 2, 3].map(i => (
-                            <div key={i} className="animate-pulse">
-                                <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-                                <div className="h-3 bg-gray-100 rounded w-full mb-1"></div>
-                                <div className="h-3 bg-gray-100 rounded w-2/3"></div>
-                            </div>
-                        ))}
-                    </div>
-                ) : error ? (
-                    <div className="text-center py-8 text-gray-400 flex-1">
-                        <FaExclamationCircle className="mx-auto text-2xl mb-2 text-gray-300" />
-                        <p className="text-sm">{error}</p>
-                    </div>
-                ) : (
-                    <div className="space-y-6 flex-1">
-                        {news.map((newsItem) => (
-                            <div
-                                key={newsItem._id}
-                                onClick={() => handleNewsClick(newsItem.url)}
-                                className="group cursor-pointer"
-                            >
-                                <h4 className="font-bold text-gray-800 group-hover:text-blue-600 transition-colors mb-1 line-clamp-2">
-                                    {newsItem.title}
-                                </h4>
-                                <p className="text-sm text-gray-500 line-clamp-2 mb-2 leading-relaxed">
-                                    {newsItem.description || newsItem.title}
-                                </p>
-                                <div className="flex items-center justify-between text-xs text-gray-400">
-                                    <span className="font-medium bg-gray-50 px-2 py-1 rounded">{newsItem.source}</span>
-                                    <span className="flex items-center gap-1">
-                                        {new Date(newsItem.publishedAt).toLocaleDateString()}
-                                        <FaChevronRight className="opacity-0 group-hover:opacity-100 transition-opacity text-blue-500 -ml-2 group-hover:ml-0 duration-300" />
-                                    </span>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                )}
-
-                <div className="pt-6 mt-auto border-t border-gray-50">
-                    <Link
-                        href="/insights"
-                        className="w-full flex items-center justify-center space-x-2 bg-blue-50 text-blue-600 py-2 rounded-xl font-bold text-sm hover:bg-blue-100 transition-colors"
-                    >
-                        <span>View All Insights</span>
-                        <FaArrowRight />
-                    </Link>
-                </div>
-            </div>
+  return (
+    <div className="space-y-8">
+      {/* Daily Tip Card - Tertiary Accent */}
+      <div className="bg-[#635888]/5 p-8 rounded-lg relative overflow-hidden transition-all duration-500 hover:bg-[#635888]/10 group">
+        <div className="absolute top-0 right-0 p-6 opacity-5 transition-transform duration-700">
+          <FaLightbulb className="text-7xl text-tertiary" />
         </div>
-    );
+        <div className="relative z-10">
+          <div className="flex items-center space-x-3 text-tertiary font-black text-[10px] mb-4 uppercase tracking-[0.2em]">
+            <FaLightbulb /> <span>Wellness Insight</span>
+          </div>
+          <p className="text-[#2c3436] font-bold text-base leading-relaxed">
+            "{TIPS_MOCK[tipIndex]}"
+          </p>
+        </div>
+      </div>
+
+      {/* News Feed */}
+      <div className="bg-surface-container-lowest rounded-lg p-8 shadow-ambient min-h-[300px] flex flex-col">
+        <div className="flex items-center justify-between mb-10">
+          <div>
+            <h3 className="text-xl font-bold text-[#2c3436] font-display flex items-center gap-3">
+              The Clinical Feed
+            </h3>
+            <p className="text-[11px] text-[#635888]/60 font-black uppercase tracking-[0.2em] mt-1">
+              Global Medical News
+            </p>
+          </div>
+          <div className="flex items-center gap-3 bg-surface-container-low px-3 py-1.5 rounded-lg">
+            <span className="w-1.5 h-1.5 bg-red-500 rounded-full"></span>
+            <span className="text-[10px] font-black text-[#635888]/70 uppercase tracking-widest">
+              Live
+            </span>
+          </div>
+        </div>
+
+        {loading ? (
+          <div className="space-y-8 flex-1">
+            {[1, 2].map((i) => (
+              <div key={i}>
+                <div className="h-5 bg-surface-container-low rounded-xl w-3/4 mb-3"></div>
+                <div className="h-3 bg-surface-container-low rounded-xl w-full mb-2"></div>
+                <div className="h-3 bg-surface-container-low rounded-xl w-2/3"></div>
+              </div>
+            ))}
+          </div>
+        ) : error ? (
+          <div className="text-center py-12 text-[#635888]/40 flex-1">
+            <FaExclamationCircle className="mx-auto text-3xl mb-4 opacity-20" />
+            <p className="text-sm font-bold">{error}</p>
+          </div>
+        ) : (
+          <div className="space-y-10 flex-1">
+            {news.map((newsItem) => (
+              <div
+                key={newsItem._id}
+                onClick={() => handleNewsClick(newsItem.url)}
+                className="group cursor-pointer"
+              >
+                <h4 className="font-bold text-[#2c3436] text-sm group-hover:text-primary transition-colors mb-2 leading-tight">
+                  {newsItem.title}
+                </h4>
+                <div className="flex items-center justify-between mt-4">
+                  <span className="text-[10px] font-black bg-surface-container-low px-3 py-1.5 rounded-lg text-[#635888]/70 uppercase tracking-widest">
+                    {newsItem.source}
+                  </span>
+                  <span className="flex items-center gap-2 text-[10px] font-bold text-[#635888]/40 uppercase tracking-widest">
+                    {new Date(newsItem.publishedAt).toLocaleDateString()}
+                    <FaChevronRight className="opacity-0 group-hover:opacity-100 transition-opacity text-primary -ml-2 group-hover:ml-0 duration-300" />
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        <div className="pt-10 mt-10 border-t border-surface-container-low">
+          <Link
+            href="/insights"
+            className="w-full flex items-center justify-center space-x-3 text-primary py-1 font-black text-[10px] hover:underline uppercase tracking-[0.2em] transition-all"
+          >
+            <span>Curated Insights</span>
+            <FaArrowRight />
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default HealthNewsWidget;

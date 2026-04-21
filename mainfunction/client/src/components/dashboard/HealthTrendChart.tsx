@@ -1,92 +1,86 @@
-"use client";
+'use client';
+import React from 'react';
 import {
-  ResponsiveContainer,
   AreaChart,
   Area,
   XAxis,
   YAxis,
-  Tooltip,
   CartesianGrid,
-} from "recharts";
+  Tooltip,
+  ResponsiveContainer,
+} from 'recharts';
 
-interface HealthTrendChartProps {
+interface ChartProps {
+  title: string;
   data: any[];
   dataKey: string;
-  color: string;
-  title: string;
+  color?: string;
 }
 
-const HealthTrendChart = ({
-  data,
-  dataKey,
-  color,
-  title,
-}: HealthTrendChartProps) => {
-  if (!data || data.length === 0) {
-    return (
-      <div className="h-64 flex items-center justify-center bg-gray-50 rounded-2xl border border-dashed border-gray-200">
-        <p className="text-gray-400 text-sm">No data available for {title}</p>
-      </div>
-    );
-  }
-
+const HealthTrendChart: React.FC<ChartProps> = ({ title, data, dataKey, color = '#006977' }) => {
   return (
-    <div className="bg-white p-6 rounded-2xl  shadow-sm">
-      <h3 className="text-base font-bold text-gray-800 mb-6">
-        {title} History
-      </h3>
+    <div className="w-full">
+      {title && (
+        <div className="mb-10">
+          <h3 className="text-xl font-bold text-[#2c3436] font-jakarta">{title}</h3>
+          <p className="text-[11px] text-[#635888]/60 font-black uppercase tracking-[0.2em] mt-1">Biometric Analysis</p>
+        </div>
+      )}
       <div className="h-64 w-full">
         <ResponsiveContainer width="100%" height="100%">
-          <AreaChart data={data}>
+          <AreaChart
+            data={data}
+            margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
+          >
             <defs>
-              <linearGradient
-                id={`color${dataKey}`}
-                x1="0"
-                y1="0"
-                x2="0"
-                y2="1"
-              >
-                <stop offset="5%" stopColor={color} stopOpacity={0.3} />
+              <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor={color} stopOpacity={0.15} />
                 <stop offset="95%" stopColor={color} stopOpacity={0} />
               </linearGradient>
             </defs>
-            <CartesianGrid
-              strokeDasharray="3 3"
-              vertical={false}
-              stroke="#E5E7EB"
+            <CartesianGrid 
+                strokeDasharray="3 3" 
+                vertical={false} 
+                stroke="rgba(172, 179, 182, 0.1)" 
             />
-            <XAxis
-              dataKey="date"
-              axisLine={false}
-              tickLine={false}
-              tick={{ fill: "#9CA3AF", fontSize: 10 }}
-              tickMargin={10}
-              tickFormatter={(value) =>
-                new Date(value).toLocaleDateString(undefined, {
-                  month: "short",
-                  day: "numeric",
-                })
-              }
+            <XAxis 
+                dataKey="date" 
+                axisLine={false} 
+                tickLine={false} 
+                tick={{ fill: '#635888', fontSize: 10, fontWeight: 700 }}
+                tickFormatter={(str) => {
+                    const date = new Date(str);
+                    return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+                }}
+                dy={10}
             />
-            <YAxis
-              axisLine={false}
-              tickLine={false}
-              tick={{ fill: "#9CA3AF", fontSize: 10 }}
+            <YAxis 
+                axisLine={false} 
+                tickLine={false} 
+                tick={{ fill: '#635888', fontSize: 10, fontWeight: 700 }}
+                dx={-10}
             />
-            <Tooltip
-              contentStyle={{
-                borderRadius: "12px",
-                border: "none",
-                boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
-              }}
+            <Tooltip 
+                contentStyle={{ 
+                    backgroundColor: '#ffffff', 
+                    border: 'none', 
+                    borderRadius: '16px', 
+                    boxShadow: '0 24px 48px rgba(44, 52, 54, 0.1)',
+                    fontSize: '12px',
+                    fontWeight: '700',
+                    color: '#2c3436'
+                }}
+                itemStyle={{ color: '#006977' }}
+                cursor={{ stroke: '#006977', strokeWidth: 1, strokeDasharray: '4 4' }}
             />
             <Area
               type="monotone"
               dataKey={dataKey}
               stroke={color}
-              fillOpacity={1}
-              fill={`url(#color${dataKey})`}
               strokeWidth={3}
+              fillOpacity={1}
+              fill="url(#colorValue)"
+              animationDuration={2000}
             />
           </AreaChart>
         </ResponsiveContainer>

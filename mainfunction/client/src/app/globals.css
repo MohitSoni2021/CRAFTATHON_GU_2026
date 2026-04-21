@@ -1,18 +1,38 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 @import "tailwindcss";
 
 @theme {
-  /* Typography Scale - Further Reduced sizes */
-  --font-size-xs: 10px;    /* Hints */
-  --font-size-sm: 12px;    /* Labels/Captions */
-  --font-size-base: 14px;  /* Body Text */
-  --font-size-lg: 16px;    /* Subheadings H4 */
-  --font-size-xl: 18px;    /* Subheadings H3 */
-  --font-size-2xl: 20px;   /* Subheadings H3 alternate */
-  --font-size-3xl: 24px;   /* Headings H2 */
-  --font-size-4xl: 28px;   /* Headings H1 */
-  --font-size-5xl: 32px;   /* Hero text */
-  --font-size-6xl: 36px;   /* Hero text */
-  --font-size-7xl: 42px;   /* Hero text */
+  /* The Clinical Editorial Design Tokens */
+  --color-primary: #006977;
+  --color-primary-dim: #005c68;
+  --color-on-primary: #edfcff;
+  
+  --color-surface: #f8fafb;
+  --color-surface-container-low: #f0f4f6;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-high: #e3e9eb;
+  
+  --color-tertiary: #635888;
+  --color-outline-variant: rgba(172, 179, 182, 0.15);
+
+  /* Typography */
+  --font-jakarta: "Plus Jakarta Sans", sans-serif;
+  --font-manrope: "Plus Jakarta Sans", sans-serif;
+  --font-inter: "Plus Jakarta Sans", sans-serif;
+  --font-sans: "Plus Jakarta Sans", sans-serif;
+
+  /* Typography Scale */
+  --font-size-xs: 10px;
+  --font-size-sm: 12px;
+  --font-size-base: 14px;
+  --font-size-lg: 16px;
+  --font-size-xl: 18px;
+  --font-size-2xl: 20px;
+  --font-size-3xl: 24px;
+  --font-size-4xl: 28px;
+  --font-size-5xl: 32px;
+  --font-size-6xl: 36px;
+  --font-size-7xl: 42px;
 
   --font-weight-heading: 700;
   --font-weight-subheading: 600;
@@ -28,121 +48,75 @@
 @layer base {
   * {
     @apply scroll-smooth;
-    scrollbar-width: none; /* Firefox */
-    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
   }
 
-  /* Hide scrollbar for Chrome, Safari and Opera */
   *::-webkit-scrollbar {
     display: none;
   }
 
   body {
+    font-family: var(--font-jakarta);
     font-size: var(--font-size-base);
-    font-weight: var(--font-weight-body);
-    line-height: var(--line-height-normal);
-    background-color: #FAFFF5;
-    color: #2C2C2C;
-    top: 0 !important;
+    background-color: var(--color-surface);
+    color: #2c3436;
   }
 
-  h1 {
-    font-size: var(--font-size-4xl);
-    font-weight: var(--font-weight-heading);
-    line-height: var(--line-height-tight);
+  h1, h2, h3, .font-display {
+    font-family: var(--font-jakarta);
+    letter-spacing: -0.02em;
   }
 
-  h2 {
-    font-size: var(--font-size-3xl);
-    font-weight: var(--font-weight-heading);
-    line-height: var(--line-height-snug);
-  }
-
-  h3 {
-    font-size: var(--font-size-xl);
-    font-weight: var(--font-weight-subheading);
-    line-height: var(--line-height-normal);
-  }
-
-  h4 {
-    font-size: var(--font-size-lg);
-    font-weight: var(--font-weight-subheading);
-    line-height: var(--line-height-normal);
-  }
-
-  h5 {
-    font-size: var(--font-size-base);
-    font-weight: var(--font-weight-subheading);
-    line-height: var(--line-height-normal);
-  }
-
-  h6 {
-    font-size: var(--font-size-sm);
-    font-weight: var(--font-weight-subheading);
-    line-height: var(--line-height-normal);
-  }
-
-  button, .btn {
-    font-size: var(--font-size-base);
-    font-weight: 600;
-  }
-
-  nav, .nav-link {
-    font-size: var(--font-size-sm);
-    font-weight: 500;
-  }
-
-  small, .text-small {
-    font-size: var(--font-size-sm);
-  }
+  h1 { font-size: var(--font-size-4xl); }
+  h2 { font-size: var(--font-size-3xl); }
+  h3 { font-size: var(--font-size-xl); }
 }
 
 @layer utilities {
   .glass {
-    @apply bg-white/60 backdrop-blur-xl border border-[#A9C29B]/20 shadow-sm;
-  }
-
-  .text-gradient {
-    background: linear-gradient(135deg, #7A8E6B 0%, #A9C29B 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    color: transparent;
+    background-color: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--color-outline-variant);
   }
 
   .bg-gradient-primary {
-    background: linear-gradient(135deg, #7A8E6B 0%, #A9C29B 100%);
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dim) 100%);
   }
 
   .btn-primary {
-    @apply px-6 py-4 text-white rounded-full font-bold shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 flex items-center justify-center;
-    background: linear-gradient(135deg, #7A8E6B 0%, #99B888 100%);
-    box-shadow: 0 10px 25px -5px rgba(122, 142, 107, 0.4);
+    @apply px-8 py-4 text-white rounded-full font-bold transition-all duration-300 flex items-center justify-center;
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dim) 100%);
+    box-shadow: 0 10px 25px -5px rgba(0, 105, 119, 0.3);
   }
 
-  .card-hover {
-    @apply hover:shadow-lg hover:border-[#7A8E6B]/30 transition-all duration-300 hover:-translate-y-1;
+  .btn-primary:hover {
+    @apply -translate-y-0.5;
+    box-shadow: 0 20px 40px -10px rgba(0, 105, 119, 0.4);
   }
 
-  .input-field {
-    @apply w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-[#7A8E6B] focus:ring-2 focus:ring-[#7A8E6B]/20 outline-none transition-all;
+  .card-editorial {
+    @apply bg-white rounded-xl transition-all duration-300;
+    /* Tonal layering: depth achieved by background shift, but we add ambient shadow for floating cards */
   }
 
-  /* Animation for Language Switcher */
-  @keyframes slide-up {
-    from {
-      opacity: 0;
-      transform: translateY(10px);
-    }
-
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
+  .shadow-ambient {
+    box-shadow: 0 24px 48px rgba(44, 52, 54, 0.06);
   }
 
-  .animate-slide-up {
-    animation: slide-up 0.3s ease-out forwards;
+  .ghost-border {
+    border: 1px solid var(--color-outline-variant);
+  }
+
+  .input-editorial {
+    @apply w-full px-4 py-3 rounded-xl bg-white border border-transparent transition-all;
+    border: 1px solid var(--color-outline-variant);
+  }
+
+  .input-editorial:focus {
+    @apply ring-4 ring-primary/10;
+    border-color: var(--color-primary);
+    outline: none;
   }
 }
 
