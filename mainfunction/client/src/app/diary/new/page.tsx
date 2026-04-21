@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '@/store/store';
 import { createDiaryEntry } from '@/store/slices/diarySlice';
 import { useRouter } from 'next/navigation';
-import { FaArrowLeft, FaMagic, FaSmile, FaMeh, FaFrown, FaBolt, FaCloudRain } from 'react-icons/fa';
+import { FaArrowLeft, FaMagic, FaSmile, FaMeh, FaFrown, FaBolt, FaCloudRain, FaCalendarAlt } from 'react-icons/fa';
 
 export default function NewDiaryEntryPage() {
     const dispatch = useDispatch<AppDispatch>();
@@ -73,110 +73,138 @@ export default function NewDiaryEntryPage() {
     };
 
     const moods = [
-        { id: 'happy', icon: FaSmile, color: 'text-yellow-500', bg: 'bg-yellow-50', border: 'border-yellow-200' },
+        { id: 'happy', icon: FaSmile, color: 'text-amber-500', bg: 'bg-amber-50', border: 'border-amber-200' },
         { id: 'energetic', icon: FaBolt, color: 'text-orange-500', bg: 'bg-orange-50', border: 'border-orange-200' },
-        { id: 'neutral', icon: FaMeh, color: 'text-gray-500', bg: 'bg-gray-50', border: 'border-gray-200' },
-        { id: 'sad', icon: FaCloudRain, color: 'text-blue-500', bg: 'bg-blue-50', border: 'border-blue-200' },
-        { id: 'stressed', icon: FaFrown, color: 'text-red-500', bg: 'bg-red-50', border: 'border-red-200' },
+        { id: 'neutral', icon: FaMeh, color: 'text-slate-500', bg: 'bg-slate-50', border: 'border-slate-200' },
+        { id: 'sad', icon: FaCloudRain, color: 'text-sky-500', bg: 'bg-sky-50', border: 'border-sky-200' },
+        { id: 'stressed', icon: FaFrown, color: 'text-rose-500', bg: 'bg-rose-50', border: 'border-rose-200' },
     ];
 
     return (
         <ProtectedRoute>
             <DashboardLayout>
-                <header className="flex items-center mb-8">
+                <header className="flex items-center mb-10">
                     <button
                         onClick={() => router.back()}
-                        className="mr-4 p-2 hover:bg-gray-100 rounded-full transition"
+                        className="mr-6 p-3 hover:bg-white hover:shadow-md rounded-xl transition-all border border-transparent hover:border-outline-variant text-slate-600"
                     >
-                        <FaArrowLeft />
+                        <FaArrowLeft size={18} />
                     </button>
-                    <h1 className="text-2xl font-bold text-gray-800">New Diary Entry</h1>
+                    <div>
+                        <h1 className="text-3xl font-bold tracking-tight text-gray-900">New Journal Entry</h1>
+                        <p className="text-gray-500 font-medium mt-1">Capture your thoughts and feelings for today.</p>
+                    </div>
                 </header>
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
                     {/* Input Form */}
-                    <div className="lg:col-span-2 space-y-6">
-                        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                            <div className="mb-6">
-                                <label className="block text-sm font-medium text-gray-700 mb-2">Date</label>
-                                <input
-                                    type="date"
-                                    value={date}
-                                    onChange={(e) => setDate(e.target.value)}
-                                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                />
+                    <div className="lg:col-span-2 space-y-8">
+                        <div className="card-editorial p-8 shadow-ambient border border-outline-variant">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                                <div>
+                                    <label className="block text-sm font-bold text-gray-700 mb-3 uppercase tracking-wider">Date of Entry</label>
+                                    <div className="relative">
+                                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                            <FaCalendarAlt className="text-primary/50" />
+                                        </div>
+                                        <input
+                                            type="date"
+                                            value={date}
+                                            onChange={(e) => setDate(e.target.value)}
+                                            className="input-editorial pl-11 !bg-surface-container-low font-medium"
+                                        />
+                                    </div>
+                                </div>
                             </div>
 
-                            <div className="mb-6">
-                                <label className="block text-sm font-medium text-gray-700 mb-2">How are you feeling?</label>
-                                <div className="flex space-x-4 overflow-x-auto pb-2">
+                            <div className="mb-8">
+                                <label className="block text-sm font-bold text-gray-700 mb-4 uppercase tracking-wider">How are you feeling today?</label>
+                                <div className="flex space-x-4 overflow-x-auto pb-4 no-scrollbar">
                                     {moods.map((m) => (
                                         <button
                                             key={m.id}
                                             type="button"
                                             onClick={() => setMood(m.id)}
-                                            className={`flex flex-col items-center p-4 rounded-xl border min-w-[80px] transition ${mood === m.id
-                                                ? `${m.bg} ${m.border} ring-2 ring-offset-1 ring-blue-500`
-                                                : 'bg-white border-gray-100 hover:bg-gray-50'
+                                            className={`flex flex-col items-center p-5 rounded-xl border min-w-[100px] transition-all duration-300 ${mood === m.id
+                                                ? `${m.bg} ${m.border} ring-4 ring-primary/5 shadow-inner translate-y-[-2px]`
+                                                : 'bg-white border-outline-variant hover:bg-surface-container-low hover:border-primary/20'
                                                 }`}
                                         >
-                                            <m.icon className={`text-2xl mb-2 ${m.color}`} />
-                                            <span className="text-xs font-semibold capitalize text-gray-600">{m.id}</span>
+                                            <m.icon className={`text-3xl mb-3 ${mood === m.id ? m.color : 'text-slate-300'}`} />
+                                            <span className={`text-xs font-bold capitalize ${mood === m.id ? 'text-gray-900' : 'text-slate-500'}`}>{m.id}</span>
                                         </button>
                                     ))}
                                 </div>
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">Journal Entry</label>
+                                <label className="block text-sm font-bold text-gray-700 mb-4 uppercase tracking-wider">Journal Entry</label>
                                 <textarea
                                     value={text}
                                     onChange={(e) => setText(e.target.value)}
-                                    placeholder="Write about your day, health, diet, or exercise..."
-                                    className="w-full px-4 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 h-64 resize-none leading-relaxed"
+                                    placeholder="Write about your day, health, diet, or exercise. Be as detailed as you like..."
+                                    className="input-editorial !bg-surface-container-low h-80 resize-none leading-relaxed font-medium placeholder:text-slate-400"
                                 />
                             </div>
                         </div>
                     </div>
 
-                    {/* AI Summary Side (Simulated) */}
-                    <div className="space-y-6">
-                        <div className="bg-gradient-to-br from-purple-600 to-blue-600 p-6 rounded-2xl shadow-lg text-white">
-                            <div className="flex items-center space-x-2 mb-4">
-                                <FaMagic className="text-yellow-300" />
-                                <h3 className="font-bold">AI Companion</h3>
+                    {/* AI Summary Side */}
+                    <div className="space-y-8">
+                        <div className="bg-gradient-primary p-8 rounded-xl shadow-xl text-white relative overflow-hidden group">
+                            {/* Decorative Sparkles */}
+                            <div className="absolute top-0 right-0 p-8 opacity-20">
+                                <FaMagic size={120} />
                             </div>
-                            <p className="text-purple-100 text-sm mb-6">
-                                I can summarize your day and extract health insights from your writing.
-                            </p>
-
-                            {summary ? (
-                                <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 mb-4">
-                                    <h4 className="text-xs font-bold uppercase text-purple-200 mb-1">Generated Summary</h4>
-                                    <p className="text-sm leading-relaxed">{summary}</p>
+                            
+                            <div className="relative z-10">
+                                <div className="flex items-center space-x-3 mb-6">
+                                    <div className="p-3 bg-white/20 backdrop-blur-md rounded-xl">
+                                        <FaMagic className="text-yellow-300 text-xl" />
+                                    </div>
+                                    <h3 className="text-xl font-bold">AI Companion</h3>
                                 </div>
-                            ) : (
-                                <div className="border border-white/20 border-dashed rounded-xl p-8 text-center text-purple-200 text-sm">
-                                    Write your entry first...
-                                </div>
-                            )}
+                                <p className="text-on-primary/80 text-sm mb-8 leading-relaxed font-medium">
+                                    I can help you reflect by summarizing your day and identifying health trends from your journal.
+                                </p>
 
-                            <button
-                                type="button"
-                                onClick={generateSummary}
-                                disabled={!text || isGenerating}
-                                className="w-full py-3 bg-white text-purple-600 rounded-xl font-bold hover:bg-purple-50 transition disabled:opacity-50"
-                            >
-                                {isGenerating ? 'Generating...' : 'Generate Summary'}
-                            </button>
+                                {summary ? (
+                                    <div className="bg-white/10 backdrop-blur-md rounded-xl p-5 mb-8 border border-white/10">
+                                        <h4 className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/60 mb-3">AI Analysis Result</h4>
+                                        <p className="text-sm leading-relaxed font-medium italic">"{summary}"</p>
+                                    </div>
+                                ) : (
+                                    <div className="border border-white/20 border-dashed rounded-xl p-10 text-center text-white/40 text-sm mb-8 font-medium">
+                                        Once you write your entry, I can analyze it for you.
+                                    </div>
+                                )}
+
+                                <button
+                                    type="button"
+                                    onClick={generateSummary}
+                                    disabled={!text || isGenerating}
+                                    className="w-full py-4 bg-white text-primary rounded-xl font-bold hover:shadow-2xl hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:scale-100 flex items-center justify-center space-x-3"
+                                >
+                                    {isGenerating ? (
+                                        <div className="w-5 h-5 border-2 border-primary/30 border-t-primary rounded-full animate-spin"></div>
+                                    ) : (
+                                        <FaMagic size={14} />
+                                    )}
+                                    <span>{isGenerating ? 'Analyzing...' : 'Generate AI Summary'}</span>
+                                </button>
+                            </div>
                         </div>
 
                         <button
                             onClick={handleSubmit}
                             disabled={loading || !text}
-                            className="w-full py-4 bg-gray-900 text-white rounded-xl font-bold shadow-lg hover:bg-black transition disabled:opacity-50"
+                            className="btn-primary !rounded-xl w-full py-5 text-lg shadow-ambient"
                         >
-                            {loading ? 'Saving...' : 'Save Entry'}
+                            {loading ? (
+                                <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                            ) : (
+                                'Save Journal Entry'
+                            )}
                         </button>
                     </div>
                 </div>
