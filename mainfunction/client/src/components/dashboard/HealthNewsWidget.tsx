@@ -66,7 +66,7 @@ const HealthNewsWidget = () => {
   return (
     <div className="space-y-8">
       {/* Daily Tip Card - Tertiary Accent */}
-      <div className="bg-[#635888]/5 p-8 rounded-lg relative overflow-hidden transition-all duration-500 hover:bg-[#635888]/10 group">
+      <div className="bg-[#635888]/5 p-8 rounded-xl relative overflow-hidden transition-all duration-500 hover:bg-[#635888]/10 group">
         <div className="absolute top-0 right-0 p-6 opacity-5 transition-transform duration-700">
           <FaLightbulb className="text-7xl text-tertiary" />
         </div>
@@ -81,7 +81,7 @@ const HealthNewsWidget = () => {
       </div>
 
       {/* News Feed */}
-      <div className="bg-surface-container-lowest rounded-lg p-8 shadow-ambient min-h-[300px] flex flex-col">
+      <div className="bg-surface-container-lowest rounded-xl p-8 shadow-ambient min-h-[300px] flex flex-col">
         <div className="flex items-center justify-between mb-10">
           <div>
             <h3 className="text-xl font-bold text-[#2c3436] font-display flex items-center gap-3">
