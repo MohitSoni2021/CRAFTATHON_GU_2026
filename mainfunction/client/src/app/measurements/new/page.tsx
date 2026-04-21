@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '@/store/store';
 import { createMeasurement, MeasurementReading } from '@/store/slices/measurementsSlice';
 import { useRouter } from 'next/navigation';
-import { FaArrowLeft, FaTint, FaHeartbeat, FaWeight, FaStopwatch } from 'react-icons/fa';
+import { FaArrowLeft, FaTint, FaHeartbeat, FaWeight, FaStopwatch, FaCalendarAlt, FaInfoCircle, FaChevronRight } from 'react-icons/fa';
 
 export default function NewMeasurementPage() {
     const dispatch = useDispatch<AppDispatch>();
@@ -71,121 +71,149 @@ export default function NewMeasurementPage() {
     return (
         <ProtectedRoute>
             <DashboardLayout>
-                <header className="flex items-center mb-8">
+                <header className="flex items-center mb-10">
                     <button
                         onClick={() => router.back()}
-                        className="mr-4 p-2 hover:bg-gray-100 rounded-full transition"
+                        className="mr-6 p-3 hover:bg-white hover:shadow-md rounded-xl transition-all border border-transparent hover:border-outline-variant text-slate-600"
                     >
-                        <FaArrowLeft />
+                        <FaArrowLeft size={18} />
                     </button>
-                    <h1 className="text-2xl font-bold text-gray-800">Record New Measurement</h1>
+                    <div>
+                        <h1 className="text-3xl font-bold tracking-tight text-gray-900">Add Measurement</h1>
+                        <p className="text-gray-500 font-medium mt-1">Record your latest health vitals and measurements.</p>
+                    </div>
                 </header>
 
-                <div className="max-w-2xl mx-auto bg-white p-8 rounded-2xl shadow-lg border border-gray-100">
-                    <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="w-full">
+                    <div className="card-editorial p-8 md:p-10 shadow-ambient border border-outline-variant">
+                        <form onSubmit={handleSubmit} className="space-y-10">
 
-                        {/* Date */}
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">Date</label>
-                            <input
-                                type="date"
-                                value={date}
-                                onChange={(e) => setDate(e.target.value)}
-                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                required
-                            />
-                        </div>
-
-                        {/* Type Selection */}
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">Measurement Type</label>
-                            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                                {['glucose', 'bloodPressure', 'weight', 'heartRate'].map((type) => (
-                                    <button
-                                        key={type}
-                                        type="button"
-                                        onClick={() => setSelectedType(type)}
-                                        className={`p-3 rounded-xl border flex flex-col items-center justify-center space-y-2 transition ${selectedType === type
-                                            ? 'border-blue-500 bg-blue-50 text-blue-600'
-                                            : 'border-gray-200 hover:border-blue-300 hover:bg-gray-50'
-                                            }`}
-                                    >
-                                        {type === 'glucose' && <FaTint />}
-                                        {type === 'bloodPressure' && <FaHeartbeat />}
-                                        {type === 'weight' && <FaWeight />}
-                                        {type === 'heartRate' && <FaStopwatch />}
-                                        <span className="text-xs font-semibold uppercase">{type.replace(/([A-Z])/g, ' $1')}</span>
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-
-                        {/* Dynamic Inputs */}
-                        <div className="p-6 bg-gray-50 rounded-xl space-y-4">
-                            {selectedType === 'bloodPressure' ? (
-                                <div className="flex space-x-4">
-                                    <div className="flex-1">
-                                        <label className="block text-xs font-semibold text-gray-500 mb-1 uppercase">Systolic</label>
-                                        <input
-                                            type="number"
-                                            placeholder="120"
-                                            value={reading.systolic}
-                                            onChange={(e) => setReading({ ...reading, systolic: e.target.value })}
-                                            className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                            required
-                                        />
-                                    </div>
-                                    <div className="flex-1">
-                                        <label className="block text-xs font-semibold text-gray-500 mb-1 uppercase">Diastolic</label>
-                                        <input
-                                            type="number"
-                                            placeholder="80"
-                                            value={reading.diastolic}
-                                            onChange={(e) => setReading({ ...reading, diastolic: e.target.value })}
-                                            className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                            required
-                                        />
-                                    </div>
-                                </div>
-                            ) : (
+                            {/* Date Section */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                 <div>
-                                    <label className="block text-xs font-semibold text-gray-500 mb-1 uppercase">Value</label>
+                                    <label className="block text-xs font-bold text-gray-400 mb-3 uppercase tracking-widest">Reading Date</label>
                                     <div className="relative">
+                                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-primary/50">
+                                            <FaCalendarAlt size={14} />
+                                        </div>
                                         <input
-                                            type="number"
-                                            step="0.1"
-                                            placeholder="0"
-                                            value={reading.value}
-                                            onChange={(e) => setReading({ ...reading, value: e.target.value })}
-                                            className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            type="date"
+                                            value={date}
+                                            onChange={(e) => setDate(e.target.value)}
+                                            className="input-editorial pl-11 !bg-surface-container-low font-bold text-gray-900 !rounded-xl"
                                             required
                                         />
-                                        <span className="absolute right-4 top-2 text-gray-400 text-sm">
-                                            {selectedType === 'glucose' ? 'mg/dL' : selectedType === 'weight' ? 'kg' : selectedType === 'heartRate' ? 'bpm' : ''}
-                                        </span>
                                     </div>
                                 </div>
-                            )}
-
-                            <div>
-                                <label className="block text-xs font-semibold text-gray-500 mb-1 uppercase">Notes (Optional)</label>
-                                <textarea
-                                    value={reading.notes}
-                                    onChange={(e) => setReading({ ...reading, notes: e.target.value })}
-                                    placeholder="e.g., Fasting, After meal..."
-                                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 h-20 resize-none"
-                                />
                             </div>
-                        </div>
 
-                        <button
-                            type="submit"
-                            disabled={loading}
-                            className="w-full py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-bold shadow-lg hover:shadow-xl transition transform hover:scale-[1.02] disabled:opacity-50"
-                        >
-                            {loading ? 'Saving...' : 'Save Measurement'}
-                        </button>
-                    </form>
+                            {/* Measurement Type */}
+                            <div>
+                                <label className="block text-xs font-bold text-gray-400 mb-4 uppercase tracking-widest text-center md:text-left">What are you measuring?</label>
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                    {[
+                                        { id: 'glucose', icon: FaTint, label: 'Glucose' },
+                                        { id: 'bloodPressure', icon: FaHeartbeat, label: 'BP' },
+                                        { id: 'weight', icon: FaWeight, label: 'Weight' },
+                                        { id: 'heartRate', icon: FaStopwatch, label: 'Heart Rate' },
+                                    ].map((type) => (
+                                        <button
+                                            key={type.id}
+                                            type="button"
+                                            onClick={() => setSelectedType(type.id)}
+                                            className={`p-6 rounded-xl border-2 flex flex-col items-center justify-center space-y-3 transition-all duration-300 ${selectedType === type.id
+                                                ? 'border-primary bg-primary/[0.03] text-primary shadow-sm scale-[1.02]'
+                                                : 'border-outline-variant hover:border-primary/20 hover:bg-gray-50 text-gray-400'
+                                                }`}
+                                        >
+                                            <type.icon size={24} className={selectedType === type.id ? "text-primary" : "text-gray-300"} />
+                                            <span className="text-xs font-extrabold uppercase tracking-widest">{type.label}</span>
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Data Input Section */}
+                            <div className="p-8 bg-surface-container-low rounded-xl border border-outline-variant space-y-8">
+                                <div className="flex items-center space-x-2 mb-2">
+                                    <FaInfoCircle className="text-primary/50" size={14} />
+                                    <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">Entry Details</span>
+                                </div>
+
+                                {selectedType === 'bloodPressure' ? (
+                                    <div className="grid grid-cols-2 gap-6">
+                                        <div>
+                                            <label className="block text-[10px] font-bold text-gray-400 mb-2 uppercase tracking-widest">Systolic (mmHg)</label>
+                                            <input
+                                                type="number"
+                                                placeholder="120"
+                                                value={reading.systolic}
+                                                onChange={(e) => setReading({ ...reading, systolic: e.target.value })}
+                                                className="input-editorial text-xl font-extrabold !rounded-xl !bg-white"
+                                                required
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-[10px] font-bold text-gray-400 mb-2 uppercase tracking-widest">Diastolic (mmHg)</label>
+                                            <input
+                                                type="number"
+                                                placeholder="80"
+                                                value={reading.diastolic}
+                                                onChange={(e) => setReading({ ...reading, diastolic: e.target.value })}
+                                                className="input-editorial text-xl font-extrabold !rounded-xl !bg-white"
+                                                required
+                                            />
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div>
+                                        <label className="block text-[10px] font-bold text-gray-400 mb-2 uppercase tracking-widest">
+                                            Recorded Value ({selectedType === 'glucose' ? 'mg/dL' : selectedType === 'weight' ? 'kg' : 'bpm'})
+                                        </label>
+                                        <div className="relative">
+                                            <input
+                                                type="number"
+                                                step="0.1"
+                                                placeholder="0.0"
+                                                value={reading.value}
+                                                onChange={(e) => setReading({ ...reading, value: e.target.value })}
+                                                className="input-editorial text-2xl font-extrabold !rounded-xl !bg-white pr-16"
+                                                required
+                                            />
+                                            <span className="absolute right-6 top-1/2 -translate-y-1/2 text-gray-400 font-bold text-sm uppercase tracking-widest pointer-events-none">
+                                                {selectedType === 'glucose' ? 'mg/dL' : selectedType === 'weight' ? 'kg' : selectedType === 'heartRate' ? 'bpm' : ''}
+                                            </span>
+                                        </div>
+                                    </div>
+                                )}
+
+                                <div>
+                                    <label className="block text-[10px] font-bold text-gray-400 mb-2 uppercase tracking-widest">Notes & Context (Optional)</label>
+                                    <textarea
+                                        value={reading.notes}
+                                        onChange={(e) => setReading({ ...reading, notes: e.target.value })}
+                                        placeholder="Add any relevant information (e.g. after morning workout, following 12h fast...)"
+                                        className="input-editorial h-32 resize-none leading-relaxed font-medium !rounded-xl !bg-white p-5"
+                                    />
+                                </div>
+                            </div>
+
+                            <button
+                                type="submit"
+                                disabled={loading}
+                                className="btn-primary !rounded-xl w-full py-5 text-lg shadow-ambient group"
+                            >
+                                {loading ? (
+                                    <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                                ) : (
+                                    <span className="flex items-center justify-center space-x-2">
+                                        <span>Complete Entry</span>
+                                        <FaChevronRight size={14} className="group-hover:translate-x-1 transition-transform" />
+                                    </span>
+                                )}
+                            </button>
+                        </form>
+                    </div>
                 </div>
             </DashboardLayout>
         </ProtectedRoute>

@@ -14,7 +14,7 @@ const MeasurementsSkeleton = () => {
             <div className="bg-white border border-gray-100 rounded-xl p-8 shadow-sm">
                 <div className="flex gap-4 mb-8 overflow-x-auto pb-2">
                     {[1, 2, 3].map((i) => (
-                        <div key={i} className="h-12 bg-gray-200 rounded-full w-32 flex-shrink-0"></div>
+                        <div key={i} className="h-12 bg-gray-200 rounded-xl w-32 flex-shrink-0"></div>
                     ))}
                 </div>
                 <div className="h-[350px] bg-gray-100 rounded-xl w-full"></div>
