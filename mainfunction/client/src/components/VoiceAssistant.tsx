@@ -113,11 +113,6 @@ function VoiceAssistantComponent({ className }: VoiceAssistantProps) {
                 setParsedData(data);
                 setView('confirm');
                 SpeechRecognition.stopListening();
-            }
-            // ... (previous regex logic for match)
-
-            if (match) {
-                // ... (existing sugar level logic)
             } else {
                 // 3. Fallback: Ask AI Guide
                 handleAIGuide(finalTranscript);
@@ -225,108 +220,140 @@ function VoiceAssistantComponent({ className }: VoiceAssistantProps) {
         <>
             <button
                 onClick={handleToggle}
-                className={`fixed bottom-44 right-6 z-50 p-4 rounded-full shadow-lg transition-transform hover:scale-110 
-            ${listening ? 'bg-red-500 animate-pulse' : 'bg-blue-600'} text-white ${className || ''}`}
+                className={`fixed bottom-44 right-6 z-50 p-4 rounded-xl shadow-xl transition-all hover:scale-105 border 
+            ${listening ? 'bg-red-50 text-red-600 border-red-200 animate-pulse' : 'bg-primary text-white border-primary/20'} ${className || ''}`}
                 title="Voice Assistant"
             >
                 {/* Use FaRobot instead of FaMicrophone */}
-                {listening ? <div className="w-6 h-6 flex items-center justify-center font-bold">...</div> : <FaRobot size={24} />}
+                {listening ? (
+                    <div className="relative w-6 h-6 flex items-center justify-center">
+                        <div className="absolute inset-0 bg-red-400 rounded-full animate-ping opacity-75"></div>
+                        <FaRobot size={24} className="relative z-10 text-red-600" />
+                    </div>
+                ) : (
+                    <div className="relative">
+                        <FaRobot size={24} />
+                    </div>
+                )}
             </button>
 
             {isOpen && (
-                <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-                    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden relative animate-slide-up">
-
-                        <div className="bg-blue-600 p-4 flex justify-between items-center text-white">
-                            <h3 className="font-semibold flex items-center gap-2">
-                                <FaRobot /> {/* Updated header icon too */}
-                                {view === 'listening' ? 'Voice Assistant' : 'Confirm Details'}
+                <div className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center bg-gray-900/60 backdrop-blur-sm p-4 animate-in fade-in">
+                    <div className="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden relative animate-in zoom-in-95 duration-200 border border-gray-100">
+                        {/* Header */}
+                        <div className="bg-[#f8f9fc] p-6 border-b border-gray-100 flex justify-between items-center relative overflow-hidden">
+                            {listening && (
+                                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-red-500 via-pink-500 to-red-500 animate-pulse" />
+                            )}
+                            <h3 className="text-xl font-black text-gray-900 tracking-tight flex items-center gap-3 relative z-10">
+                                <div className={`w-10 h-10 rounded-xl flex items-center justify-center border shadow-sm ${listening ? 'bg-red-50 text-red-600 border-red-100' : 'bg-primary/10 text-primary border-primary/20'}`}>
+                                    <FaRobot size={18} />
+                                </div>
+                                {view === 'listening' ? 'AI Voice Assistant' : 'Confirm Details'}
                             </h3>
-                            <button onClick={handleClose} className="hover:bg-blue-700 p-1 rounded">
-                                <FaTimes />
+                            <button onClick={handleClose} className="w-8 h-8 flex items-center justify-center rounded-xl hover:bg-gray-200 text-gray-500 hover:text-gray-900 transition-colors">
+                                <FaTimes size={14} />
                             </button>
                         </div>
 
-                        <div className="p-6 text-center">
+                        <div className="p-8 text-center space-y-6">
                             {view === 'listening' ? (
                                 <>
-                                    <div className="mb-4">
+                                    <div className="flex flex-col items-center gap-2">
                                         {listening ? (
-                                            <p className="text-green-600 font-medium animate-pulse">Listening...</p>
+                                            <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-red-600 animate-pulse bg-red-50 px-3 py-1.5 rounded-xl border border-red-100">
+                                                <div className="w-2 h-2 rounded-full bg-red-500" /> Listening to you...
+                                            </div>
                                         ) : (
-                                            <p className="text-gray-500">Microphone off</p>
+                                            <div className="text-[10px] font-black uppercase tracking-widest text-gray-400 bg-gray-50 px-3 py-1.5 rounded-xl border border-gray-100">
+                                                Microphone off
+                                            </div>
                                         )}
                                     </div>
-                                    <div className="min-h-[100px] bg-gray-50 rounded-lg p-4 border border-gray-200 text-left">
-                                        {transcript || (
-                                            <div className="text-gray-400 italic space-y-2">
-                                                <p>Try saying:</p>
-                                                <ul className="list-disc pl-5 text-sm">
-                                                    <li>"Record sugar level is 180"</li>
-                                                    <li>"Show my records"</li>
+                                    <div className="min-h-[120px] bg-[#f8f9fc] rounded-xl p-6 border border-gray-100 text-left relative overflow-hidden shadow-inner">
+                                        {transcript ? (
+                                            <p className="text-gray-900 font-medium leading-relaxed italic relative z-10">
+                                                "{transcript}"
+                                            </p>
+                                        ) : (
+                                            <div className="text-gray-400 space-y-3 relative z-10">
+                                                <p className="text-[10px] font-black uppercase tracking-widest">Try saying:</p>
+                                                <ul className="space-y-2 text-sm font-medium">
+                                                    <li className="flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-primary/40"></span>"Record sugar level is 180"</li>
+                                                    <li className="flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-primary/40"></span>"Show my records"</li>
                                                 </ul>
                                             </div>
                                         )}
                                     </div>
                                 </>
                             ) : (
-                                <div className="text-left space-y-4">
-                                    <div className="p-4 bg-blue-50 rounded-lg border border-blue-100">
-                                        <h4 className="font-semibold text-blue-800 mb-2">Detected Measurement</h4>
-                                        <div className="grid grid-cols-2 gap-2 text-sm">
-                                            <span className="text-gray-600">Type:</span>
-                                            <span className="font-medium">Glucose (Sugar)</span>
-
-                                            <span className="text-gray-600">Value:</span>
-                                            <span className="font-bold text-lg text-blue-700">{parsedData?.value} mg/dL</span>
-
-                                            <span className="text-gray-600">Context:</span>
-                                            <span className="font-medium capitalize">{parsedData?.time.replace(/_/g, ' ')}</span>
+                                <div className="text-left space-y-6">
+                                    <div className="p-6 bg-primary/5 rounded-xl border border-primary/20 shadow-sm relative overflow-hidden">
+                                        <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-2xl -mr-10 -mt-10 pointer-events-none"></div>
+                                        <h4 className="text-[10px] font-black text-primary uppercase tracking-widest mb-4 flex items-center gap-2 relative z-10">
+                                            <span className="w-1.5 h-1.5 rounded-full bg-primary"></span> Detected Measurement
+                                        </h4>
+                                        <div className="grid grid-cols-2 gap-y-4 gap-x-6 relative z-10">
+                                            <div>
+                                                <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">Type</p>
+                                                <p className="font-black text-gray-900 text-sm">Glucose (Sugar)</p>
+                                            </div>
+                                            <div>
+                                                <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">Context</p>
+                                                <p className="font-black text-gray-900 text-sm capitalize">{parsedData?.time.replace(/_/g, ' ')}</p>
+                                            </div>
+                                            <div className="col-span-2 bg-white p-3 rounded-lg border border-primary/10 shadow-sm flex items-center justify-between">
+                                                <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Value</span>
+                                                <span className="font-black text-2xl text-primary tracking-tight">{parsedData?.value} <span className="text-xs font-bold text-gray-400 tracking-widest ml-1">MG/DL</span></span>
+                                            </div>
                                         </div>
                                     </div>
-                                    <p className="text-xs text-gray-500">
-                                        Based on: "{parsedData?.originalText}"
-                                    </p>
+                                    <div className="bg-gray-50 p-4 rounded-xl border border-gray-100 flex gap-3 items-start">
+                                        <div className="mt-0.5 text-gray-400">
+                                            <FaMicrophone size={14} />
+                                        </div>
+                                        <p className="text-xs text-gray-500 font-medium italic leading-relaxed">
+                                            "{parsedData?.originalText}"
+                                        </p>
+                                    </div>
                                 </div>
-
                             )}
                         </div>
 
                         {/* Footer */}
-                        <div className="p-4 border-t bg-gray-50 flex justify-center gap-3">
+                        <div className="p-6 border-t border-gray-100 bg-[#f8f9fc] flex justify-end gap-3">
                             {view === 'listening' ? (
-                                !listening && (
+                                <>
                                     <button
-                                        onClick={() => SpeechRecognition.startListening({ continuous: true, language: 'en-IN' })}
-                                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm"
+                                        onClick={handleClose}
+                                        className="px-6 py-2.5 bg-white text-[10px] font-black uppercase tracking-widest text-gray-500 border border-gray-200 rounded-xl hover:bg-gray-50 hover:text-gray-900 transition-colors shadow-sm"
                                     >
-                                        Resume Listening
+                                        Cancel
                                     </button>
-                                )
+                                    {!listening && (
+                                        <button
+                                            onClick={() => SpeechRecognition.startListening({ continuous: true, language: 'en-IN' })}
+                                            className="px-6 py-2.5 bg-primary text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-primary/90 shadow-xl shadow-primary/20 transition-all flex items-center gap-2"
+                                        >
+                                            <FaMicrophone size={12} /> Resume Listening
+                                        </button>
+                                    )}
+                                </>
                             ) : (
                                 <>
                                     <button
-                                        onClick={handleConfirm}
-                                        className="flex items-center gap-2 px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm font-medium"
-                                    >
-                                        <FaCheck /> Confirm & Save
-                                    </button>
-                                    <button
                                         onClick={() => { setView('listening'); setParsedData(null); resetTranscript(); SpeechRecognition.startListening({ continuous: true }); }}
-                                        className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 text-sm"
+                                        className="px-6 py-2.5 bg-white text-[10px] font-black uppercase tracking-widest text-gray-500 border border-gray-200 rounded-xl hover:bg-gray-50 hover:text-gray-900 transition-colors shadow-sm"
                                     >
                                         Retry
                                     </button>
+                                    <button
+                                        onClick={handleConfirm}
+                                        className="flex items-center gap-2 px-8 py-2.5 bg-gray-900 text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-primary shadow-xl shadow-gray-300 hover:shadow-primary/20 transition-all"
+                                    >
+                                        <FaCheck size={12} /> Confirm & Save
+                                    </button>
                                 </>
-                            )}
-
-                            {view === 'listening' && (
-                                <button
-                                    onClick={handleClose}
-                                    className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 text-sm"
-                                >
-                                    Close
-                                </button>
                             )}
                         </div>
                     </div>
