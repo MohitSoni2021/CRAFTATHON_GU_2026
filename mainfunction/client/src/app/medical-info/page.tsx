@@ -6,6 +6,7 @@ import { useSelector } from 'react-redux';
 import { RootState } from '@/store/store';
 import { FaSearch, FaPills, FaVial, FaBookMedical, FaChevronRight } from 'react-icons/fa';
 import Link from 'next/link';
+import MedicalInfoSkeleton from '@/components/dashboard/MedicalInfoSkeleton';
 
 interface MedicalItem {
     _id: string;
@@ -81,50 +82,50 @@ const MedicalInfoPage = () => {
 
     return (
         <DashboardLayout>
-            <div className="max-w-7xl mx-auto">
-                <header className="mb-8">
-                    <h1 className="text-xl font-extrabold text-gray-900 flex items-center mb-2">
-                        <FaBookMedical className="mr-3 text-[#3AAFA9]" />
-                        Medical Encyclopedia
-                    </h1>
-                    <p className="text-gray-600">
-                        Trusted information about medicines and lab tests.
-                    </p>
-                </header>
-
-                {/* Tabs */}
-                <div className="flex flex-col sm:flex-row sm:space-x-6 border-b border-gray-200 mb-8 gap-4 sm:gap-0">
-                    <div className="flex space-x-6">
+            <div className="w-full">
+                <header className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-10">
+                    <div>
+                        <p className="text-tertiary text-[11px] font-bold uppercase tracking-[0.1em] opacity-80 mb-1">
+                            Clinical Archive • Medical Encyclopedia
+                        </p>
+                        <h1 className="text-3xl md:text-4xl font-extrabold text-[#2c3436] leading-tight">
+                            Medical <span className="text-primary">Reference</span>
+                        </h1>
+                        <p className="text-tertiary/70 text-sm font-medium mt-1 italic border-l-2 border-primary/20 pl-4">
+                            "Empowering clinicians with trusted pharmacotherapy and diagnostic insights."
+                        </p>
+                    </div>
+                    <div className="bg-surface-container-low p-1 rounded-xl border border-gray-100 flex space-x-1">
                         <button
                             onClick={() => setActiveTab('medicine')}
-                            className={`pb-4 px-2 font-bold text-base transition-colors border-b-2 ${activeTab === 'medicine'
-                                ? 'border-[#3AAFA9] text-[#3AAFA9]'
-                                : 'border-transparent text-gray-400 hover:text-gray-600'
+                            className={`px-6 py-2.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === 'medicine'
+                                ? 'bg-primary text-white shadow-lg shadow-primary/20'
+                                : 'text-tertiary/40 hover:text-primary hover:bg-white'
                                 }`}
                         >
-                            <FaPills className="inline mr-2 mb-1" /> Medicines
+                            <FaPills className="inline mr-2" /> Medicines
                         </button>
                         <button
                             onClick={() => setActiveTab('test')}
-                            className={`pb-4 px-2 font-bold text-base transition-colors border-b-2 ${activeTab === 'test'
-                                ? 'border-[#3AAFA9] text-[#3AAFA9]'
-                                : 'border-transparent text-gray-400 hover:text-gray-600'
+                            className={`px-6 py-2.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === 'test'
+                                ? 'bg-primary text-white shadow-lg shadow-primary/20'
+                                : 'text-tertiary/40 hover:text-primary hover:bg-white'
                                 }`}
                         >
-                            <FaVial className="inline mr-2 mb-1" /> Lab Tests
+                            <FaVial className="inline mr-2" /> Lab Tests
                         </button>
                     </div>
-                </div>
+                </header>
 
-                {/* Search */}
-                <div className="mb-8 relative">
-                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                        <FaSearch className="text-gray-400" />
+                {/* Search Bar */}
+                <div className="mb-10 relative group">
+                    <div className="absolute inset-y-0 left-0 pl-6 flex items-center pointer-events-none transition-colors group-focus-within:text-primary">
+                        <FaSearch className="text-tertiary/20 group-focus-within:text-primary" />
                     </div>
                     <input
                         type="text"
-                        placeholder={`Search ${activeTab === 'medicine' ? 'medicines' : 'lab tests'}...`}
-                        className="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-200 shadow-sm focus:border-[#3AAFA9] focus:ring-4 focus:ring-[#3AAFA9]/10 outline-none transition-all text-base"
+                        placeholder={`Search ${activeTab === 'medicine' ? 'pharmacopoeia' : 'diagnostic tests'}...`}
+                        className="w-full pl-14 pr-6 py-5 rounded-xl border border-gray-100 shadow-sm focus:border-primary/20 focus:ring-4 focus:ring-primary/5 outline-none transition-all text-sm font-bold text-[#2c3436] placeholder:text-tertiary/20"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                     />
@@ -132,42 +133,52 @@ const MedicalInfoPage = () => {
 
                 {/* Content Grid */}
                 {loading ? (
-                    <div className="flex justify-center items-center h-64">
-                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#3AAFA9]"></div>
-                    </div>
+                    <MedicalInfoSkeleton />
                 ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                         {displayItems.length > 0 ? (
                             displayItems.map((item) => (
                                 <Link
                                     key={item._id}
                                     href={`/medical-info/${activeTab}/${item._id}`}
-                                    className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-lg hover:border-[#3AAFA9]/30 transition-all group"
+                                    className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-ambient hover:border-primary/20 transition-all duration-300 group flex flex-col h-full relative overflow-hidden"
                                 >
-                                    <div className="flex justify-between items-start mb-4">
-                                        <div className={`p-3 rounded-xl ${activeTab === 'medicine' ? 'bg-blue-50 text-blue-600' : 'bg-purple-50 text-purple-600'}`}>
-                                            {activeTab === 'medicine' ? <FaPills className="text-xl" /> : <FaVial className="text-xl" />}
+                                    <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 rounded-full -mr-12 -mt-12 transition-transform duration-500 group-hover:scale-110"></div>
+                                    
+                                    <div className="flex justify-between items-start mb-6 relative">
+                                        <div className={`p-4 rounded-xl transition-all duration-300 ${
+                                            activeTab === 'medicine' 
+                                                ? 'bg-blue-50 text-blue-500 group-hover:bg-blue-500 group-hover:text-white' 
+                                                : 'bg-purple-50 text-purple-500 group-hover:bg-purple-500 group-hover:text-white'
+                                        }`}>
+                                            {activeTab === 'medicine' ? <FaPills className="text-2xl" /> : <FaVial className="text-2xl" />}
                                         </div>
                                         {item.category && (
-                                            <span className="text-xs font-bold px-2 py-1 rounded-full bg-gray-100 text-gray-600">
+                                            <span className="text-[9px] font-black uppercase tracking-[0.15em] px-3 py-1 rounded-lg bg-surface-container-low text-tertiary/40 border border-gray-50">
                                                 {item.category}
                                             </span>
                                         )}
                                     </div>
-                                    <h3 className="text-lg font-bold text-gray-900 group-hover:text-[#3AAFA9] transition-colors mb-2">
+                                    
+                                    <h3 className="text-lg font-extrabold text-[#2c3436] group-hover:text-primary transition-colors mb-2 relative">
                                         {item.name}
                                     </h3>
-                                    <p className="text-gray-500 text-sm line-clamp-3 mb-4">
+                                    
+                                    <p className="text-tertiary/60 text-xs font-medium leading-relaxed line-clamp-3 mb-6 flex-grow relative">
                                         {item.description}
                                     </p>
-                                    <div className="flex items-center text-[#3AAFA9] font-bold text-sm">
-                                        Read More <FaChevronRight className="ml-1 text-xs" />
+                                    
+                                    <div className="flex items-center text-[10px] font-black uppercase tracking-widest text-primary transition-all group-hover:translate-x-1 relative">
+                                        Reference Guide <FaChevronRight className="ml-2 text-[8px]" />
                                     </div>
                                 </Link>
                             ))
                         ) : (
-                            <div className="col-span-full text-center py-16 bg-white rounded-2xl border border-gray-100 border-dashed">
-                                <p className="text-gray-500 text-lg">No results found.</p>
+                            <div className="col-span-full text-center py-24 bg-white rounded-xl border-2 border-dashed border-gray-100">
+                                <div className="w-16 h-16 bg-gray-50 rounded-xl flex items-center justify-center mx-auto mb-4 text-gray-200 text-2xl">
+                                    <FaSearch />
+                                </div>
+                                <p className="text-tertiary/30 text-sm font-black uppercase tracking-widest">No clinical references match your query</p>
                             </div>
                         )}
                     </div>
