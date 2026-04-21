@@ -14,6 +14,7 @@ const referenceRoutes = require("./routes/reference");
 const familyRoutes = require("./routes/family");
 const savedPostRoutes = require("./routes/savedPosts");
 const shareRoutes = require("./routes/share");
+const medicineRoutes = require("./routes/medicines");
 const { startCronJob } = require("./jobs/newsFetcher");
 const compression = require("compression");
 const errorMiddleware = require("./middleware/errorMiddleware");
@@ -61,6 +62,7 @@ app.use("/api/reference", referenceRoutes);
 app.use("/api/family", familyRoutes);
 app.use("/api/saved-posts", savedPostRoutes);
 app.use("/api/share", shareRoutes);
+app.use("/api/medicines", medicineRoutes);
 app.use("/api/admin", require("./routes/adminRoutes"));
 console.log("Loading SOS Routes...");
 app.use("/api/sos", require("./routes/sos")); // <--- SOS Feature
