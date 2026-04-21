@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/store/store';
-import { FaCheck, FaSpinner, FaTimes } from 'react-icons/fa';
+import { FaCheck, FaSpinner, FaTimes, FaCrown, FaBolt, FaShieldAlt } from 'react-icons/fa';
 import api from '@/utils/api';
 import stripePromise from '@/utils/stripe';
 import { useRouter } from 'next/navigation';
@@ -44,63 +44,83 @@ export default function PricingModal({ isOpen, onClose, message }: PricingModalP
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-            <div className="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
-                {/* Header with Gradient */}
-                <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-8 text-white text-center relative">
-                    <button
-                        onClick={onClose}
-                        className="absolute top-4 right-4 p-2 bg-white/20 hover:bg-white/30 rounded-full transition"
-                    >
-                        <FaTimes size={20} />
-                    </button>
-                    <h2 className="text-xl font-extrabold mb-2">Limit Reached</h2>
-                    <p className="text-blue-100 text-base">
-                        {message || "You've hit your monthly free limit."}
-                    </p>
-                </div>
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-gray-900/40 backdrop-blur-md animate-in fade-in duration-300">
+            <div className="relative w-full max-w-lg bg-white rounded-xl shadow-2xl overflow-hidden animate-in zoom-in-95 slide-in-from-bottom-10 duration-500 border border-outline-variant">
+                {/* Decorative Accent */}
+                <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-primary"></div>
 
-                <div className="p-8">
-                    <div className="text-center mb-8">
-                        <p className="text-gray-500 mb-4">Upgrade to <strong>Premium</strong> for unexpected power.</p>
-                        <div className="flex items-center justify-center gap-2 mb-6">
-                            <span className="text-3xl font-extrabold text-blue-900">$9.99</span>
-                            <span className="text-gray-400 font-medium">/ month</span>
+                <div className="p-10">
+                    <div className="flex justify-between items-start mb-8">
+                        <div className="w-12 h-12 bg-primary/10 text-primary rounded-xl flex items-center justify-center text-xl shadow-sm border border-primary/10">
+                            <FaCrown />
+                        </div>
+                        <button
+                            onClick={onClose}
+                            className="p-2 text-gray-400 hover:text-primary transition-colors rounded-xl hover:bg-surface-container-low"
+                        >
+                            <FaTimes size={18} />
+                        </button>
+                    </div>
+
+                    <div className="mb-10">
+                        <h2 className="text-3xl font-extrabold text-gray-900 mb-2 tracking-tight">Limit Reached</h2>
+                        <p className="text-gray-500 font-medium leading-relaxed">
+                            {message || "You've hit your monthly free limit for AI interactions."}
+                        </p>
+                    </div>
+
+                    <div className="bg-surface-container-low rounded-xl p-8 border border-outline-variant mb-10 relative overflow-hidden group">
+                        <div className="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transition-opacity">
+                            <FaBolt size={80} />
+                        </div>
+                        
+                        <div className="flex items-baseline gap-2 mb-8 relative z-10">
+                            <span className="text-4xl font-extrabold text-gray-900">$9.99</span>
+                            <span className="text-gray-400 font-bold uppercase tracking-widest text-[10px]">Per Month</span>
                         </div>
 
-                        <ul className="space-y-3 text-left max-w-xs mx-auto text-gray-600">
-                            <li className="flex items-center gap-3">
-                                <div className="p-1 bg-green-100 rounded-full text-green-600">
-                                    <FaCheck size={14} />
-                                </div>
-                                <span className="font-medium">Unlimited AI Consultations</span>
-                            </li>
-                            <li className="flex items-center gap-3">
-                                <div className="p-1 bg-green-100 rounded-full text-green-600">
-                                    <FaCheck size={14} />
-                                </div>
-                                <span className="font-medium">Unlimited Prescription Scans</span>
-                            </li>
-                            <li className="flex items-center gap-3">
-                                <div className="p-1 bg-green-100 rounded-full text-green-600">
-                                    <FaCheck size={14} />
-                                </div>
-                                <span className="font-medium">Priority Support</span>
-                            </li>
+                        <ul className="space-y-4 relative z-10">
+                            {[
+                                'Unlimited AI Consultations',
+                                'Unlimited Report Analysis',
+                                'Priority Doctor Verification',
+                                'Advanced Health Trends'
+                            ].map((text, i) => (
+                                <li key={i} className="flex items-center gap-3 text-sm font-bold text-gray-900">
+                                    <div className="w-5 h-5 bg-primary text-white rounded flex items-center justify-center shrink-0">
+                                        <FaCheck size={10} />
+                                    </div>
+                                    {text}
+                                </li>
+                            ))}
                         </ul>
                     </div>
 
-                    <button
-                        onClick={handleSubscribe}
-                        disabled={loading}
-                        className="w-full py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl font-bold text-base shadow-xl hover:shadow-2xl transition-all transform hover:scale-[1.02] flex justify-center items-center"
-                    >
-                        {loading ? <FaSpinner className="animate-spin mr-2" /> : 'Unlock Unlimited Access'}
-                    </button>
+                    <div className="space-y-4">
+                        <button
+                            onClick={handleSubscribe}
+                            disabled={loading}
+                            className="w-full py-5 px-6 bg-gradient-primary text-white font-extrabold rounded-xl shadow-xl shadow-primary/20 text-xs uppercase tracking-[0.2em] hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3"
+                        >
+                            {loading ? <FaSpinner className="animate-spin" /> : (
+                                <>
+                                    <span>Upgrade to Concierge</span>
+                                    <FaBolt size={12} className="opacity-50" />
+                                </>
+                            )}
+                        </button>
+                        
+                        <button 
+                            onClick={onClose}
+                            className="w-full py-4 text-gray-400 hover:text-gray-600 font-bold text-[10px] uppercase tracking-widest transition-colors"
+                        >
+                            Maybe Later
+                        </button>
+                    </div>
 
-                    <p className="text-center mt-4 text-xs text-gray-400">
-                        Secure payment powered by Stripe. Cancel anytime.
-                    </p>
+                    <div className="mt-8 pt-6 border-t border-outline-variant flex items-center justify-center gap-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                        <FaShieldAlt className="text-primary/30" /> Secure payment via Stripe
+                    </div>
                 </div>
             </div>
         </div>
