@@ -5,6 +5,7 @@ import axios from "axios";
 import { FaUserMd, FaEnvelope, FaCalendarCheck } from "react-icons/fa";
 import Link from "next/link";
 import DashboardLayout from "@/components/DashboardLayout";
+import DoctorsSkeleton from "@/components/dashboard/DoctorsSkeleton";
 
 interface Doctor {
   _id: string;
@@ -49,9 +50,9 @@ const DoctorsPage = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-screen bg-surface">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-      </div>
+      <DashboardLayout>
+        <DoctorsSkeleton />
+      </DashboardLayout>
     );
   }
 
@@ -159,7 +160,7 @@ const DoctorsPage = () => {
 
                   <Link
                     href={`/doctors/${doctor._id}`}
-                    className="flex items-center justify-center w-full px-6 py-4 bg-gradient-primary text-white text-xs font-black uppercase tracking-widest rounded-md hover:-translate-y-0.5 transition-all duration-300 shadow-lg shadow-primary/20"
+                    className="flex items-center justify-center w-full px-6 py-4 bg-gradient-primary text-white text-xs font-black uppercase tracking-widest rounded-xl hover:-translate-y-0.5 transition-all duration-300 shadow-lg shadow-primary/20"
                   >
                     <FaCalendarCheck className="mr-2" />
                     Details & Booking

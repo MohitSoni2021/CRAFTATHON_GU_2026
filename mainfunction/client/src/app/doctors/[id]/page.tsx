@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import DashboardLayout from '@/components/DashboardLayout';
 import BookingModal from '@/components/BookingModal';
+import DoctorDetailsSkeleton from '@/components/dashboard/DoctorDetailsSkeleton';
 
 interface Doctor {
     _id: string;
@@ -111,20 +112,20 @@ const DoctorDetailsPage = () => {
 
     if (loading) {
         return (
-            <div className="flex items-center justify-center h-screen bg-gray-50">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500"></div>
-            </div>
+            <DashboardLayout>
+                <DoctorDetailsSkeleton />
+            </DashboardLayout>
         );
     }
 
     if (error || !doctor) {
         return (
-            <div className="flex flex-col items-center justify-center h-screen bg-gray-50 p-4">
-                <div className="text-red-500 text-xl font-semibold mb-2">Error</div>
-                <p className="text-gray-600">{error || 'Doctor not found'}</p>
+            <div className="flex flex-col items-center justify-center h-screen bg-surface p-4">
+                <div className="text-primary text-xl font-extrabold mb-2 uppercase tracking-widest">Error</div>
+                <p className="text-tertiary/70 font-medium mb-6">{error || 'Doctor not found'}</p>
                 <button
                     onClick={() => router.back()}
-                    className="mt-4 px-4 py-2 bg-emerald-500 text-white rounded hover:bg-emerald-600 transition-colors"
+                    className="btn-primary !rounded-xl"
                 >
                     Go Back
                 </button>
@@ -134,66 +135,82 @@ const DoctorDetailsPage = () => {
 
     return (
         <DashboardLayout>
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div className="w-full">
                 {/* Back Button */}
                 <button
                     onClick={() => router.back()}
-                    className="flex items-center text-gray-500 hover:text-emerald-600 mb-6 transition-colors"
+                    className="flex items-center text-tertiary/60 hover:text-primary mb-8 transition-all font-bold text-xs uppercase tracking-widest group"
                 >
-                    <FaChevronLeft className="mr-2" /> Back to Doctors
+                    <div className="w-8 h-8 rounded-xl bg-surface-container-low flex items-center justify-center mr-3 group-hover:bg-primary/10 transition-colors">
+                        <FaChevronLeft className="text-sm" />
+                    </div>
+                    Back to Care Network
                 </button>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     {/* Left Column: Doctor Profile */}
                     <div className="lg:col-span-1">
-                        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden sticky top-8">
-                            <div className="h-32 bg-emerald-50"></div>
-                            <div className="px-6 relative">
-                                <div className="absolute -top-16 left-6 w-32 h-32 rounded-2xl border-4 border-white overflow-hidden bg-white shadow-md">
+                        <div className="bg-white rounded-xl shadow-ambient border border-gray-100 overflow-hidden sticky top-8">
+                            <div className="h-32 bg-primary/5"></div>
+                            <div className="px-8 relative">
+                                <div className="absolute -top-16 left-8 w-32 h-32 rounded-xl border-4 border-white overflow-hidden bg-white shadow-ambient">
                                     {doctor.profileImage ? (
                                         <img src={doctor.profileImage} alt={doctor.name} className="w-full h-full object-cover" />
                                     ) : (
-                                        <div className="w-full h-full flex items-center justify-center bg-emerald-100 text-emerald-300">
+                                        <div className="w-full h-full flex items-center justify-center bg-primary/5 text-primary/20">
                                             <FaUserMd className="text-5xl" />
                                         </div>
                                     )}
                                 </div>
                             </div>
-                            <div className="mt-20 px-6 pb-6">
-                                <h1 className="text-2xl font-bold text-gray-900">{doctor.name}</h1>
-                                <p className="text-emerald-600 font-medium">{doctor.profile?.specialization || 'General Practitioner'}</p>
+                            <div className="mt-20 px-8 pb-8">
+                                <div className="mb-6">
+                                    <h1 className="text-2xl font-extrabold text-[#2c3436]">{doctor.name}</h1>
+                                    <p className="text-primary font-black text-xs uppercase tracking-widest mt-1">
+                                        {doctor.profile?.specialization || 'General Practitioner'}
+                                    </p>
+                                </div>
 
-                                <div className="mt-6 space-y-4">
-                                    <div className="flex items-center text-gray-600">
-                                        <div className="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center text-blue-500 mr-3">
+                                <div className="space-y-5">
+                                    <div className="flex items-center text-tertiary/70">
+                                        <div className="w-10 h-10 rounded-xl bg-surface-container-low flex items-center justify-center text-primary/60 mr-4">
                                             <FaEnvelope className="text-sm" />
                                         </div>
-                                        <span className="text-sm">{doctor.email}</span>
+                                        <div className="flex flex-col">
+                                            <span className="text-[10px] font-black uppercase tracking-widest opacity-50">Email</span>
+                                            <span className="text-sm font-bold">{doctor.email}</span>
+                                        </div>
                                     </div>
                                     {doctor.availability?.workingHours && (
-                                        <div className="flex items-center text-gray-600">
-                                            <div className="w-8 h-8 rounded-full bg-purple-50 flex items-center justify-center text-purple-500 mr-3">
+                                        <div className="flex items-center text-tertiary/70">
+                                            <div className="w-10 h-10 rounded-xl bg-surface-container-low flex items-center justify-center text-primary/60 mr-4">
                                                 <FaClock className="text-sm" />
                                             </div>
-                                            <span className="text-sm">
-                                                {doctor.availability.workingHours.start} - {doctor.availability.workingHours.end}
-                                            </span>
+                                            <div className="flex flex-col">
+                                                <span className="text-[10px] font-black uppercase tracking-widest opacity-50">Hours</span>
+                                                <span className="text-sm font-bold">
+                                                    {doctor.availability.workingHours.start} - {doctor.availability.workingHours.end}
+                                                </span>
+                                            </div>
                                         </div>
                                     )}
                                     {doctor.availability?.days && (
-                                        <div className="flex items-center text-gray-600">
-                                            <div className="w-8 h-8 rounded-full bg-green-50 flex items-center justify-center text-green-500 mr-3">
+                                        <div className="flex items-center text-tertiary/70">
+                                            <div className="w-10 h-10 rounded-xl bg-surface-container-low flex items-center justify-center text-primary/60 mr-4">
                                                 <FaCalendarCheck className="text-sm" />
                                             </div>
-                                            <span className="text-sm">{doctor.availability.days.join(', ')}</span>
+                                            <div className="flex flex-col">
+                                                <span className="text-[10px] font-black uppercase tracking-widest opacity-50">Availability</span>
+                                                <span className="text-sm font-bold">{doctor.availability.days.join(', ')}</span>
+                                            </div>
                                         </div>
                                     )}
                                 </div>
 
                                 {doctor.profile?.bio && (
-                                    <div className="mt-6 pt-6 border-t border-gray-100">
-                                        <h3 className="font-semibold text-gray-900 mb-2">About</h3>
-                                        <p className="text-gray-500 text-sm leading-relaxed">{doctor.profile.bio}</p>
+                                    <div className="mt-8 pt-8 border-t border-gray-50">
+                                        <h3 className="text-[11px] font-black text-tertiary/40 uppercase tracking-[0.2em] mb-3">Clinical Biography</h3>
+                                        <p className="text-tertiary/70 text-sm leading-relaxed font-medium">{doctor.profile.bio}</p>
                                     </div>
                                 )}
                             </div>
@@ -202,18 +219,23 @@ const DoctorDetailsPage = () => {
 
                     {/* Right Column: Booking Slots */}
                     <div className="lg:col-span-2">
-                        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 md:p-8">
-                            <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center">
-                                <FaCalendarCheck className="mr-3 text-emerald-500" />
-                                Book an Appointment
-                            </h2>
+                        <div className="bg-white rounded-xl shadow-ambient border border-gray-100 p-8 md:p-10">
+                            <header className="mb-10">
+                                <div className="flex items-center space-x-4 text-primary text-[11px] font-black tracking-widest uppercase mb-4">
+                                    <FaCalendarCheck className="text-lg" /> <span>Appointment Scheduling</span>
+                                </div>
+                                <h2 className="text-2xl md:text-3xl font-extrabold text-[#2c3436]">
+                                    Book your <span className="text-primary">Consultation</span>
+                                </h2>
+                                <p className="text-tertiary/60 text-sm mt-2 font-medium">Select a date and time slot that fits your schedule.</p>
+                            </header>
 
                             {/* Date Picker */}
-                            <div className="mb-8">
-                                <label className="block text-sm font-medium text-gray-700 mb-2">Select Date</label>
+                            <div className="mb-10">
+                                <label className="block text-[11px] font-black text-tertiary/40 uppercase tracking-widest mb-3">Select Consultation Date</label>
                                 <input
                                     type="date"
-                                    className="w-full md:w-auto px-4 py-3 rounded-xl border border-gray-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all"
+                                    className="w-full md:w-auto px-6 py-4 rounded-xl border border-gray-100 bg-surface-container-low text-[#2c3436] font-bold outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all"
                                     value={selectedDate}
                                     min={new Date().toISOString().split('T')[0]}
                                     onChange={(e) => setSelectedDate(e.target.value)}
@@ -222,35 +244,39 @@ const DoctorDetailsPage = () => {
 
                             {/* Slots Grid */}
                             <div>
-                                <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">Available Slots</h3>
+                                <h3 className="text-[11px] font-black text-tertiary/40 uppercase tracking-widest mb-6">Available Time Slots</h3>
 
                                 {slotsLoading ? (
-                                    <div className="flex justify-center py-12">
-                                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-500"></div>
+                                    <div className="flex justify-center py-16">
+                                        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary"></div>
                                     </div>
                                 ) : slots.length > 0 ? (
-                                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                                    <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
                                         {slots.map((slot) => (
                                             <button
                                                 key={slot.time}
                                                 disabled={!slot.available}
                                                 onClick={() => handleSlotClick(slot.time)}
-                                                className={`group relative flex items-center justify-center py-3 px-4 rounded-xl border transition-all duration-200 shadow-sm 
+                                                className={`group relative flex items-center justify-center py-5 px-6 rounded-xl border transition-all duration-300
                                                     ${!slot.available
-                                                        ? 'bg-gray-50 border-gray-200 text-gray-400 cursor-not-allowed'
-                                                        : 'bg-white border-emerald-200 hover:bg-emerald-500 hover:border-emerald-500 hover:text-white hover:shadow-md'
+                                                        ? 'bg-surface-container-low border-transparent text-tertiary/30 cursor-not-allowed opacity-50'
+                                                        : 'bg-white border-gray-100 text-[#2c3436] hover:border-primary hover:text-primary hover:shadow-lg hover:shadow-primary/5 font-bold'
                                                     }`}
                                             >
-                                                <span className="font-medium">{slot.time}</span>
+                                                <span className="text-sm">{slot.time}</span>
+                                                {slot.available && (
+                                                    <div className="absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-primary opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                                                )}
                                             </button>
                                         ))}
                                     </div>
                                 ) : (
-                                    <div className="text-center py-12 bg-gray-50 rounded-xl border border-dashed border-gray-200">
-                                        <p className="text-gray-500">No slots available for this date.</p>
+                                    <div className="text-center py-16 bg-surface-container-low rounded-xl border border-dashed border-gray-200">
+                                        <FaClock className="mx-auto h-12 w-12 text-tertiary/20 mb-4" />
+                                        <p className="text-tertiary/60 font-bold">No slots available for this date.</p>
                                         {!doctor.availability?.days.includes(new Date(selectedDate).toLocaleDateString('en-US', { weekday: 'long' })) && (
-                                            <p className="text-sm text-gray-400 mt-1">
-                                                (Doctor is usually available on: {doctor.availability?.days.join(', ')})
+                                            <p className="text-xs text-tertiary/40 mt-2 font-medium uppercase tracking-wider">
+                                                Doctor availability: {doctor.availability?.days.join(', ')}
                                             </p>
                                         )}
                                     </div>
