@@ -6,11 +6,11 @@ import DashboardLayout from '@/components/DashboardLayout';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '@/store/store';
 import { updateUserProfile, uploadProfilePhoto, fetchUserProfile } from '@/store/slices/authSlice';
-import { FaUser, FaEnvelope, FaBirthdayCake, FaIdCard, FaEdit, FaTimes, FaSave, FaCamera, FaStethoscope, FaCheck, FaChevronRight, FaBookmark, FaShareAlt, FaUserMd, FaCog, FaStar } from 'react-icons/fa';
+import { FaUser, FaEnvelope, FaBirthdayCake, FaIdCard, FaEdit, FaTimes, FaSave, FaCamera, FaStethoscope, FaCheck, FaChevronRight, FaBookmark, FaShareAlt, FaUserMd, FaCog, FaStar, FaBolt, FaShieldAlt, FaQrcode, FaChartLine, FaCrown } from 'react-icons/fa';
 import axios from 'axios';
 import Link from 'next/link';
 import { QRCodeCanvas } from 'qrcode.react';
-import LanguageSwitcher from '@/components/LanguageSwitcher'; // <--- Import
+import LanguageSwitcher from '@/components/LanguageSwitcher';
 
 export default function Profile() {
     const dispatch = useDispatch<AppDispatch>();
@@ -38,7 +38,7 @@ export default function Profile() {
 
     // Explain Yourself State
     const [showExplainModal, setShowExplainModal] = useState(false);
-    const [explainStep, setExplainStep] = useState(1); // 1: Disease, 2: Questions, 3: Analysis
+    const [explainStep, setExplainStep] = useState(1);
     const [selectedDiseases, setSelectedDiseases] = useState<string[]>([]);
     const [questions, setQuestions] = useState<any[]>([]);
     const [additionalDetails, setAdditionalDetails] = useState('');
@@ -58,7 +58,7 @@ export default function Profile() {
     const handleShareProfile = () => {
         if (!user) return;
         setShowShareModal(true);
-        setShowQR(false); // Reset QR view when opening
+        setShowQR(false);
     };
 
     const copyToClipboard = () => {
@@ -152,7 +152,7 @@ export default function Profile() {
         }
 
         if (editSection === 'health') {
-            if (formData.age) payload.age = formData.age; // API expects Age on root
+            if (formData.age) payload.age = formData.age;
             if (formData.gender) payload.gender = formData.gender;
             if (formData.height) payload.height = parseFloat(formData.height);
             if (formData.weight) payload.weight = parseFloat(formData.weight);
@@ -160,14 +160,10 @@ export default function Profile() {
             if (formData.chronicConditions) {
                 payload.chronicConditions = formData.chronicConditions.split(',').map((c: string) => c.trim()).filter(Boolean);
             }
-            if (formData.chronicConditions) {
-                payload.chronicConditions = formData.chronicConditions.split(',').map((c: string) => c.trim()).filter(Boolean);
-            }
         }
 
         if (editSection === 'sos') {
             let currentContacts = user?.sosContacts ? [...user.sosContacts] : [];
-
             const newContact = {
                 name: formData.sosName,
                 phone: formData.sosPhone,
@@ -176,10 +172,8 @@ export default function Profile() {
             };
 
             if (editingContactIndex !== null && editingContactIndex >= 0) {
-                // Edit existing
                 currentContacts[editingContactIndex] = { ...currentContacts[editingContactIndex], ...newContact };
             } else {
-                // Add new
                 currentContacts.push(newContact);
             }
 
@@ -193,10 +187,8 @@ export default function Profile() {
 
     const handleDeleteContact = async (index: number) => {
         if (!user || !user.sosContacts) return;
-
         const updatedContacts = [...user.sosContacts];
         updatedContacts.splice(index, 1);
-
         await dispatch(updateUserProfile({ sosContacts: updatedContacts }));
     };
 
@@ -228,7 +220,6 @@ export default function Profile() {
 
     const handleCloseModal = () => {
         setEditSection(null);
-        // Reset form to current user state when closing without saving
         if (user) {
             setFormData({
                 name: user.name || '',
@@ -268,7 +259,6 @@ export default function Profile() {
 
     const startQuestionnaire = async () => {
         if (selectedDiseases.length === 0) return;
-
         setIsAnalyzing(true);
         try {
             const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/ai/generate-questions`, {
@@ -296,7 +286,6 @@ export default function Profile() {
     };
 
     const handleSubmitAll = () => {
-        // Transform questions to the format expected by the API
         const formattedAnswers = questions.map(q => ({
             question: q.question,
             answer: q.ans
@@ -329,7 +318,6 @@ export default function Profile() {
             const data = await response.json();
             setAnalysisResult(data.summary);
             setExplainStep(3);
-            // Refresh user profile to show new storyDesc
             dispatch(fetchUserProfile());
         } catch (error) {
             console.error("Error analyzing answers", error);
@@ -350,35 +338,46 @@ export default function Profile() {
     return (
         <ProtectedRoute>
             <DashboardLayout>
-                <div className="flex flex-col min-h-screen bg-gray-50/30">
-                    <header className="mb-8 flex justify-between items-end">
-                        <div>
-                            <p className="text-gray-400 text-sm font-semibold uppercase tracking-wider mb-1">My Account</p>
-                            <h1 className="text-xl font-extrabold text-gray-900">
-                                Profile
-                            </h1>
+                <div className="flex flex-col min-h-screen bg-white">
+                    <header className="mb-10 w-full max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+                        <div className="flex justify-between items-end">
+                            <div>
+                                <div className="inline-flex items-center space-x-2 bg-primary/5 px-3 py-1 rounded-lg text-primary text-[10px] font-bold mb-3 border border-primary/10 uppercase tracking-widest">
+                                    <FaUser /> <span>Account Settings</span>
+                                </div>
+                                <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">
+                                    Profile Central
+                                </h1>
+                            </div>
                         </div>
                     </header>
 
-                    <div className="w-full px-4 sm:px-6 lg:px-8 max-w-[1920px] mx-auto">
-                        {/* Profile Header Card */}
-                        <div className="bg-gradient-to-r from-[#7A8E6B] to-[#5A6E4B] rounded-3xl p-8 mb-8 shadow-xl relative overflow-hidden ring-1 ring-black/5">
-                            <div className="relative z-10 flex flex-col md:flex-row items-center md:items-start gap-8">
-                                <div className="relative group perspective-1000">
-                                    <div className="w-28 h-28 bg-white rounded-2xl rotate-3 shadow-lg flex items-center justify-center text-5xl font-bold text-[#7A8E6B] border-4 border-white overflow-hidden transform transition-transform group-hover:rotate-0 duration-300">
-                                        {user?.profileImage ? (
-                                            <img src={user.profileImage} alt="Profile" className="w-full h-full object-cover" />
-                                        ) : user?.profile?.photoUrl ? (
-                                            <img src={user.profile.photoUrl} alt="Profile" className="w-full h-full object-cover" />
+                    <div className="w-full px-4 sm:px-6 lg:px-8 max-w-[1920px] mx-auto pb-20">
+                        {/* Profile Hero Card */}
+                        <div className="bg-gradient-to-br from-gray-900 via-gray-800 to-black rounded-xl p-8 mb-10 shadow-2xl relative overflow-hidden group">
+                            <div className="absolute top-0 right-0 w-96 h-96 bg-primary/10 rounded-full blur-[100px] pointer-events-none translate-x-1/3 -translate-y-1/3 group-hover:scale-110 transition-transform duration-700"></div>
+                            
+                            <div className="relative z-10 flex flex-col md:flex-row items-center md:items-start gap-10">
+                                <div className="relative group/avatar">
+                                    <div className="w-40 h-40 bg-surface-container-low rounded-xl ring-4 ring-white/10 shadow-2xl flex items-center justify-center text-6xl font-bold text-primary overflow-hidden transition-transform duration-500 group-hover/avatar:scale-[1.02]">
+                                        {user?.profileImage || user?.profile?.photoUrl ? (
+                                            <img 
+                                                src={user.profileImage || user.profile.photoUrl} 
+                                                alt="Profile" 
+                                                className="w-full h-full object-cover" 
+                                            />
                                         ) : (
                                             user?.name?.charAt(0).toUpperCase() || 'U'
                                         )}
+                                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/avatar:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-[2px]">
+                                            <FaCamera className="text-white text-2xl" />
+                                        </div>
                                     </div>
                                     <button
                                         onClick={() => fileInputRef.current?.click()}
-                                        className="absolute bottom-0 right-0 bg-white p-2 rounded-full shadow-md text-gray-600 hover:text-[#7A8E6B] transition-colors"
+                                        className="absolute -bottom-2 -right-2 bg-primary text-white p-3 rounded-xl shadow-xl hover:scale-110 transition-all border-2 border-white/10"
                                     >
-                                        <FaCamera className="text-sm" />
+                                        <FaCamera size={14} />
                                     </button>
                                     <input
                                         type="file"
@@ -388,374 +387,386 @@ export default function Profile() {
                                         onChange={handleFileChange}
                                     />
                                 </div>
-                                <div className="text-center md:text-left text-white">
-                                    <h2 className="text-lg font-bold mb-2">{user?.name || 'User Name'}</h2>
-                                    <p className="text-white/80 text-base flex items-center justify-center md:justify-start gap-2">
-                                        <FaEnvelope className="text-sm" />
-                                        {user?.email || 'email@example.com'}
+
+                                <div className="text-center md:text-left flex-1">
+                                    <div className="flex flex-col md:flex-row md:items-center gap-4 mb-4">
+                                        <h2 className="text-4xl font-extrabold text-white tracking-tight leading-tight">
+                                            {user?.name || 'Incomplete Profile'}
+                                        </h2>
+                                        <div className="flex gap-2 justify-center md:justify-start">
+                                            {user?.type === 'doctor' ? (
+                                                <span className="bg-blue-500 text-white px-4 py-1 rounded-xl text-[10px] font-bold uppercase tracking-widest flex items-center gap-2">
+                                                    <FaUserMd /> Verified Specialist
+                                                </span>
+                                            ) : (
+                                                <span className="bg-white/10 backdrop-blur-md text-white px-4 py-1 rounded-xl text-[10px] font-bold uppercase tracking-widest border border-white/10">
+                                                    Standard Member
+                                                </span>
+                                            )}
+                                            {user?.subscription?.plan === 'premium' && (
+                                                <span className="bg-amber-500 text-white px-4 py-1 rounded-xl text-[10px] font-bold uppercase tracking-widest flex items-center gap-2">
+                                                    <FaCrown /> Concierge
+                                                </span>
+                                            )}
+                                        </div>
+                                    </div>
+                                    
+                                    <p className="text-gray-400 text-lg flex items-center justify-center md:justify-start gap-3 mb-8 font-medium">
+                                        <FaEnvelope className="text-primary/60" />
+                                        {user?.email || 'No email associated'}
                                     </p>
-                                    <div className="mt-4 flex gap-3 justify-center md:justify-start">
-                                        <span className="bg-white/20 backdrop-blur-sm px-4 py-1.5 rounded-full text-sm font-medium border border-white/10">
-                                            Patient
-                                        </span>
-                                        {user?.age && (
-                                            <span className="bg-white/20 backdrop-blur-sm px-4 py-1.5 rounded-full text-sm font-medium border border-white/10 flex items-center gap-2">
-                                                <FaBirthdayCake className="text-xs" />
-                                                {user.age} Years
-                                            </span>
-                                        )}
-                                        {user?.profile?.bloodGroup && (
-                                            <span className="bg-white/20 backdrop-blur-sm px-4 py-1.5 rounded-full text-sm font-medium border border-white/10">
-                                                {user.profile.bloodGroup}
-                                            </span>
-                                        )}
+
+                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-2xl">
+                                        <div className="bg-white/5 backdrop-blur-sm p-4 rounded-xl border border-white/5 hover:bg-white/10 transition-colors">
+                                            <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-1">Status</p>
+                                            <p className="text-white font-bold capitalize">{user?.type || 'Patient'}</p>
+                                        </div>
+                                        <div className="bg-white/5 backdrop-blur-sm p-4 rounded-xl border border-white/5 hover:bg-white/10 transition-colors">
+                                            <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-1">Age</p>
+                                            <p className="text-white font-bold">{user?.age ? `${user.age} Y` : '--'}</p>
+                                        </div>
+                                        <div className="bg-white/5 backdrop-blur-sm p-4 rounded-xl border border-white/5 hover:bg-white/10 transition-colors">
+                                            <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-1">Blood</p>
+                                            <p className="text-white font-bold">{user?.profile?.bloodGroup || '--'}</p>
+                                        </div>
+                                        <div className="bg-white/5 backdrop-blur-sm p-4 rounded-xl border border-white/5 hover:bg-white/10 transition-colors">
+                                            <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-1">Weight</p>
+                                            <p className="text-white font-bold">{user?.profile?.weight ? `${user.profile.weight}kg` : '--'}</p>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-
-                            {/* Decorative circles */}
-                            <div className="absolute top-0 right-0 -mt-10 -mr-10 w-40 h-40 bg-white/10 rounded-full blur-2xl"></div>
-                            <div className="absolute bottom-0 left-0 -mb-10 -ml-10 w-40 h-40 bg-white/10 rounded-full blur-2xl"></div>
                         </div>
 
-                        {/* Details Grid */}
-                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                            {/* Personal Information */}
-                            <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow h-full">
-                                <div className="flex justify-between items-center mb-6">
-                                    <h3 className="text-base font-bold text-gray-800 flex items-center gap-2">
-                                        <FaIdCard className="text-[#7A8E6B]" />
-                                        Personal Information
-                                    </h3>
-                                    <button
-                                        onClick={() => setEditSection('personal')}
-                                        className="text-gray-400 hover:text-[#7A8E6B] transition-colors"
-                                    >
-                                        <FaEdit />
-                                    </button>
-                                </div>
-
-                                <div className="space-y-4">
-                                    <div className="p-4 bg-gray-50/50 rounded-2xl border border-gray-100/50 hover:bg-gray-50 transition-colors">
-                                        <p className="text-xs text-gray-500 font-bold uppercase tracking-wider mb-1">Full Name</p>
-                                        <p className="text-gray-900 font-medium">{user?.name || '--'}</p>
-                                    </div>
-                                    <div className="p-4 bg-gray-50 rounded-xl">
-                                        <p className="text-xs text-gray-500 font-bold uppercase tracking-wider mb-1">Email Address</p>
-                                        <p className="text-gray-900 font-medium">{user?.email || '--'}</p>
-                                    </div>
-                                    <div className="p-4 bg-gray-50 rounded-xl">
-                                        <p className="text-xs text-gray-500 font-bold uppercase tracking-wider mb-1">Account ID</p>
-                                        <p className="text-gray-900 font-medium font-mono text-sm">{user?.id || '--'}</p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Health Profile Summary */}
-                            <div className="lg:col-span-2 bg-white p-6 rounded-3xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
-                                <div className="flex justify-between items-center mb-6">
-                                    <h3 className="text-base font-bold text-gray-800 flex items-center gap-2">
-                                        <FaUser className="text-[#7A8E6B]" />
-                                        Health Profile
-                                    </h3>
-                                    <div className="flex gap-2">
-                                        <button
-                                            onClick={() => setShowExplainModal(true)}
-                                            className="text-[#7A8E6B] hover:text-[#6a7d5d] transition-colors flex items-center gap-1 text-sm font-semibold bg-[#7A8E6B]/10 px-3 py-1.5 rounded-lg"
-                                        >
-                                            <FaStethoscope />
-                                            Explain Yourself
-                                        </button>
-                                        <button
-                                            onClick={handleShareProfile}
-                                            className="text-[#7A8E6B] hover:text-[#6a7d5d] transition-colors flex items-center gap-1 text-sm font-semibold bg-[#7A8E6B]/10 px-3 py-1.5 rounded-lg"
-                                        >
-                                            {copySuccess ? <FaCheck /> : <FaShareAlt />}
-                                            {copySuccess ? 'Copied!' : 'Share'}
-                                        </button>
-                                        <button
-                                            onClick={() => setEditSection('health')}
-                                            className="text-gray-400 hover:text-[#7A8E6B] transition-colors"
-                                        >
-                                            <FaEdit />
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <div className="space-y-4">
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div className="p-4 bg-gray-50 rounded-xl">
-                                            <p className="text-xs text-gray-500 font-bold uppercase tracking-wider mb-1">Age</p>
-                                            <p className="text-gray-900 font-medium">{user?.age ? `${user.age} Years` : 'Not Set'}</p>
-                                        </div>
-                                        <div className="p-4 bg-gray-50 rounded-xl">
-                                            <p className="text-xs text-gray-500 font-bold uppercase tracking-wider mb-1">Gender</p>
-                                            <p className="text-gray-900 font-medium capitalize">{user?.profile?.gender || '--'}</p>
-                                        </div>
-                                        <div className="p-4 bg-gray-50 rounded-xl">
-                                            <p className="text-xs text-gray-500 font-bold uppercase tracking-wider mb-1">Blood Type</p>
-                                            <p className="text-gray-900 font-medium">{user?.profile?.bloodGroup || '--'}</p>
-                                        </div>
-                                        <div className="p-4 bg-gray-50 rounded-xl">
-                                            <p className="text-xs text-gray-500 font-bold uppercase tracking-wider mb-1">Height</p>
-                                            <p className="text-gray-900 font-medium">{user?.profile?.height ? `${user.profile.height} cm` : '--'}</p>
-                                        </div>
-                                        <div className="p-4 bg-gray-50 rounded-xl">
-                                            <p className="text-xs text-gray-500 font-bold uppercase tracking-wider mb-1">Weight</p>
-                                            <p className="text-gray-900 font-medium">{user?.profile?.weight ? `${user.profile.weight} kg` : '--'}</p>
-                                        </div>
-                                        <div className="col-span-2 p-4 bg-gray-50 rounded-xl">
-                                            <p className="text-xs text-gray-500 font-bold uppercase tracking-wider mb-1">Chronic Conditions</p>
-                                            <div className="flex flex-wrap gap-2">
-                                                {user?.profile?.chronicConditions && user.profile.chronicConditions.length > 0 ? (
-                                                    user.profile.chronicConditions.map((condition: string, idx: number) => (
-                                                        <span key={idx} className="bg-red-50 text-red-600 px-2 py-1 rounded-md text-sm font-medium">
-                                                            {condition}
-                                                        </span>
-                                                    ))
-                                                ) : (
-                                                    <span className="text-gray-500">None listed</span>
-                                                )}
+                        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+                            {/* Main Sections */}
+                            <div className="lg:col-span-8 space-y-10">
+                                {/* Health Profile Section */}
+                                <div className="card-editorial rounded-xl p-8 border border-outline-variant shadow-ambient relative overflow-hidden group">
+                                    <div className="flex justify-between items-center mb-10">
+                                        <div className="flex items-center gap-4">
+                                            <div className="w-12 h-12 bg-primary/10 text-primary rounded-xl flex items-center justify-center text-xl shadow-sm">
+                                                <FaStethoscope />
                                             </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                            </div>
-                        </div>
-
-                        {/* Doctor Verification Section */}
-                        <div className="mt-8 bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-3xl border border-blue-100 shadow-sm flex items-center justify-between relative overflow-hidden">
-                            <div className="flex items-center gap-4">
-                                <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center text-xl">
-                                    <FaUserMd />
-                                </div>
-                                <div>
-                                    <h3 className="text-base font-bold text-gray-800">
-                                        {user?.type === 'doctor' ? 'Verified Doctor' : 'Are you a Doctor?'}
-                                    </h3>
-                                    <p className="text-gray-500 text-sm">
-                                        {user?.type === 'doctor'
-                                            ? 'You have full access to doctor features and patient consultations.'
-                                            : 'Join our network of healthcare professionals to help patients.'}
-                                    </p>
-                                </div>
-                            </div>
-                            {user?.type !== 'doctor' && (
-                                <Link href="/doctor/apply" className="px-6 py-2 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition shadow-lg shadow-blue-200">
-                                    Apply Now
-                                </Link>
-                            )}
-                            {user?.type === 'doctor' && (
-                                <span className="px-4 py-2 bg-green-100 text-green-700 font-bold rounded-lg flex items-center gap-2">
-                                    <FaCheck /> Verified
-                                </span>
-                            )}
-                        </div>
-
-                        {/* SOS Contacts Section */}
-                        <div className="mt-8 bg-white p-8 rounded-3xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
-                            <div className="flex justify-between items-center mb-6">
-                                <h3 className="text-base font-bold text-gray-800 flex items-center gap-2">
-                                    <FaEnvelope className="text-red-500" />
-                                    SOS / Emergency Contacts
-                                </h3>
-                                <button
-                                    onClick={openAddContact}
-                                    className="text-sm font-semibold text-[#7A8E6B] hover:text-[#6a7d5d] transition-colors flex items-center gap-1 bg-[#7A8E6B]/10 px-3 py-1.5 rounded-lg"
-                                >
-                                    + Add Contact
-                                </button>
-                            </div>
-
-                            {user?.sosContacts && user.sosContacts.length > 0 ? (
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                                    {user.sosContacts.map((contact: any, idx: number) => (
-                                        <div key={idx} className="p-4 bg-red-50 rounded-xl border border-red-100 relative group">
-                                            <div className="flex justify-between items-start">
-                                                <div>
-                                                    <p className="font-bold text-gray-900">{contact.name}</p>
-                                                    <p className="text-sm text-gray-600">{contact.relationship}</p>
-                                                    <p className="text-sm text-gray-800 font-mono mt-1">{contact.phone}</p>
-                                                    {contact.email && <p className="text-xs text-gray-500">{contact.email}</p>}
-                                                </div>
-                                                <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                    <button
-                                                        onClick={() => openEditContact(idx)}
-                                                        className="text-gray-400 hover:text-blue-500"
-                                                    >
-                                                        <FaEdit />
-                                                    </button>
-                                                    <button
-                                                        onClick={() => handleDeleteContact(idx)}
-                                                        className="text-gray-400 hover:text-red-500"
-                                                    >
-                                                        <FaTimes />
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            ) : (
-                                <div className="text-center py-6 bg-gray-50 rounded-xl border border-dashed border-gray-200">
-                                    <p className="text-gray-500 mb-2">No emergency contacts added yet.</p>
-                                    <p className="text-xs text-gray-400">Add trusted contacts for emergency situations.</p>
-                                </div>
-                            )}
-                        </div>
-
-
-
-                        {/* Subscription Plan Section */}
-                        <div className="mt-8 bg-white p-8 rounded-3xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
-                            <div className="flex items-center gap-2 mb-6">
-                                <div className="w-10 h-10 bg-amber-50 rounded-full flex items-center justify-center text-amber-500">
-                                    <FaStar />
-                                </div>
-                                <h3 className="text-base font-bold text-gray-800">Subscription Plan</h3>
-                            </div>
-
-                            <div className={`rounded-xl p-6 ${user?.subscription?.plan === 'premium'
-                                ? 'bg-gradient-to-r from-yellow-50 to-amber-50 border border-yellow-100'
-                                : 'bg-gray-50 border border-gray-100'
-                                }`}>
-                                <div className="flex items-center justify-between mb-4">
-                                    <div>
-                                        <span className={`text-sm font-bold uppercase tracking-wider ${user?.subscription?.plan === 'premium' ? 'text-amber-700' : 'text-gray-500'
-                                            }`}>
-                                            {user?.subscription?.plan === 'premium' ? 'Premium Plan' : 'Free Plan'}
-                                        </span>
-                                        {user?.subscription?.plan === 'premium' && (
-                                            <p className="text-xs text-amber-600 font-medium mt-1">
-                                                Unlimited Access Unlocked
-                                            </p>
-                                        )}
-                                    </div>
-                                    {user?.subscription?.plan === 'premium' && <FaStar className="text-2xl text-amber-500" />}
-                                </div>
-
-                                {user?.subscription?.plan !== 'premium' && (
-                                    <div className="space-y-4">
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                             <div>
-                                                <div className="flex justify-between text-xs text-gray-500 mb-1">
-                                                    <span>Consultations Used</span>
+                                                <h3 className="text-xl font-extrabold text-gray-900 tracking-tight">Clinical Profile</h3>
+                                                <p className="text-gray-500 text-xs font-bold uppercase tracking-widest">Medical History & Vitals</p>
+                                            </div>
+                                        </div>
+                                        <div className="flex gap-2">
+                                            <button
+                                                onClick={() => setShowExplainModal(true)}
+                                                className="bg-surface-container-low text-gray-600 hover:text-primary px-4 py-2 rounded-xl text-[10px] font-extrabold uppercase tracking-widest border border-outline-variant transition-all hover:scale-[1.02] flex items-center gap-2"
+                                            >
+                                                <FaBolt className="text-primary animate-pulse" /> AI Insight
+                                            </button>
+                                            <button
+                                                onClick={() => setEditSection('health')}
+                                                className="bg-primary text-white px-4 py-2 rounded-xl text-[10px] font-extrabold uppercase tracking-widest shadow-lg shadow-primary/20 transition-all hover:scale-[1.02] active:scale-95"
+                                            >
+                                                Modify
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+                                        {[
+                                            { label: 'Primary Gender', value: user?.profile?.gender || '--', icon: <FaUser /> },
+                                            { label: 'Height (cm)', value: user?.profile?.height || '--', icon: <FaChartLine /> },
+                                            { label: 'Weight (kg)', value: user?.profile?.weight || '--', icon: <FaChartLine /> },
+                                            { label: 'Blood Group', value: user?.profile?.bloodGroup || '--', icon: <FaBolt /> },
+                                            { label: 'Current Age', value: user?.age || '--', icon: <FaBirthdayCake /> }
+                                        ].map((item, i) => (
+                                            <div key={i} className="p-5 bg-surface-container-low rounded-xl border border-outline-variant group/item hover:border-primary/20 transition-colors">
+                                                <div className="flex items-center gap-3 mb-3">
+                                                    <div className="text-primary/40 group-hover/item:text-primary transition-colors">{item.icon}</div>
+                                                    <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest">{item.label}</p>
+                                                </div>
+                                                <p className="text-lg font-extrabold text-gray-900 capitalize">{item.value}</p>
+                                            </div>
+                                        ))}
+                                    </div>
+
+                                    <div className="p-6 bg-surface-container-low rounded-xl border border-outline-variant relative group/conditions">
+                                        <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-4">Documented Chronic Conditions</p>
+                                        <div className="flex flex-wrap gap-3">
+                                            {user?.profile?.chronicConditions && user.profile.chronicConditions.length > 0 ? (
+                                                user.profile.chronicConditions.map((condition: string, idx: number) => (
+                                                    <span key={idx} className="bg-red-50 text-red-600 px-4 py-2 rounded-xl text-xs font-bold border border-red-100/50 flex items-center gap-2">
+                                                        <span className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse"></span>
+                                                        {condition}
+                                                    </span>
+                                                ))
+                                            ) : (
+                                                <div className="text-gray-400 font-bold text-xs flex items-center gap-2">
+                                                    <FaCheck className="text-primary/50" /> No chronic conditions reported
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* My Health Story Section */}
+                                {user?.profile?.storyDesc && (
+                                    <div className="card-editorial rounded-xl p-8 border border-outline-variant shadow-ambient bg-primary/5 relative group">
+                                        <div className="absolute top-0 right-0 p-8 opacity-5">
+                                            <FaStethoscope size={100} />
+                                        </div>
+                                        <div className="flex items-center gap-4 mb-6">
+                                            <div className="w-10 h-10 bg-primary text-white rounded-xl flex items-center justify-center text-lg shadow-lg shadow-primary/20">
+                                                <FaBolt />
+                                            </div>
+                                            <h3 className="text-xl font-extrabold text-gray-900 tracking-tight">Health Narrative</h3>
+                                        </div>
+                                        <div className="p-6 bg-white/50 rounded-xl border border-primary/10 backdrop-blur-sm">
+                                            <p className="text-gray-700 text-lg leading-relaxed font-medium italic opacity-90">
+                                                "{user.profile.storyDesc}"
+                                            </p>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* SOS Contacts Section */}
+                                <div className="card-editorial rounded-xl p-8 border border-outline-variant shadow-ambient relative group">
+                                    <div className="flex justify-between items-center mb-8">
+                                        <div className="flex items-center gap-4">
+                                            <div className="w-12 h-12 bg-red-50 text-red-500 rounded-xl flex items-center justify-center text-xl shadow-sm border border-red-100">
+                                                <FaShieldAlt />
+                                            </div>
+                                            <div>
+                                                <h3 className="text-xl font-extrabold text-gray-900 tracking-tight">Emergency Contacts</h3>
+                                                <p className="text-red-500 text-[10px] font-bold uppercase tracking-widest opacity-70">Active SOS Protocol</p>
+                                            </div>
+                                        </div>
+                                        <button
+                                            onClick={openAddContact}
+                                            className="bg-red-500 text-white px-5 py-2.5 rounded-xl text-[10px] font-extrabold uppercase tracking-widest shadow-lg shadow-red-200 hover:scale-[1.02] transition-all"
+                                        >
+                                            + Secure New
+                                        </button>
+                                    </div>
+
+                                    {user?.sosContacts && user.sosContacts.length > 0 ? (
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                            {user.sosContacts.map((contact: any, idx: number) => (
+                                                <div key={idx} className="p-6 bg-surface-container-low rounded-xl border border-outline-variant relative group/contact hover:border-red-200 transition-colors">
+                                                    <div className="flex justify-between items-start mb-4">
+                                                        <div>
+                                                            <p className="font-extrabold text-gray-900 text-lg leading-tight mb-1">{contact.name}</p>
+                                                            <p className="text-[10px] text-primary font-bold uppercase tracking-widest">{contact.relationship}</p>
+                                                        </div>
+                                                        <div className="flex gap-2 opacity-0 group-hover/contact:opacity-100 transition-opacity">
+                                                            <button
+                                                                onClick={() => openEditContact(idx)}
+                                                                className="w-8 h-8 flex items-center justify-center bg-white rounded-lg text-gray-400 hover:text-primary shadow-sm border border-outline-variant"
+                                                            >
+                                                                <FaEdit size={12} />
+                                                            </button>
+                                                            <button
+                                                                onClick={() => handleDeleteContact(idx)}
+                                                                className="w-8 h-8 flex items-center justify-center bg-white rounded-lg text-gray-400 hover:text-red-500 shadow-sm border border-outline-variant"
+                                                            >
+                                                                <FaTimes size={12} />
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <p className="text-sm text-gray-600 font-bold flex items-center gap-2">
+                                                            <FaBolt className="text-gray-300" size={10} /> {contact.phone}
+                                                        </p>
+                                                        {contact.email && (
+                                                            <p className="text-xs text-gray-400 font-medium flex items-center gap-2">
+                                                                <FaEnvelope className="text-gray-300" size={10} /> {contact.email}
+                                                            </p>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        <div className="text-center py-14 bg-surface-container-low rounded-xl border-2 border-dashed border-outline-variant">
+                                            <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm text-gray-300">
+                                                <FaShieldAlt size={24} />
+                                            </div>
+                                            <p className="text-gray-400 font-bold uppercase tracking-widest text-[10px] mb-2">No SOS Contacts Configured</p>
+                                            <p className="text-gray-500 text-sm font-medium">Add trusted responders for critical health events.</p>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Sidebar Sections */}
+                            <div className="lg:col-span-4 space-y-10">
+                                {/* Actions & Sharing */}
+                                <div className="card-editorial rounded-xl p-8 border border-outline-variant shadow-ambient">
+                                    <h3 className="text-base font-extrabold text-gray-900 mb-6 flex items-center gap-2">
+                                        <FaShareAlt className="text-primary" /> Profile Sharing
+                                    </h3>
+                                    <div className="space-y-4">
+                                        <button 
+                                            onClick={handleShareProfile}
+                                            className="w-full flex items-center justify-between p-4 bg-surface-container-low hover:bg-primary/5 rounded-xl border border-outline-variant group transition-all"
+                                        >
+                                            <div className="flex items-center gap-4">
+                                                <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-primary shadow-sm border border-outline-variant group-hover:scale-110 transition-transform">
+                                                    <FaShareAlt size={14} />
+                                                </div>
+                                                <div className="text-left">
+                                                    <p className="text-xs font-extrabold text-gray-900 uppercase tracking-widest">Public Link</p>
+                                                    <p className="text-[10px] text-gray-500 font-medium">Share with caregivers</p>
+                                                </div>
+                                            </div>
+                                            <FaChevronRight size={10} className="text-gray-300 group-hover:translate-x-1 transition-transform" />
+                                        </button>
+
+                                        <button 
+                                            onClick={() => {
+                                                setShowShareModal(true);
+                                                setShowQR(true);
+                                            }}
+                                            className="w-full flex items-center justify-between p-4 bg-surface-container-low hover:bg-primary/5 rounded-xl border border-outline-variant group transition-all"
+                                        >
+                                            <div className="flex items-center gap-4">
+                                                <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-primary shadow-sm border border-outline-variant group-hover:scale-110 transition-transform">
+                                                    <FaQrcode size={14} />
+                                                </div>
+                                                <div className="text-left">
+                                                    <p className="text-xs font-extrabold text-gray-900 uppercase tracking-widest">Medical QR</p>
+                                                    <p className="text-[10px] text-gray-500 font-medium">Instant scan access</p>
+                                                </div>
+                                            </div>
+                                            <FaChevronRight size={10} className="text-gray-300 group-hover:translate-x-1 transition-transform" />
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {/* Subscription Summary */}
+                                <div className="card-editorial rounded-xl p-8 border border-outline-variant shadow-ambient relative overflow-hidden group">
+                                    <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+                                        <FaCrown size={80} />
+                                    </div>
+                                    <h3 className="text-base font-extrabold text-gray-900 mb-6 flex items-center gap-2">
+                                        <FaBolt className="text-amber-500" /> Subscription
+                                    </h3>
+                                    
+                                    <div className={`p-6 rounded-xl border mb-6 ${user?.subscription?.plan === 'premium' 
+                                        ? 'bg-amber-50 border-amber-100' 
+                                        : 'bg-surface-container-low border-outline-variant'}`}>
+                                        <div className="flex items-center justify-between mb-4">
+                                            <p className={`text-[10px] font-extrabold uppercase tracking-widest ${user?.subscription?.plan === 'premium' ? 'text-amber-700' : 'text-gray-500'}`}>
+                                                {user?.subscription?.plan === 'premium' ? 'Concierge' : 'Essential'}
+                                            </p>
+                                            {user?.subscription?.plan === 'premium' && <FaCrown className="text-amber-500" size={12} />}
+                                        </div>
+                                        <p className="text-lg font-black text-gray-900 mb-1">
+                                            {user?.subscription?.plan === 'premium' ? 'Unlimited Access' : 'Monthly Quota'}
+                                        </p>
+                                        <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Status: {user?.subscription?.status || 'Active'}</p>
+                                    </div>
+
+                                    {user?.subscription?.plan !== 'premium' && (
+                                        <div className="space-y-6">
+                                            <div>
+                                                <div className="flex justify-between text-[10px] font-extrabold text-gray-400 uppercase tracking-widest mb-2">
+                                                    <span>AI Consultations</span>
                                                     <span>{user?.usage?.aiConsultations || 0}/5</span>
                                                 </div>
-                                                <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
-                                                    <div
-                                                        className="bg-blue-500 h-2 rounded-full transition-all duration-500"
+                                                <div className="w-full bg-gray-100 rounded-full h-1.5 overflow-hidden">
+                                                    <div 
+                                                        className="bg-primary h-full transition-all duration-1000"
                                                         style={{ width: `${Math.min(((user?.usage?.aiConsultations || 0) / 5) * 100, 100)}%` }}
                                                     ></div>
                                                 </div>
                                             </div>
-                                            <div>
-                                                <div className="flex justify-between text-xs text-gray-500 mb-1">
-                                                    <span>Scans Used</span>
-                                                    <span>{user?.usage?.ocrScans || 0}/5</span>
-                                                </div>
-                                                <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
-                                                    <div
-                                                        className="bg-purple-500 h-2 rounded-full transition-all duration-500"
-                                                        style={{ width: `${Math.min(((user?.usage?.ocrScans || 0) / 5) * 100, 100)}%` }}
-                                                    ></div>
-                                                </div>
+                                            <Link 
+                                                href="/pricing"
+                                                className="block w-full py-4 text-center bg-gray-900 text-white rounded-xl text-[10px] font-extrabold uppercase tracking-[0.2em] shadow-xl shadow-gray-200 hover:scale-[1.02] active:scale-95 transition-all"
+                                            >
+                                                Upgrade Now
+                                            </Link>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Settings & Identity */}
+                                <div className="card-editorial rounded-xl p-8 border border-outline-variant shadow-ambient relative overflow-hidden group">
+                                    <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
+                                        <FaCog size={100} />
+                                    </div>
+                                    <div className="flex items-center gap-4 mb-8">
+                                        <div className="w-12 h-12 bg-surface-container-low text-gray-400 rounded-xl flex items-center justify-center text-xl shadow-sm border border-outline-variant">
+                                            <FaCog />
+                                        </div>
+                                        <div>
+                                            <h3 className="text-xl font-extrabold text-gray-900 tracking-tight">{l.title}</h3>
+                                            <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Preference Configuration</p>
+                                        </div>
+                                    </div>
+                                    <div className="space-y-6">
+                                        <div className="p-6 bg-surface-container-low rounded-xl border border-outline-variant flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 group/item hover:border-primary/20 transition-colors">
+                                            <div className="flex-1">
+                                                <p className="font-black text-gray-900 text-sm mb-1 uppercase tracking-wider">{l.appLang}</p>
+                                                <p className="text-[11px] text-gray-500 leading-relaxed font-bold uppercase tracking-widest opacity-60">{l.appLangDesc}</p>
+                                            </div>
+                                            <div className="relative shrink-0 w-full sm:w-auto">
+                                                <LanguageSwitcher className="!relative !flex-row !bottom-auto !right-auto" />
                                             </div>
                                         </div>
-
-                                        <Link
-                                            href="/pricing"
-                                            className="block w-full sm:w-auto sm:inline-block text-center bg-gray-900 text-white text-sm font-bold px-6 py-3 rounded-xl hover:bg-black transition-colors shadow-lg shadow-gray-200 mt-2"
-                                        >
-                                            Upgrade to Premium
-                                        </Link>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-
-                        {/* Settings Section */}
-                        <div className="mt-8 bg-white p-8 rounded-[2rem] border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300">
-                            <div className="flex justify-between items-center mb-8">
-                                <h3 className="text-lg font-extrabold text-gray-900 flex items-center gap-3">
-                                    <div className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center text-gray-500">
-                                        <FaCog />
-                                    </div>
-                                    {l.title}
-                                </h3>
-                            </div>
-                            <div className="space-y-4">
-                                <div className="p-6 bg-gradient-to-r from-gray-50 to-white rounded-2xl border border-gray-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 group hover:border-blue-100 transition-colors">
-                                    <div className="flex-1">
-                                        <p className="font-black text-gray-900 text-base mb-1 tracking-tight">{l.appLang}</p>
-                                        <p className="text-sm text-gray-500 leading-relaxed font-medium">{l.appLangDesc}</p>
-                                    </div>
-                                    <div className="relative shrink-0 w-full sm:w-auto">
-                                        {/* Embed Language Switcher Here */}
-                                        <LanguageSwitcher className="!relative !flex-row !bottom-auto !right-auto" />
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        {/* My Health Story Section */}
-                        {user?.profile?.storyDesc && (
-                            <div className="mt-8 bg-white p-8 rounded-3xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
-                                <div className="flex items-center gap-2 mb-4">
-                                    <div className="w-10 h-10 bg-[#7A8E6B]/10 rounded-full flex items-center justify-center text-[#7A8E6B]">
-                                        <FaStethoscope />
-                                    </div>
-                                    <h3 className="text-base font-bold text-gray-800">My Health Story</h3>
-                                </div>
-                                <div className="p-6 bg-[#7A8E6B]/5 rounded-xl border border-[#7A8E6B]/20">
-                                    <p className="text-gray-800 text-base leading-relaxed italic">
-                                        "{user.profile.storyDesc}"
-                                    </p>
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Saved Posts Section */}
-                        <div className="mt-8 bg-white p-8 rounded-3xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
-                            <div className="flex items-center justify-between mb-4">
-                                <div className="flex items-center gap-2">
-                                    <div className="w-10 h-10 bg-blue-50 rounded-full flex items-center justify-center text-blue-600">
+                        {/* Saved Posts / Bookmarks */}
+                        <div className="mt-16">
+                            <div className="flex items-center justify-between mb-8">
+                                <div className="flex items-center gap-4">
+                                    <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center text-xl shadow-sm border border-blue-100">
                                         <FaBookmark />
                                     </div>
-                                    <h3 className="text-base font-bold text-gray-800">Saved Articles</h3>
+                                    <div>
+                                        <h3 className="text-2xl font-extrabold text-gray-900 tracking-tight">Saved Insights</h3>
+                                        <p className="text-gray-500 text-[10px] font-bold uppercase tracking-widest">Your Curated Library</p>
+                                    </div>
                                 </div>
-                                {savedPosts.length > 3 && (
-                                    <Link href="/profile/saved-posts" className="text-sm font-semibold text-blue-600 hover:text-blue-700 hover:underline flex items-center gap-1">
-                                        View All <FaChevronRight className="text-xs" />
+                                {savedPosts.length > 4 && (
+                                    <Link href="/profile/saved-posts" className="bg-surface-container-low text-gray-600 hover:text-primary px-5 py-2.5 rounded-xl text-[10px] font-extrabold uppercase tracking-widest border border-outline-variant transition-all hover:scale-[1.02] flex items-center gap-2">
+                                        View Library <FaChevronRight size={10} />
                                     </Link>
                                 )}
                             </div>
 
                             {loadingSaved ? (
-                                <div className="text-center py-4 text-gray-500">Loading saved posts...</div>
+                                <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                                    {[1, 2, 3, 4].map(i => (
+                                        <div key={i} className="h-40 bg-gray-50 rounded-xl animate-pulse"></div>
+                                    ))}
+                                </div>
                             ) : savedPosts.length === 0 ? (
-                                <div className="text-center py-8 bg-gray-50 rounded-xl border border-dashed border-gray-200">
-                                    <p className="text-gray-500">You haven't saved any articles yet.</p>
-                                    <Link href="/insights" className="text-blue-600 font-medium hover:underline mt-2 inline-block">
-                                        Browse Health Insights
+                                <div className="text-center py-20 bg-surface-container-low rounded-xl border-2 border-dashed border-outline-variant">
+                                    <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm text-gray-300">
+                                        <FaBookmark size={24} />
+                                    </div>
+                                    <p className="text-gray-400 font-bold uppercase tracking-widest text-[10px] mb-4">No Saved Articles Yet</p>
+                                    <Link href="/insights" className="bg-primary text-white px-6 py-3 rounded-xl text-[10px] font-extrabold uppercase tracking-widest shadow-lg shadow-primary/20 hover:scale-[1.02] transition-all inline-block">
+                                        Explore Insights
                                     </Link>
                                 </div>
                             ) : (
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                                    {savedPosts.slice(0, 3).map((post) => (
-                                        <div key={post.savedPostId} className="border border-gray-100 rounded-xl p-4 hover:bg-gray-50 transition-colors flex gap-4">
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                                    {savedPosts.slice(0, 4).map((post) => (
+                                        <div key={post.savedPostId} className="group bg-white rounded-xl border border-outline-variant overflow-hidden hover:shadow-2xl hover:border-primary/20 transition-all">
                                             {post.imageUrl && (
-                                                <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
-                                                    <img src={post.imageUrl} alt={post.title} className="w-full h-full object-cover" />
+                                                <div className="h-40 overflow-hidden">
+                                                    <img src={post.imageUrl} alt={post.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                                                 </div>
                                             )}
-                                            <div className="flex-1 min-w-0">
-                                                <h4 className="font-bold text-gray-900 line-clamp-2 text-sm mb-1">{post.title}</h4>
-                                                <div className="flex justify-between items-center mt-2">
-                                                    <span className="text-xs text-gray-500">{new Date(post.savedAt).toLocaleDateString()}</span>
-                                                    <a href={post.url} target="_blank" rel="noopener noreferrer" className="text-xs font-medium text-blue-600 hover:underline">
-                                                        Read Article
+                                            <div className="p-6">
+                                                <h4 className="font-extrabold text-gray-900 text-sm mb-4 line-clamp-2 leading-tight group-hover:text-primary transition-colors">{post.title}</h4>
+                                                <div className="flex justify-between items-center">
+                                                    <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{new Date(post.savedAt).toLocaleDateString()}</span>
+                                                    <a href={post.url} target="_blank" rel="noopener noreferrer" className="text-[10px] font-extrabold text-primary uppercase tracking-[0.2em] flex items-center gap-1 group/link">
+                                                        Read <FaChevronRight size={8} className="group-hover/link:translate-x-1 transition-transform" />
                                                     </a>
                                                 </div>
                                             </div>
@@ -768,59 +779,69 @@ export default function Profile() {
 
                     {/* Share Modal */}
                     {showShareModal && (
-                        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-                            <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl transform transition-all scale-100">
-                                <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50 rounded-t-2xl">
-                                    <h3 className="text-xl font-bold text-gray-900">Share Profile</h3>
-                                    <button onClick={() => setShowShareModal(false)} className="text-gray-400 hover:text-gray-600">
-                                        <FaTimes className="text-xl" />
-                                    </button>
-                                </div>
-                                <div className="p-6 space-y-6">
-                                    <div className="space-y-2">
-                                        <label className="block text-sm font-semibold text-gray-700">Profile Link</label>
-                                        <div className="flex gap-2">
-                                            <input
-                                                type="text"
-                                                readOnly
-                                                value={`${typeof window !== 'undefined' ? window.location.origin : ''}/share/${(user as any)?._id || user?.id}`}
-                                                className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2 text-gray-600 text-sm focus:outline-none"
-                                            />
-                                            <button
-                                                onClick={copyToClipboard}
-                                                className="bg-[#7A8E6B] text-white px-4 py-2 rounded-lg font-semibold hover:bg-[#6a7d5d] transition-colors flex items-center gap-2 whitespace-nowrap"
-                                            >
-                                                {copySuccess ? <FaCheck /> : <FaShareAlt />}
-                                                {copySuccess ? 'Copied' : 'Copy'}
-                                            </button>
+                        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-gray-900/40 backdrop-blur-md animate-in fade-in duration-300">
+                            <div className="bg-white rounded-xl w-full max-w-md shadow-2xl overflow-hidden animate-in zoom-in-95 slide-in-from-bottom-10 duration-500 border border-outline-variant">
+                                <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-primary"></div>
+                                <div className="p-10">
+                                    <div className="flex justify-between items-start mb-8">
+                                        <div className="w-12 h-12 bg-primary/10 text-primary rounded-xl flex items-center justify-center text-xl border border-primary/10 shadow-sm">
+                                            <FaShareAlt />
                                         </div>
+                                        <button onClick={() => setShowShareModal(false)} className="p-2 text-gray-400 hover:text-primary transition-colors rounded-xl hover:bg-surface-container-low">
+                                            <FaTimes size={18} />
+                                        </button>
                                     </div>
 
-                                    <div className="pt-4 border-t border-gray-100 flex flex-col items-center">
-                                        {!showQR ? (
-                                            <button
-                                                onClick={() => setShowQR(true)}
-                                                className="text-[#7A8E6B] font-bold hover:underline flex items-center gap-2"
-                                            >
-                                                Generate QR Code
-                                            </button>
-                                        ) : (
-                                            <div className="flex flex-col items-center space-y-4 animation-fade-in">
-                                                <div className="p-4 bg-white rounded-xl shadow-lg border border-gray-100">
-                                                    <QRCodeCanvas
-                                                        value={`${typeof window !== 'undefined' ? window.location.origin : ''}/share/${(user as any)?._id || user?.id}`}
-                                                        size={200}
-                                                        level={"H"}
-                                                    />
-                                                </div>
+                                    <div className="mb-10 text-center">
+                                        <h3 className="text-2xl font-extrabold text-gray-900 mb-2 tracking-tight">Share Your Profile</h3>
+                                        <p className="text-gray-500 text-sm font-medium leading-relaxed">Provide external access to your clinical record and vitals.</p>
+                                    </div>
+
+                                    <div className="space-y-8">
+                                        <div className="space-y-3">
+                                            <label className="text-[10px] font-extrabold text-gray-400 uppercase tracking-widest">Identity Link</label>
+                                            <div className="flex gap-2 p-2 bg-surface-container-low rounded-xl border border-outline-variant">
+                                                <input
+                                                    type="text"
+                                                    readOnly
+                                                    value={`${typeof window !== 'undefined' ? window.location.origin : ''}/share/${(user as any)?._id || user?.id}`}
+                                                    className="flex-1 bg-transparent px-3 text-gray-600 text-xs font-bold font-mono focus:outline-none truncate"
+                                                />
                                                 <button
-                                                    onClick={() => setShowQR(false)}
-                                                    className="text-gray-400 text-sm hover:text-gray-600"
+                                                    onClick={copyToClipboard}
+                                                    className="bg-primary text-white px-5 py-2.5 rounded-lg font-extrabold text-[10px] uppercase tracking-widest shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all"
                                                 >
-                                                    Hide QR Code
+                                                    {copySuccess ? <FaCheck /> : 'Copy'}
                                                 </button>
                                             </div>
-                                        )}
+                                        </div>
+
+                                        <div className="pt-8 border-t border-outline-variant flex flex-col items-center">
+                                            {!showQR ? (
+                                                <button
+                                                    onClick={() => setShowQR(true)}
+                                                    className="text-primary font-extrabold text-[10px] uppercase tracking-[0.2em] hover:opacity-70 transition-opacity flex items-center gap-3"
+                                                >
+                                                    <FaQrcode size={14} /> Generate QR Identity
+                                                </button>
+                                            ) : (
+                                                <div className="flex flex-col items-center space-y-6 animate-in fade-in slide-in-from-top-4 duration-500">
+                                                    <div className="p-6 bg-white rounded-xl shadow-2xl border border-outline-variant">
+                                                        <QRCodeCanvas
+                                                            value={`${typeof window !== 'undefined' ? window.location.origin : ''}/share/${(user as any)?._id || user?.id}`}
+                                                            size={220}
+                                                            level={"H"}
+                                                        />
+                                                    </div>
+                                                    <button
+                                                        onClick={() => setShowQR(false)}
+                                                        className="text-gray-400 text-[10px] font-extrabold uppercase tracking-widest hover:text-red-500 transition-colors"
+                                                    >
+                                                        Hide QR Code
+                                                    </button>
+                                                </div>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -829,171 +850,180 @@ export default function Profile() {
 
                     {/* Edit Modal */}
                     {editSection && (
-                        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-                            <div className="bg-white rounded-2xl w-full max-w-lg shadow-2xl transform transition-all scale-100">
-                                <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50 rounded-t-2xl">
-                                    <h3 className="text-xl font-bold text-gray-900">
-                                        {editSection === 'personal' ? 'Edit Personal Information' :
-                                            editSection === 'health' ? 'Edit Health Profile' :
-                                                editSection === 'sos' ? (editingContactIndex !== null ? 'Edit Contact' : 'Add Contact') : ''}
-                                    </h3>
-                                    <button onClick={handleCloseModal} className="text-gray-400 hover:text-gray-600">
-                                        <FaTimes className="text-xl" />
-                                    </button>
-                                </div>
-
-                                <div className="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
-                                    {editSection === 'personal' && (
-                                        <div>
-                                            <label className="block text-sm font-semibold text-gray-700 mb-1">Full Name</label>
-                                            <input
-                                                type="text"
-                                                name="name"
-                                                value={formData.name}
-                                                onChange={handleInputChange}
-                                                className="w-full bg-white border border-gray-200 rounded-lg px-4 py-3 text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#7A8E6B]/50"
-                                            />
+                        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-gray-900/40 backdrop-blur-md animate-in fade-in duration-300">
+                            <div className="bg-white rounded-xl w-full max-w-lg shadow-2xl overflow-hidden animate-in zoom-in-95 slide-in-from-bottom-10 duration-500 border border-outline-variant">
+                                <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-primary"></div>
+                                <div className="p-10">
+                                    <div className="flex justify-between items-start mb-8">
+                                        <div className="w-12 h-12 bg-primary/10 text-primary rounded-xl flex items-center justify-center text-xl border border-primary/10 shadow-sm">
+                                            <FaEdit />
                                         </div>
-                                    )}
+                                        <button onClick={handleCloseModal} className="p-2 text-gray-400 hover:text-primary transition-colors rounded-xl hover:bg-surface-container-low">
+                                            <FaTimes size={18} />
+                                        </button>
+                                    </div>
 
-                                    {editSection === 'health' && (
-                                        <div className="grid grid-cols-2 gap-4">
-                                            <div className="col-span-1">
-                                                <label className="block text-sm font-semibold text-gray-700 mb-1">Age</label>
-                                                <input
-                                                    type="number"
-                                                    name="age"
-                                                    value={formData.age}
-                                                    onChange={handleInputChange}
-                                                    className="w-full bg-white border border-gray-200 rounded-lg px-4 py-3 text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#7A8E6B]/50"
-                                                />
-                                            </div>
-                                            <div className="col-span-1">
-                                                <label className="block text-sm font-semibold text-gray-700 mb-1">Gender</label>
-                                                <select
-                                                    name="gender"
-                                                    value={formData.gender}
-                                                    onChange={handleInputChange}
-                                                    className="w-full bg-white border border-gray-200 rounded-lg px-4 py-3 text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#7A8E6B]/50"
-                                                >
-                                                    <option value="">Select</option>
-                                                    <option value="male">Male</option>
-                                                    <option value="female">Female</option>
-                                                    <option value="other">Other</option>
-                                                </select>
-                                            </div>
-                                            <div className="col-span-1">
-                                                <label className="block text-sm font-semibold text-gray-700 mb-1">Height (cm)</label>
-                                                <input
-                                                    type="number"
-                                                    name="height"
-                                                    value={formData.height}
-                                                    onChange={handleInputChange}
-                                                    className="w-full bg-white border border-gray-200 rounded-lg px-4 py-3 text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#7A8E6B]/50"
-                                                />
-                                            </div>
-                                            <div className="col-span-1">
-                                                <label className="block text-sm font-semibold text-gray-700 mb-1">Weight (kg)</label>
-                                                <input
-                                                    type="number"
-                                                    name="weight"
-                                                    value={formData.weight}
-                                                    onChange={handleInputChange}
-                                                    className="w-full bg-white border border-gray-200 rounded-lg px-4 py-3 text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#7A8E6B]/50"
-                                                />
-                                            </div>
-                                            <div className="col-span-1">
-                                                <label className="block text-sm font-semibold text-gray-700 mb-1">Blood Type</label>
-                                                <select
-                                                    name="bloodGroup"
-                                                    value={formData.bloodGroup}
-                                                    onChange={handleInputChange}
-                                                    className="w-full bg-white border border-gray-200 rounded-lg px-4 py-3 text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#7A8E6B]/50"
-                                                >
-                                                    <option value="">Select</option>
-                                                    <option value="A+">A+</option>
-                                                    <option value="A-">A-</option>
-                                                    <option value="B+">B+</option>
-                                                    <option value="B-">B-</option>
-                                                    <option value="O+">O+</option>
-                                                    <option value="O-">O-</option>
-                                                    <option value="AB+">AB+</option>
-                                                    <option value="AB-">AB-</option>
-                                                </select>
-                                            </div>
-                                            <div className="col-span-2">
-                                                <label className="block text-sm font-semibold text-gray-700 mb-1">Chronic Conditions (comma separated)</label>
+                                    <div className="mb-10">
+                                        <h3 className="text-2xl font-extrabold text-gray-900 mb-2 tracking-tight">
+                                            {editSection === 'personal' ? 'Identify Record' :
+                                                editSection === 'health' ? 'Clinical Profile' :
+                                                    editSection === 'sos' ? (editingContactIndex !== null ? 'Secure Contact' : 'New Responder') : ''}
+                                        </h3>
+                                        <p className="text-gray-500 text-sm font-medium leading-relaxed">Ensure all parameters are current for accurate diagnostics.</p>
+                                    </div>
+
+                                    <div className="space-y-6 max-h-[50vh] overflow-y-auto px-1">
+                                        {editSection === 'personal' && (
+                                            <div className="space-y-2">
+                                                <label className="text-[10px] font-extrabold text-gray-400 uppercase tracking-widest">Full Legal Name</label>
                                                 <input
                                                     type="text"
-                                                    name="chronicConditions"
-                                                    value={formData.chronicConditions}
+                                                    name="name"
+                                                    value={formData.name}
                                                     onChange={handleInputChange}
-                                                    placeholder="Diabetes, Hypertension"
-                                                    className="w-full bg-white border border-gray-200 rounded-lg px-4 py-3 text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#7A8E6B]/50"
+                                                    className="w-full bg-surface-container-low border border-outline-variant rounded-xl px-5 py-4 text-gray-900 font-bold focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
                                                 />
                                             </div>
-                                        </div>
-                                    )}
-                                    {editSection === 'sos' && (
-                                        <div className="grid grid-cols-1 gap-4">
-                                            <div>
-                                                <label className="block text-sm font-semibold text-gray-700 mb-1">Contact Name *</label>
-                                                <input
-                                                    type="text"
-                                                    name="sosName"
-                                                    value={formData.sosName}
-                                                    onChange={handleInputChange}
-                                                    className="w-full bg-white border border-gray-200 rounded-lg px-4 py-3 text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#7A8E6B]/50"
-                                                />
-                                            </div>
-                                            <div>
-                                                <label className="block text-sm font-semibold text-gray-700 mb-1">Phone Number *</label>
-                                                <input
-                                                    type="tel"
-                                                    name="sosPhone"
-                                                    value={formData.sosPhone}
-                                                    onChange={handleInputChange}
-                                                    className="w-full bg-white border border-gray-200 rounded-lg px-4 py-3 text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#7A8E6B]/50"
-                                                />
-                                            </div>
-                                            <div>
-                                                <label className="block text-sm font-semibold text-gray-700 mb-1">Relationship</label>
-                                                <input
-                                                    type="text"
-                                                    name="sosRelation"
-                                                    value={formData.sosRelation}
-                                                    onChange={handleInputChange}
-                                                    placeholder="e.g. Spouse, Parent, Doctor"
-                                                    className="w-full bg-white border border-gray-200 rounded-lg px-4 py-3 text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#7A8E6B]/50"
-                                                />
-                                            </div>
-                                            <div>
-                                                <label className="block text-sm font-semibold text-gray-700 mb-1">Email (Optional)</label>
-                                                <input
-                                                    type="email"
-                                                    name="sosEmail"
-                                                    value={formData.sosEmail}
-                                                    onChange={handleInputChange}
-                                                    className="w-full bg-white border border-gray-200 rounded-lg px-4 py-3 text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#7A8E6B]/50"
-                                                />
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
+                                        )}
 
-                                <div className="p-6 border-t border-gray-100 flex justify-end gap-3 rounded-b-2xl bg-gray-50">
-                                    <button
-                                        onClick={handleCloseModal}
-                                        className="px-5 py-2.5 rounded-xl font-semibold text-gray-600 hover:bg-gray-200 transition-colors"
-                                    >
-                                        Cancel
-                                    </button>
-                                    <button
-                                        onClick={handleSave}
-                                        className="px-5 py-2.5 rounded-xl font-semibold bg-[#7A8E6B] text-white hover:bg-[#6a7d5d] shadow-md shadow-[#7A8E6B]/20 transition-all"
-                                    >
-                                        Save Changes
-                                    </button>
+                                        {editSection === 'health' && (
+                                            <div className="grid grid-cols-2 gap-6">
+                                                <div className="col-span-1 space-y-2">
+                                                    <label className="text-[10px] font-extrabold text-gray-400 uppercase tracking-widest">Age</label>
+                                                    <input
+                                                        type="number"
+                                                        name="age"
+                                                        value={formData.age}
+                                                        onChange={handleInputChange}
+                                                        className="w-full bg-surface-container-low border border-outline-variant rounded-xl px-5 py-4 text-gray-900 font-bold focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+                                                    />
+                                                </div>
+                                                <div className="col-span-1 space-y-2">
+                                                    <label className="text-[10px] font-extrabold text-gray-400 uppercase tracking-widest">Gender</label>
+                                                    <select
+                                                        name="gender"
+                                                        value={formData.gender}
+                                                        onChange={handleInputChange}
+                                                        className="w-full bg-surface-container-low border border-outline-variant rounded-xl px-5 py-4 text-gray-900 font-bold focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all appearance-none"
+                                                    >
+                                                        <option value="">Select</option>
+                                                        <option value="male">Male</option>
+                                                        <option value="female">Female</option>
+                                                        <option value="other">Other</option>
+                                                    </select>
+                                                </div>
+                                                <div className="col-span-1 space-y-2">
+                                                    <label className="text-[10px] font-extrabold text-gray-400 uppercase tracking-widest">Height (cm)</label>
+                                                    <input
+                                                        type="number"
+                                                        name="height"
+                                                        value={formData.height}
+                                                        onChange={handleInputChange}
+                                                        className="w-full bg-surface-container-low border border-outline-variant rounded-xl px-5 py-4 text-gray-900 font-bold focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+                                                    />
+                                                </div>
+                                                <div className="col-span-1 space-y-2">
+                                                    <label className="text-[10px] font-extrabold text-gray-400 uppercase tracking-widest">Weight (kg)</label>
+                                                    <input
+                                                        type="number"
+                                                        name="weight"
+                                                        value={formData.weight}
+                                                        onChange={handleInputChange}
+                                                        className="w-full bg-surface-container-low border border-outline-variant rounded-xl px-5 py-4 text-gray-900 font-bold focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+                                                    />
+                                                </div>
+                                                <div className="col-span-2 space-y-2">
+                                                    <label className="text-[10px] font-extrabold text-gray-400 uppercase tracking-widest">Blood Type</label>
+                                                    <select
+                                                        name="bloodGroup"
+                                                        value={formData.bloodGroup}
+                                                        onChange={handleInputChange}
+                                                        className="w-full bg-surface-container-low border border-outline-variant rounded-xl px-5 py-4 text-gray-900 font-bold focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all appearance-none"
+                                                    >
+                                                        <option value="">Select</option>
+                                                        {['A+', 'A-', 'B+', 'B-', 'O+', 'O-', 'AB+', 'AB-'].map(bg => (
+                                                            <option key={bg} value={bg}>{bg}</option>
+                                                        ))}
+                                                    </select>
+                                                </div>
+                                                <div className="col-span-2 space-y-2">
+                                                    <label className="text-[10px] font-extrabold text-gray-400 uppercase tracking-widest">Chronic Conditions</label>
+                                                    <input
+                                                        type="text"
+                                                        name="chronicConditions"
+                                                        value={formData.chronicConditions}
+                                                        onChange={handleInputChange}
+                                                        placeholder="e.g. Diabetes, Hypertension"
+                                                        className="w-full bg-surface-container-low border border-outline-variant rounded-xl px-5 py-4 text-gray-900 font-bold focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+                                                    />
+                                                    <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest px-2">Separate with commas</p>
+                                                </div>
+                                            </div>
+                                        )}
+                                        
+                                        {editSection === 'sos' && (
+                                            <div className="space-y-6">
+                                                <div className="space-y-2">
+                                                    <label className="text-[10px] font-extrabold text-gray-400 uppercase tracking-widest">Responder Identity</label>
+                                                    <input
+                                                        type="text"
+                                                        name="sosName"
+                                                        value={formData.sosName}
+                                                        onChange={handleInputChange}
+                                                        placeholder="Full Name"
+                                                        className="w-full bg-surface-container-low border border-outline-variant rounded-xl px-5 py-4 text-gray-900 font-bold focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+                                                    />
+                                                </div>
+                                                <div className="grid grid-cols-2 gap-6">
+                                                    <div className="space-y-2">
+                                                        <label className="text-[10px] font-extrabold text-gray-400 uppercase tracking-widest">Secure Phone</label>
+                                                        <input
+                                                            type="tel"
+                                                            name="sosPhone"
+                                                            value={formData.sosPhone}
+                                                            onChange={handleInputChange}
+                                                            className="w-full bg-surface-container-low border border-outline-variant rounded-xl px-5 py-4 text-gray-900 font-bold focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+                                                        />
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <label className="text-[10px] font-extrabold text-gray-400 uppercase tracking-widest">Relationship</label>
+                                                        <input
+                                                            type="text"
+                                                            name="sosRelation"
+                                                            value={formData.sosRelation}
+                                                            onChange={handleInputChange}
+                                                            className="w-full bg-surface-container-low border border-outline-variant rounded-xl px-5 py-4 text-gray-900 font-bold focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <label className="text-[10px] font-extrabold text-gray-400 uppercase tracking-widest">Email (Vault Only)</label>
+                                                    <input
+                                                        type="email"
+                                                        name="sosEmail"
+                                                        value={formData.sosEmail}
+                                                        onChange={handleInputChange}
+                                                        className="w-full bg-surface-container-low border border-outline-variant rounded-xl px-5 py-4 text-gray-900 font-bold focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+                                                    />
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    <div className="mt-10 pt-8 border-t border-outline-variant flex flex-col gap-3">
+                                        <button
+                                            onClick={handleSave}
+                                            className="w-full py-5 bg-gradient-primary text-white rounded-xl text-[10px] font-extrabold uppercase tracking-[0.2em] shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all"
+                                        >
+                                            Update Parameters
+                                        </button>
+                                        <button
+                                            onClick={handleCloseModal}
+                                            className="w-full py-4 text-gray-400 hover:text-gray-600 rounded-xl text-[10px] font-extrabold uppercase tracking-widest transition-colors"
+                                        >
+                                            Dismiss
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -1001,152 +1031,180 @@ export default function Profile() {
 
                     {/* Explain Yourself Modal */}
                     {showExplainModal && (
-                        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-                            <div className="bg-white rounded-2xl w-full max-w-2xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
-                                <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-[#7A8E6B] text-white">
-                                    <h3 className="text-xl font-bold flex items-center gap-2">
-                                        <FaStethoscope />
-                                        Explain Yourself
-                                    </h3>
-                                    <button onClick={closeExplainModal} className="text-white/80 hover:text-white">
-                                        <FaTimes className="text-xl" />
+                        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-gray-900/40 backdrop-blur-md animate-in fade-in duration-300">
+                            <div className="bg-white rounded-xl w-full max-w-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 slide-in-from-bottom-10 duration-500 border border-outline-variant flex flex-col max-h-[90vh]">
+                                <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-primary"></div>
+                                
+                                <div className="p-8 border-b border-outline-variant flex justify-between items-center">
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-10 h-10 bg-primary/10 text-primary rounded-xl flex items-center justify-center shadow-sm">
+                                            <FaStethoscope size={18} />
+                                        </div>
+                                        <div>
+                                            <h3 className="text-xl font-extrabold text-gray-900 tracking-tight">AI Diagnostic Interview</h3>
+                                            <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest">Personalized Health Narrative Engine</p>
+                                        </div>
+                                    </div>
+                                    <button onClick={closeExplainModal} className="p-2 text-gray-400 hover:text-primary transition-colors rounded-xl hover:bg-surface-container-low">
+                                        <FaTimes size={18} />
                                     </button>
                                 </div>
 
-                                <div className="p-8 overflow-y-auto flex-1">
+                                <div className="p-10 overflow-y-auto flex-1">
                                     {explainStep === 1 && (
-                                        <div className="space-y-6">
-                                            <div className="text-center">
-                                                <h4 className="text-2xl font-bold text-gray-800 mb-2">Do you have any chronic conditions?</h4>
-                                                <p className="text-gray-500">Select all that apply to you. This helps us personalize your health profile.</p>
+                                        <div className="space-y-10">
+                                            <div className="text-center max-w-md mx-auto">
+                                                <h4 className="text-3xl font-extrabold text-gray-900 mb-4 tracking-tight leading-tight">Documented Chronic Conditions</h4>
+                                                <p className="text-gray-500 font-medium leading-relaxed">Select all verified conditions to initialize the diagnostic protocol.</p>
                                             </div>
 
-                                            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                                            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                                                 {commonDiseases.map(disease => (
                                                     <button
                                                         key={disease}
                                                         onClick={() => handleDiseaseToggle(disease)}
-                                                        className={`p-4 rounded-xl border-2 transition-all flex items-center justify-center text-center font-medium ${selectedDiseases.includes(disease)
-                                                            ? 'border-[#7A8E6B] bg-[#7A8E6B]/10 text-[#7A8E6B]'
-                                                            : 'border-gray-100 hover:border-[#7A8E6B]/50 text-gray-600'
+                                                        className={`p-6 rounded-xl border-2 transition-all flex flex-col items-center justify-center text-center group ${selectedDiseases.includes(disease)
+                                                            ? 'border-primary bg-primary/5 text-primary'
+                                                            : 'border-outline-variant hover:border-primary/20 text-gray-600'
                                                             }`}
                                                     >
-                                                        {disease}
-                                                        {selectedDiseases.includes(disease) && <FaCheck className="ml-2 text-xs" />}
+                                                        <div className={`mb-3 w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${selectedDiseases.includes(disease) ? 'bg-primary text-white' : 'bg-gray-100 text-gray-400 group-hover:bg-primary/10 group-hover:text-primary'}`}>
+                                                            {selectedDiseases.includes(disease) ? <FaCheck size={12} /> : <FaBolt size={12} />}
+                                                        </div>
+                                                        <span className="text-xs font-bold uppercase tracking-widest">{disease}</span>
                                                     </button>
                                                 ))}
                                             </div>
 
-                                            <div className="flex justify-end pt-4">
+                                            <div className="flex justify-end pt-10">
                                                 <button
                                                     onClick={startQuestionnaire}
                                                     disabled={selectedDiseases.length === 0 || isAnalyzing}
-                                                    className="bg-[#7A8E6B] text-white px-8 py-3 rounded-xl font-bold hover:bg-[#6a7d5d] disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-all"
+                                                    className="bg-gradient-primary text-white px-10 py-5 rounded-xl text-[10px] font-extrabold uppercase tracking-[0.2em] shadow-xl shadow-primary/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-4 transition-all hover:scale-[1.02] active:scale-95"
                                                 >
-                                                    {isAnalyzing ? 'Generating...' : 'Next Step'}
-                                                    {!isAnalyzing && <FaChevronRight />}
+                                                    {isAnalyzing ? 'Initializing...' : 'Proceed to Interview'}
+                                                    {!isAnalyzing && <FaChevronRight size={12} className="opacity-50" />}
                                                 </button>
                                             </div>
                                         </div>
                                     )}
 
                                     {explainStep === 2 && questions.length > 0 && (
-                                        <div className="space-y-8">
-                                            <div className="text-center mb-6">
-                                                <h4 className="text-2xl font-bold text-gray-800">Tell us more about yourself</h4>
-                                                <p className="text-gray-500">Please answer the following questions to help us understand your lifestyle.</p>
+                                        <div className="space-y-12 pb-10">
+                                            <div className="text-center max-w-md mx-auto">
+                                                <h4 className="text-3xl font-extrabold text-gray-900 mb-4 tracking-tight leading-tight">Contextual Assessment</h4>
+                                                <p className="text-gray-500 font-medium leading-relaxed">Provide detailed responses for a high-fidelity health narrative.</p>
                                             </div>
 
-                                            <div className="space-y-6">
+                                            <div className="space-y-10">
                                                 {questions.map((q, index) => (
-                                                    <div key={index} className="bg-gray-50 p-6 rounded-xl border border-gray-100">
-                                                        <h5 className="text-lg font-bold text-gray-800 mb-4">
-                                                            {index + 1}. {q.question}
-                                                        </h5>
+                                                    <div key={index} className="space-y-6">
+                                                        <div className="flex items-start gap-6">
+                                                            <div className="w-10 h-10 bg-primary/5 text-primary rounded-xl flex items-center justify-center font-black text-xs shrink-0 border border-primary/10">
+                                                                {index + 1}
+                                                            </div>
+                                                            <h5 className="text-xl font-extrabold text-gray-900 tracking-tight leading-relaxed pt-1">
+                                                                {q.question}
+                                                            </h5>
+                                                        </div>
 
                                                         {q.type === 'mcq' && q.options ? (
-                                                            <div className="space-y-3">
+                                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pl-16">
                                                                 {q.options.map((option: string, optIdx: number) => (
                                                                     <button
                                                                         key={optIdx}
                                                                         onClick={() => handleAnswerChange(index, option)}
-                                                                        className={`w-full p-4 text-left rounded-xl border-2 transition-all ${q.ans === option
-                                                                            ? 'border-[#7A8E6B] bg-[#7A8E6B]/10 text-[#7A8E6B] font-semibold'
-                                                                            : 'border-gray-100 hover:border-[#7A8E6B]/50 text-gray-600'
+                                                                        className={`p-5 text-left rounded-xl border-2 transition-all font-bold text-xs uppercase tracking-widest ${q.ans === option
+                                                                            ? 'border-primary bg-primary/5 text-primary'
+                                                                            : 'border-outline-variant hover:border-primary/20 text-gray-600'
                                                                             }`}
                                                                     >
-                                                                        {option}
+                                                                        <div className="flex items-center gap-3">
+                                                                            <div className={`w-3 h-3 rounded-full border-2 ${q.ans === option ? 'bg-primary border-primary' : 'border-gray-200'}`}></div>
+                                                                            {option}
+                                                                        </div>
                                                                     </button>
                                                                 ))}
                                                             </div>
                                                         ) : (
-                                                            <textarea
-                                                                value={q.ans || ''}
-                                                                onChange={(e) => handleAnswerChange(index, e.target.value)}
-                                                                placeholder="Type your answer here..."
-                                                                className="w-full h-32 p-4 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#7A8E6B]/50 resize-none"
-                                                            ></textarea>
+                                                            <div className="pl-16">
+                                                                <textarea
+                                                                    value={q.ans || ''}
+                                                                    onChange={(e) => handleAnswerChange(index, e.target.value)}
+                                                                    placeholder="Describe in detail..."
+                                                                    className="w-full h-40 p-6 bg-surface-container-low border border-outline-variant rounded-xl text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all resize-none shadow-inner"
+                                                                ></textarea>
+                                                            </div>
                                                         )}
                                                     </div>
                                                 ))}
                                             </div>
 
-                                            <div className="bg-gray-50 p-6 rounded-xl border border-gray-100">
-                                                <h5 className="text-lg font-bold text-gray-800 mb-4">
-                                                    Anything else you'd like to share? (Optional)
+                                            <div className="pl-16 space-y-6">
+                                                <h5 className="text-xl font-extrabold text-gray-900 tracking-tight leading-relaxed">
+                                                    Clinical Addendum
                                                 </h5>
                                                 <textarea
                                                     value={additionalDetails}
                                                     onChange={(e) => setAdditionalDetails(e.target.value)}
-                                                    placeholder="Feel free to add any other details about your health, habits, or concerns..."
-                                                    className="w-full h-32 p-4 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#7A8E6B]/50 resize-none"
+                                                    placeholder="Add any other relevant medical context or specific habits..."
+                                                    className="w-full h-40 p-6 bg-surface-container-low border border-outline-variant rounded-xl text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all resize-none shadow-inner"
                                                 ></textarea>
                                             </div>
 
-                                            <div className="flex justify-end pt-4">
+                                            <div className="flex justify-end pt-10 pl-16">
                                                 <button
                                                     onClick={handleSubmitAll}
                                                     disabled={questions.some(q => !q.ans)}
-                                                    className="bg-[#7A8E6B] text-white px-8 py-3 rounded-xl font-bold hover:bg-[#6a7d5d] disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-all shadow-lg shadow-[#7A8E6B]/20"
+                                                    className="bg-gradient-primary text-white px-10 py-5 rounded-xl text-[10px] font-extrabold uppercase tracking-[0.2em] shadow-xl shadow-primary/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-4 transition-all hover:scale-[1.02] active:scale-95"
                                                 >
-                                                    Submit Analysis
-                                                    <FaChevronRight />
+                                                    Finalize Analysis
+                                                    <FaChevronRight size={12} className="opacity-50" />
                                                 </button>
                                             </div>
                                         </div>
                                     )}
 
                                     {explainStep === 3 && (
-                                        <div className="text-center space-y-6 py-8">
-                                            <div className="w-20 h-20 bg-[#7A8E6B]/10 rounded-full flex items-center justify-center mx-auto text-[#7A8E6B] text-4xl mb-4">
+                                        <div className="text-center space-y-10 py-10 max-w-xl mx-auto">
+                                            <div className="w-24 h-24 bg-primary/10 text-primary rounded-full flex items-center justify-center mx-auto text-4xl shadow-xl shadow-primary/5 animate-in zoom-in-50 duration-700">
                                                 <FaCheck />
                                             </div>
-                                            <h4 className="text-3xl font-bold text-gray-800">Analysis Complete!</h4>
-                                            <p className="text-gray-600 max-w-md mx-auto">
-                                                We've analyzed your lifestyle and health profile. Here is your personalized health story:
-                                            </p>
+                                            <div>
+                                                <h4 className="text-4xl font-extrabold text-gray-900 mb-4 tracking-tight leading-tight">Narrative Synopsized</h4>
+                                                <p className="text-gray-500 font-medium leading-relaxed">The AI has generated your clinical story based on the provided parameters.</p>
+                                            </div>
 
-                                            <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100 text-left shadow-inner">
-                                                <p className="text-gray-800 leading-relaxed italic">
+                                            <div className="p-10 bg-primary/5 rounded-xl border border-primary/10 text-left relative overflow-hidden group">
+                                                <div className="absolute top-0 right-0 p-4 opacity-5">
+                                                    <FaBolt size={60} />
+                                                </div>
+                                                <p className="text-gray-800 text-xl leading-relaxed italic font-medium opacity-90 relative z-10">
                                                     "{analysisResult}"
                                                 </p>
                                             </div>
 
                                             <button
                                                 onClick={closeExplainModal}
-                                                className="bg-[#7A8E6B] text-white px-8 py-3 rounded-xl font-bold hover:bg-[#6a7d5d] shadow-lg shadow-[#7A8E6B]/20 transition-all"
+                                                className="bg-gradient-primary text-white px-12 py-5 rounded-xl text-[10px] font-extrabold uppercase tracking-[0.2em] shadow-xl shadow-primary/20 transition-all hover:scale-[1.02] active:scale-95"
                                             >
-                                                Go to Profile
+                                                Return to Profile
                                             </button>
                                         </div>
                                     )}
 
                                     {isAnalyzing && (
-                                        <div className="absolute inset-0 bg-white/80 backdrop-blur-sm flex flex-col items-center justify-center z-10">
-                                            <div className="w-16 h-16 border-4 border-[#7A8E6B]/30 border-t-[#7A8E6B] rounded-full animate-spin mb-4"></div>
-                                            <p className="text-[#7A8E6B] font-bold animate-pulse">
-                                                {explainStep === 1 ? 'Generating personalized questions...' : 'Analyzing your health profile...'}
-                                            </p>
+                                        <div className="absolute inset-0 bg-white/90 backdrop-blur-md flex flex-col items-center justify-center z-50 animate-in fade-in duration-300">
+                                            <div className="relative">
+                                                <div className="w-24 h-24 border-4 border-primary/10 border-t-primary rounded-full animate-spin"></div>
+                                                <FaBolt className="absolute inset-0 m-auto text-primary animate-pulse" size={24} />
+                                            </div>
+                                            <div className="mt-8 text-center">
+                                                <p className="text-primary font-black uppercase tracking-[0.3em] text-[10px]">
+                                                    {explainStep === 1 ? 'Constructing Interview' : 'Synthesizing Narrative'}
+                                                </p>
+                                                <p className="text-gray-400 text-[10px] font-bold uppercase tracking-widest mt-2 animate-pulse">Running Clinical Models</p>
+                                            </div>
                                         </div>
                                     )}
                                 </div>
