@@ -1,4 +1,4 @@
-# Data Flow Diagram - LifeDoc
+# Data Flow Diagram - SwasthyaSaathi
 
 > Level-0 and Level-1 Data Flow Diagrams (Textual Representation)
 
@@ -8,7 +8,7 @@
 
 ### Overview
 
-The Level-0 DFD shows the LifeDoc system as a single process with external entities (actors) and data flows between them.
+The Level-0 DFD shows the SwasthyaSaathi system as a single process with external entities (actors) and data flows between them.
 
 ```
 ┌─────────────┐                                      ┌─────────────┐
@@ -23,7 +23,7 @@ The Level-0 DFD shows the LifeDoc system as a single process with external entit
        ▼                                                    ▼
 ┌──────────────────────────────────────────────────────────────────┐
 │                                                                  │
-│                          LIFEDOC                                 │
+│                          SWASTHYASAATHI                                 │
 │           AI-Powered Family Health Management System             │
 │                                                                  │
 └──────────────────────────────────────────────────────────────────┘
@@ -756,5 +756,5 @@ This Data Flow Diagram demonstrates:
 
 **Document Version:** 1.0  
 **Last Updated:** January 11, 2026  
-**Author:** LifeDoc Development Team  
+**Author:** SwasthyaSaathi Development Team  
 **Status:** ✅ Production Ready

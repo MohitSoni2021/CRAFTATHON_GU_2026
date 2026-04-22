@@ -87,7 +87,7 @@ export default function OnboardingTour({ isNewUser, userId }: OnboardingTourProp
         {
             target: 'body',
             placement: 'center',
-            title: 'Welcome to LifeDoc! 👋',
+            title: 'Welcome to SwasthyaSaathi! 👋',
             content: 'Let us take you through a quick tour of your new Health Companion. We will explain what each feature does.',
             disableBeacon: true,
         },

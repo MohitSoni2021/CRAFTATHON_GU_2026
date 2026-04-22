@@ -40,8 +40,8 @@ export default function ForgotPassword() {
       {/* Header */}
       <div className="absolute top-0 left-0 right-0 p-6 flex justify-between items-center">
         <div className="flex items-center gap-2">
-          <div className="text-2xl font-bold text-gray-900">Life</div>
-          <div className="text-2xl font-bold text-emerald-600">Doc</div>
+          <div className="text-2xl font-bold text-gray-900">Swasthya</div>
+          <div className="text-2xl font-bold text-emerald-600">Saathi</div>
         </div>
         <button className="text-gray-600 hover:text-gray-900 text-sm font-medium">
           EN ▼
@@ -99,7 +99,7 @@ export default function ForgotPassword() {
 
             {/* Footer */}
             <div className="text-center text-gray-500 text-xs mt-12">
-              <p>Need assistance? <a href="mailto:support@lifedoc.com" className="text-emerald-600 hover:text-emerald-700">support@lifedoc.com</a></p>
+              <p>Need assistance? <a href="mailto:support@swasthyasaathi.com" className="text-emerald-600 hover:text-emerald-700">support@swasthyasaathi.com</a></p>
             </div>
           </div>
         </div>

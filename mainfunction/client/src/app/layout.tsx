@@ -5,7 +5,7 @@ import { ReduxProvider } from "@/store/ReduxProvider";
 import ActionDock from "@/components/ActionDock";
 
 export const metadata: Metadata = {
-  title: "LifeDoc - Your Health Documentation",
+  title: "SwasthyaSaathi - Your Health Documentation",
   description: "Create, organize, and share your medical records",
   icons: {
     icon: '/favicon.ico',

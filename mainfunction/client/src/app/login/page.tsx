@@ -66,8 +66,8 @@ export default function Login() {
       {/* Header */}
       <div className="absolute top-0 left-0 right-0 p-6 flex justify-between items-center">
         <div className="flex items-center gap-2">
-          <div className="text-2xl font-bold text-gray-900">Life</div>
-          <div className="text-2xl font-bold text-emerald-600">Doc</div>
+          <div className="text-2xl font-bold text-gray-900">Swasthya</div>
+          <div className="text-2xl font-bold text-emerald-600">Saathi</div>
         </div>
         <button className="text-gray-600 hover:text-gray-900 text-sm font-medium">
           EN ▼
@@ -155,10 +155,10 @@ export default function Login() {
             <div className="text-center text-gray-500 text-xs mt-12">
               Need help?{' '}
               <a
-                href="mailto:support@lifedoc.com"
+                href="mailto:support@swasthyasaathi.com"
                 className="text-emerald-600 hover:text-emerald-700"
               >
-                support@lifedoc.com
+                support@swasthyasaathi.com
               </a>
             </div>
           </div>
@@ -168,7 +168,7 @@ export default function Login() {
         <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-gray-100">
           <img
             src="https://res.cloudinary.com/dzsvjyg2c/image/upload/v1766864239/Gemini_Generated_Image_7tp4m87tp4m87tp4_o2zzbs.png"
-            alt="LifeDoc Medical Professionals"
+            alt="SwasthyaSaathi Medical Professionals"
             className="absolute inset-0 w-full h-full object-cover"
           />
 

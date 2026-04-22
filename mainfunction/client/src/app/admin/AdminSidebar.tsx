@@ -18,7 +18,7 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
                     </div>
                     <span className="font-black text-base tracking-tight">Admin Panel</span>
                 </div>
-                <p className="text-gray-500 text-[9px] font-bold uppercase tracking-widest ml-11">LifeDoc Control Center</p>
+                <p className="text-gray-500 text-[9px] font-bold uppercase tracking-widest ml-11">SwasthyaSaathi Control Center</p>
             </div>
 
             <div className="mb-8 p-4 bg-white/5 rounded-xl border border-white/10">

@@ -1,4 +1,4 @@
-# 📡 LifeDoc API Documentation
+# 📡 SwasthyaSaathi API Documentation
 
 Complete reference for all API endpoints, authentication, request/response formats, and error handling.
 
@@ -31,7 +31,7 @@ Complete reference for all API endpoints, authentication, request/response forma
 
 ```
 Development: http://localhost:5000/api
-Production: https://api.lifedoc.app/api
+Production: https://api.swasthyasaathi.app/api
 ```
 
 ---
@@ -1429,15 +1429,15 @@ Receive real-time notifications for critical events.
 ### JavaScript/TypeScript
 
 ```bash
-npm install @lifedoc/api-client
+npm install @swasthyasaathi/api-client
 ```
 
 ```typescript
-import { LifeDocClient } from '@lifedoc/api-client';
+import { SwasthyaSaathiClient } from '@swasthyasaathi/api-client';
 
-const client = new LifeDocClient({
+const client = new SwasthyaSaathiClient({
   apiKey: 'your_jwt_token',
-  baseURL: 'https://api.lifedoc.app'
+  baseURL: 'https://api.swasthyasaathi.app'
 });
 
 // Example: Get measurements
@@ -1453,7 +1453,7 @@ const measurements = await client.measurements.list({
 
 Import our Postman collection for easy API testing:
 
-**Collection URL:** `https://www.postman.com/lifedoc/collection`
+**Collection URL:** `https://www.postman.com/swasthyasaathi/collection`
 
 **Environment Variables:**
 ```
@@ -1481,8 +1481,8 @@ token: <your_jwt_token>
 
 ## Support & Feedback
 
-- **API Issues**: [GitHub Issues](https://github.com/your-username/lifedoc/issues)
-- **Email**: api-support@lifedoc.app
+- **API Issues**: [GitHub Issues](https://github.com/your-username/swasthyasaathi/issues)
+- **Email**: api-support@swasthyasaathi.app
 - **Documentation**: [Main README](README.md)
 
 ---

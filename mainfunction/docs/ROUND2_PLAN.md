@@ -1,14 +1,14 @@
 # Round 2: "The Slingshot" - Roadmap & Improvements
 
 ## Overview
-Based on the success of our Round 1 Prototype, we have developed a comprehensive "Slingshot" strategy to scale LifeDoc into a production-grade Family Health Ecosystem. This document details the **8 Core Innovations** we will build in Round 2.
+Based on the success of our Round 1 Prototype, we have developed a comprehensive "Slingshot" strategy to scale SwasthyaSaathi into a production-grade Family Health Ecosystem. This document details the **8 Core Innovations** we will build in Round 2.
 
 ---
 
 ## 🚀 Phase 1: Critical Care & Safety 
 
 ### 1. 🚨 Emergency SOS Network
-> *In a cardiac event, every minute lost kills heart muscle. LifeDoc bridges the gap between collapse and care.*
+> *In a cardiac event, every minute lost kills heart muscle. SwasthyaSaathi bridges the gap between collapse and care.*
 
 *   **The Concept:** A one-tap panic button that triggers a cascade of automated alerts.
 *   **Why It's Critical:** Elderly patients often live alone or cannot speak during a stroke/heart attack. A simple phone call is too slow.
@@ -24,7 +24,7 @@ Based on the success of our Round 1 Prototype, we have developed a comprehensive
 *   **The Concept:** Seamless forwarding of AI-digitized prescriptions to hyper-local pharmacies.
 *   **Why It's Critical:** Sick patients should not be standing in queues. Hand-written prescriptions are often misread by pharmacists.
 *   **Technical Implementation:**
-    *   **Partner App:** A simple "LifeDoc for Pharmacists" web dashboard.
+    *   **Partner App:** A simple "SwasthyaSaathi for Pharmacists" web dashboard.
     *   **Logic:** When a user scans a prescription, they select "Order Medicines". The JSON data is sent to the nearest verified pharmacy node via **Geospatial MongoDB Queries**.
     *   **Status Tracking:** Real-time updates (Order Received -> Out for Delivery).
 
@@ -34,7 +34,7 @@ Based on the success of our Round 1 Prototype, we have developed a comprehensive
 *   **The Concept:** A complete Hands-Free mode where the entire app can be navigated via voice.
 *   **Why It's Critical:** Arthritis, Parkinson's, and poor vision make touchscreens nearly impossible for many seniors.
 *   **Technical Implementation:**
-    *   **Wake Word:** "Hey LifeDoc" activation using specialized lightweight models (TensorFlow Lite).
+    *   **Wake Word:** "Hey SwasthyaSaathi" activation using specialized lightweight models (TensorFlow Lite).
     *   **Natural Language Understanding:** Integration with **Web Speech API** for command parsing ("Log my sugar as 140", "Read my latest report").
     *   **Feedback:** The app replies with high-contrast UI updates and audio confirmation.
 
@@ -106,4 +106,4 @@ Based on the success of our Round 1 Prototype, we have developed a comprehensive
 *   **Improvement:** Redis caching for common symptom queries (e.g., "Flu symptoms" doesn't need a fresh AI call every time).
 
 ---
-*LifeDoc R&D Team - Round 2 Strategy*
+*SwasthyaSaathi R&D Team - Round 2 Strategy*

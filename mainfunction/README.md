@@ -1,4 +1,4 @@
-# 🏥 LifeDoc: AI-Powered Family Health Guardian
+# 🏥 SwasthyaSaathi: AI-Powered Family Health Guardian
 
 <div align="center">
 
@@ -10,7 +10,7 @@
 
 **Comprehensive AI-powered healthcare platform featuring symptom analysis, prescription digitization, family health monitoring, and intelligent medical insights.**
 
-[Live Demo](https://lifedoc.vercel.app) • [Documentation](#-api-documentation) • [Report Bug](#) • [Request Feature](#)
+[Live Demo](https://swasthyasaathi.vercel.app) • [Documentation](#-api-documentation) • [Report Bug](#) • [Request Feature](#)
 
 </div>
 
@@ -39,7 +39,7 @@
 
 ## 📖 Overview
 
-**LifeDoc** is a next-generation healthcare management platform that transforms how families manage their health data. By combining advanced AI (Google Gemini, OpenAI Vision), intelligent document processing, and family-centric features, LifeDoc bridges the gap between complex medical information and actionable health insights.
+**SwasthyaSaathi** is a next-generation healthcare management platform that transforms how families manage their health data. By combining advanced AI (Google Gemini, OpenAI Vision), intelligent document processing, and family-centric features, SwasthyaSaathi bridges the gap between complex medical information and actionable health insights.
 
 ### 🎯 Core Value Proposition
 
@@ -145,7 +145,7 @@
 
 ## 🏗️ System Architecture
 
-LifeDoc follows a modern **3-tier client-server architecture** with clear separation of concerns, microservice-ready design patterns, and scalable infrastructure.
+SwasthyaSaathi follows a modern **3-tier client-server architecture** with clear separation of concerns, microservice-ready design patterns, and scalable infrastructure.
 
 ```mermaid
 graph TB
@@ -470,7 +470,7 @@ graph LR
 
 ```mermaid
 graph TD
-    Start([User Visits LifeDoc]) --> Auth{Authenticated?}
+    Start([User Visits SwasthyaSaathi]) --> Auth{Authenticated?}
     
     Auth -->|No| Signup[Sign Up / Login]
     Auth -->|Yes| Dashboard[Dashboard]
@@ -751,7 +751,7 @@ graph TB
 
 ## 👥 User Roles
 
-LifeDoc implements a role-based access control (RBAC) system with three primary user types and five family role levels.
+SwasthyaSaathi implements a role-based access control (RBAC) system with three primary user types and five family role levels.
 
 ```mermaid
 graph TD
@@ -875,9 +875,9 @@ graph TD
 
 ---
 
-## 📡 LifeDoc API Documentation
+## 📡 SwasthyaSaathi API Documentation
 
-Complete API reference for LifeDoc healthcare platform. All endpoints follow RESTful conventions with JWT authentication.
+Complete API reference for SwasthyaSaathi healthcare platform. All endpoints follow RESTful conventions with JWT authentication.
 
 ---
 
@@ -886,7 +886,7 @@ Complete API reference for LifeDoc healthcare platform. All endpoints follow RES
 
 ```
 Development: http://localhost:5000/api
-Production:  https://api.lifedoc.app/api
+Production:  https://api.swasthyasaathi.app/api
 ```
 
 ---
@@ -1451,15 +1451,15 @@ Most GET endpoints support these query parameters:
 ### JavaScript/TypeScript
 
 ```bash
-npm install @lifedoc/api-client
+npm install @swasthyasaathi/api-client
 ```
 
 ```typescript
-import { LifeDocClient } from '@lifedoc/api-client';
+import { SwasthyaSaathiClient } from '@swasthyasaathi/api-client';
 
-const client = new LifeDocClient({
+const client = new SwasthyaSaathiClient({
   apiKey: 'your_jwt_token',
-  baseURL: 'https://api.lifedoc.app'
+  baseURL: 'https://api.swasthyasaathi.app'
 });
 
 // Get measurements
@@ -1475,7 +1475,7 @@ const data = await client.measurements.list({
 
 ### Postman Collection
 
-Import collection: `https://www.postman.com/lifedoc/collection`
+Import collection: `https://www.postman.com/swasthyasaathi/collection`
 
 ### cURL Examples
 
@@ -1518,7 +1518,7 @@ curl -X POST http://localhost:5000/api/measurements \
 ## 📂 Project Structure
 
 ```
-lifedoc/
+swasthyasaathi/
 ├── client/                          # Frontend (Next.js 16)
 │   ├── src/
 │   │   ├── app/                     # Next.js App Router Pages
@@ -1825,7 +1825,7 @@ docker-compose logs -f
 
 ```bash
 # Clone repository
-git clone https://github.com/your-username/lifedoc.git
+git clone https://github.com/your-username/swasthyasaathi.git
 
 # Create feature branch
 git checkout -b feature/new-feature
@@ -1856,8 +1856,8 @@ git push origin feature/new-feature
 #### 1. Clone Repository
 
 ```bash
-git clone https://github.com/your-username/lifedoc.git
-cd lifedoc
+git clone https://github.com/your-username/swasthyasaathi.git
+cd swasthyasaathi
 ```
 
 #### 2. Backend Setup
@@ -1903,7 +1903,7 @@ SERVER_PORT=5000
 NODE_ENV=development
 
 # Database
-MONGODB_URI=mongodb://localhost:27017/lifedoc
+MONGODB_URI=mongodb://localhost:27017/swasthyasaathi
 
 # Security
 JWT_SECRET=your_super_secret_jwt_key_minimum_32_characters
@@ -1969,7 +1969,7 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 |----------|----------|-------------|---------|
 | `SERVER_PORT` | Yes | Backend port | `5000` |
 | `NODE_ENV` | Yes | Environment | `development` |
-| `MONGODB_URI` | Yes | MongoDB connection | `mongodb://localhost:27017/lifedoc` |
+| `MONGODB_URI` | Yes | MongoDB connection | `mongodb://localhost:27017/swasthyasaathi` |
 | `JWT_SECRET` | Yes | JWT secret key (32+ chars) | `your_secret_key` |
 | `GEMINI_API_KEY` | Yes | Google Gemini API key | `AIza...` |
 | `OPENAI_API_KEY` | Optional | OpenAI Vision API key | `sk-...` |
@@ -2022,7 +2022,7 @@ echo ".env.local" >> client/.gitignore
 ### 🚧 In Progress (Phase 2 - Q1 2026)
 
 - [ ] **Voice-First Interface**
-  - Wake word activation ("Hey LifeDoc")
+  - Wake word activation ("Hey SwasthyaSaathi")
   - Voice commands for hands-free navigation
   - Text-to-speech for elderly users
 
@@ -2103,7 +2103,7 @@ echo ".env.local" >> client/.gitignore
 ### 💡 Feature Requests
 
 We welcome feature suggestions! Please:
-1. Check existing [GitHub Issues](https://github.com/your-username/lifedoc/issues)
+1. Check existing [GitHub Issues](https://github.com/your-username/swasthyasaathi/issues)
 2. Open a new issue with `[Feature Request]` tag
 3. Describe the feature and its benefits
 4. Community voting determines priority
@@ -2118,8 +2118,8 @@ We welcome contributions from the community! Here's how you can help:
 
 1. **Fork the Repository**
    ```bash
-   git clone https://github.com/your-username/lifedoc.git
-   cd lifedoc
+   git clone https://github.com/your-username/swasthyasaathi.git
+   cd swasthyasaathi
    ```
 
 2. **Create a Feature Branch**
@@ -2183,7 +2183,7 @@ This project is licensed under the **MIT License**.
 ```
 MIT License
 
-Copyright (c) 2024 LifeDoc
+Copyright (c) 2024 SwasthyaSaathi
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -2206,7 +2206,7 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
 
 **IMPORTANT: This application is for informational purposes only.**
 
-- LifeDoc is **NOT** a replacement for professional medical advice, diagnosis, or treatment
+- SwasthyaSaathi is **NOT** a replacement for professional medical advice, diagnosis, or treatment
 - Always consult qualified healthcare professionals for medical concerns
 - AI-generated health insights are **suggestions only**, not medical diagnoses
 - In case of emergency, contact local emergency services immediately (911 in US, 112 in EU, 108 in India)
@@ -2229,10 +2229,10 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
 
 ## 📧 Contact & Support
 
-- **GitHub Issues**: [Report Bug or Request Feature](https://github.com/your-username/lifedoc/issues)
-- **GitHub Discussions**: [Community Forum](https://github.com/your-username/lifedoc/discussions)
-- **Email**: support@lifedoc.app
-- **Twitter**: [@LifeDocApp](https://twitter.com/lifedocapp)
+- **GitHub Issues**: [Report Bug or Request Feature](https://github.com/your-username/swasthyasaathi/issues)
+- **GitHub Discussions**: [Community Forum](https://github.com/your-username/swasthyasaathi/discussions)
+- **Email**: support@swasthyasaathi.app
+- **Twitter**: [@SwasthyaSaathiApp](https://twitter.com/swasthyasaathiapp)
 - **Documentation**: [Full API Docs](#-api-documentation)
 
 ---
@@ -2243,7 +2243,7 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
 
 ⭐ **Star this repo if you found it helpful!** ⭐
 
-[View Demo](https://lifedoc.vercel.app) • [Read Docs](#-api-documentation) • [Join Community](https://github.com/your-username/lifedoc/discussions)
+[View Demo](https://swasthyasaathi.vercel.app) • [Read Docs](#-api-documentation) • [Join Community](https://github.com/your-username/swasthyasaathi/discussions)
 
 **Hack The Winter: The Second Wave (Angry Bird Edition)**  
 **Track:** Health & Wellness | **Team Name:** TechBytes

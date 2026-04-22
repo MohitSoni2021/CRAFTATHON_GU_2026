@@ -1,6 +1,6 @@
-# System Flow Documentation - LifeDoc
+# System Flow Documentation - SwasthyaSaathi
 
-> Complete end-to-end system flows, user journeys, and process workflows for LifeDoc healthcare management platform
+> Complete end-to-end system flows, user journeys, and process workflows for SwasthyaSaathi healthcare management platform
 
 ---
 
@@ -20,7 +20,7 @@
 
 ## Overview
 
-LifeDoc is a comprehensive healthcare management system that enables patients to track health records, consult AI-powered symptom analysis, manage family health data, and access emergency services. This document details all major system workflows from user registration to complex health data processing.
+SwasthyaSaathi is a comprehensive healthcare management system that enables patients to track health records, consult AI-powered symptom analysis, manage family health data, and access emergency services. This document details all major system workflows from user registration to complex health data processing.
 
 ### Document Purpose
 
@@ -52,7 +52,7 @@ This system flow documentation serves multiple critical purposes:
 
 ### Technology Stack Context
 
-LifeDoc leverages modern healthcare technology stack:
+SwasthyaSaathi leverages modern healthcare technology stack:
 
 | Layer | Technologies | Purpose |
 |-------|-------------|----------|
@@ -229,7 +229,7 @@ stateDiagram-v2
 
 **Implementation Best Practices:**
 
-**Email Deliverability**: LifeDoc uses SMTP with SPF, DKIM, and DMARC authentication to ensure high email deliverability rates (>95%) and prevent spam filtering. Fallback to SMS OTP available for email delivery failures.
+**Email Deliverability**: SwasthyaSaathi uses SMTP with SPF, DKIM, and DMARC authentication to ensure high email deliverability rates (>95%) and prevent spam filtering. Fallback to SMS OTP available for email delivery failures.
 
 **Cryptographic Randomness**: OTPs generated using Node.js crypto.randomInt() with cryptographically secure pseudorandom number generator (CSPRNG), ensuring unpredictability and preventing brute force attacks.
 
@@ -289,7 +289,7 @@ flowchart TD
 
 **Security Implementation:**
 
-LifeDoc implements multiple layers of authentication security:
+SwasthyaSaathi implements multiple layers of authentication security:
 
 1. **Token Security**: JWT tokens use RS256 signing algorithm with rotating secret keys stored in environment variables, preventing token forgery and ensuring cryptographic integrity.
 
@@ -974,7 +974,7 @@ sequenceDiagram
 
 Please check on them immediately or call emergency services.
 
-This is an automated alert from LifeDoc Health System.
+This is an automated alert from SwasthyaSaathi Health System.
 ```
 
 **Emergency Response System Design:**
@@ -1642,7 +1642,7 @@ stateDiagram-v2
 
 ## Conclusion
 
-This document provides comprehensive system flow documentation for LifeDoc healthcare management platform. Each flow is designed for:
+This document provides comprehensive system flow documentation for SwasthyaSaathi healthcare management platform. Each flow is designed for:
 
 - **User Experience**: Intuitive workflows with clear feedback
 - **Data Security**: HIPAA-aware privacy protection
@@ -1758,7 +1758,7 @@ This system flow documentation is a living document. To contribute:
 
 **Document Version**: 1.0  
 **Last Updated**: January 11, 2026  
-**Maintained By**: LifeDoc Development Team  
+**Maintained By**: SwasthyaSaathi Development Team  
 **Related Documentation**: [ARCHITECTURE.md](ARCHITECTURE.md), [API_ENDPOINTS.md](API_ENDPOINTS.md), [DFD.md](DFD.md)
 
 For technical implementation details, see [docs/TECHNICAL_FLOWS.md](docs/TECHNICAL_FLOWS.md)

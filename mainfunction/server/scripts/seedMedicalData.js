@@ -176,7 +176,7 @@ dotenv.config({ path: path.join(__dirname, '../.env') });
 
 const seedDB = async () => {
     try {
-        await mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost:27017/lifedoc");
+        await mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost:27017/swasthyasaathi");
         console.log('MongoDB Connected for seeding');
 
         // Clear existing reference data

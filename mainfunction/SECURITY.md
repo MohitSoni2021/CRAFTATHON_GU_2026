@@ -2,7 +2,7 @@
 
 ## Our Commitment
 
-LifeDoc handles highly sensitive Protected Health Information (PHI) and personal medical data. We take security extraordinarily seriously and are committed to ensuring the safety, privacy, and confidentiality of patient health information. This document outlines our security practices, compliance measures, and how to report vulnerabilities.
+SwasthyaSaathi handles highly sensitive Protected Health Information (PHI) and personal medical data. We take security extraordinarily seriously and are committed to ensuring the safety, privacy, and confidentiality of patient health information. This document outlines our security practices, compliance measures, and how to report vulnerabilities.
 
 **Security is not just a feature—it's the foundation of trust in healthcare technology.**
 
@@ -101,7 +101,7 @@ We provide security updates and patches for the following versions:
       styleSrc: ["'self'", "'unsafe-inline'"],
       scriptSrc: ["'self'"],
       imgSrc: ["'self'", "https://res.cloudinary.com"],
-      connectSrc: ["'self'", "https://api.lifedoc.com"]
+      connectSrc: ["'self'", "https://api.swasthyasaathi.com"]
     }
   },
   hsts: {
@@ -245,7 +245,7 @@ We provide security updates and patches for the following versions:
 
 ## Reporting a Vulnerability
 
-We deeply appreciate the security community's efforts in keeping LifeDoc secure. Patient safety depends on robust security.
+We deeply appreciate the security community's efforts in keeping SwasthyaSaathi secure. Patient safety depends on robust security.
 
 ### ⚠️ Critical: DO NOT Report Publicly
 
@@ -259,12 +259,12 @@ We deeply appreciate the security community's efforts in keeping LifeDoc secure.
    - Navigate to: `Security` tab → `Report a vulnerability`
    - Private, encrypted communication with maintainers
 
-2. **Email**: security@lifedoc.example.com
+2. **Email**: security@swasthyasaathi.example.com
    - Use PGP encryption for sensitive reports (key below)
    - Include "SECURITY VULNERABILITY" in subject line
 
 3. **Anonymous Reporting**
-   - Use secure form: https://lifedoc.example.com/security-report
+   - Use secure form: https://swasthyasaathi.example.com/security-report
    - Optional anonymity while we investigate
 
 ### 📝 What to Include in Your Report
@@ -401,7 +401,7 @@ Examples:
 
 ## Security Best Practices for Deployment
 
-If you're deploying LifeDoc (self-hosted or development), follow these critical practices:
+If you're deploying SwasthyaSaathi (self-hosted or development), follow these critical practices:
 
 ### ⚙️ Environment Configuration
 
@@ -411,7 +411,7 @@ JWT_SECRET=$(openssl rand -hex 64)
 ENCRYPTION_KEY=$(openssl rand -hex 32)
 
 # Database configuration
-MONGO_URI="mongodb+srv://user:password@cluster.mongodb.net/lifedoc?retryWrites=true&w=majority"
+MONGO_URI="mongodb+srv://user:password@cluster.mongodb.net/swasthyasaathi?retryWrites=true&w=majority"
 
 # Never use default or weak credentials
 ADMIN_EMAIL="admin@yourdomain.com"
@@ -421,7 +421,7 @@ ADMIN_PASSWORD=$(openssl rand -base64 32)
 NODE_ENV=production
 
 # CORS - Only your frontend domain
-ALLOWED_ORIGINS="https://lifedoc.yourdomain.com"
+ALLOWED_ORIGINS="https://swasthyasaathi.yourdomain.com"
 
 # Secure cookie settings
 SESSION_COOKIE_SECURE=true
@@ -460,14 +460,14 @@ ALLOWED_FILE_TYPES="image/jpeg,image/png,application/pdf"
   db.createUser({
     user: "analytics",
     pwd: "strong_password",
-    roles: [{ role: "read", db: "lifedoc" }]
+    roles: [{ role: "read", db: "swasthyasaathi" }]
   })
   
   // API user with read-write
   db.createUser({
     user: "api_user",
     pwd: "strong_password",
-    roles: [{ role: "readWrite", db: "lifedoc" }]
+    roles: [{ role: "readWrite", db: "swasthyasaathi" }]
   })
   ```
 - [x] Enable SSL/TLS for database connections
@@ -717,7 +717,7 @@ Before submitting a pull request:
 ### Data Protection Officer (DPO)
 
 For privacy and security inquiries:
-- **Email**: dpo@lifedoc.example.com
+- **Email**: dpo@swasthyasaathi.example.com
 - **Phone**: +1 (555) 123-4567
 - **Address**: [Your Company Address]
 
@@ -769,7 +769,7 @@ Discovered by: [Researcher Name]
 
 ## Timeline
 - 2026-01-05: Reported by researcher
-- 2026-01-06: Confirmed by LifeDoc team
+- 2026-01-06: Confirmed by SwasthyaSaathi team
 - 2026-01-12: Patch developed and tested
 - 2026-01-15: Version 1.2.4 released
 - 2026-01-22: Public disclosure
@@ -783,7 +783,7 @@ We recognize and thank security researchers who help protect patient data:
 
 ### 2026
 
-_No vulnerabilities reported yet. Be the first to help secure LifeDoc and protect patient health information!_
+_No vulnerabilities reported yet. Be the first to help secure SwasthyaSaathi and protect patient health information!_
 
 ### Recognition Criteria
 
@@ -816,7 +816,7 @@ _No vulnerabilities reported yet. Be the first to help secure LifeDoc and protec
 - [Express.js Security Guide](https://expressjs.com/en/advanced/best-practice-security.html)
 - [MongoDB Security Checklist](https://docs.mongodb.com/manual/administration/security-checklist/)
 
-### LifeDoc-Specific Documentation
+### SwasthyaSaathi-Specific Documentation
 
 - [ARCHITECTURE.md](ARCHITECTURE.md) - System security architecture
 - [API_ENDPOINTS.md](API_ENDPOINTS.md) - Authentication requirements
@@ -839,28 +839,28 @@ _No vulnerabilities reported yet. Be the first to help secure LifeDoc and protec
 ### For Security Vulnerabilities
 
 **Primary Contact:**
-- **Email**: security@lifedoc.example.com
+- **Email**: security@swasthyasaathi.example.com
 - **Response Time**: Within 24 hours
 - **PGP Key**: [See below]
 
 **GitHub Security Advisories:**
-- Repository: https://github.com/yourusername/lifedoc
+- Repository: https://github.com/yourusername/swasthyasaathi
 - Navigate to: `Security` tab → `Report a vulnerability`
 
 **Anonymous Reporting:**
-- Web Form: https://lifedoc.example.com/security-report
+- Web Form: https://swasthyasaathi.example.com/security-report
 - Complete anonymity guaranteed
 
 ### For Privacy Concerns
 
 **Data Protection Officer:**
-- **Email**: dpo@lifedoc.example.com
+- **Email**: dpo@swasthyasaathi.example.com
 - **Phone**: +1 (555) 123-4567
 - **Office Hours**: Monday-Friday, 9 AM - 5 PM EST
 
 ### For General Security Questions
 
-- **Email**: support@lifedoc.example.com
+- **Email**: support@swasthyasaathi.example.com
 - **Documentation**: See [CONTRIBUTING.md](CONTRIBUTING.md)
 - **Community**: GitHub Discussions
 
@@ -870,7 +870,7 @@ _No vulnerabilities reported yet. Be the first to help secure LifeDoc and protec
 -----BEGIN PGP PUBLIC KEY BLOCK-----
 [Your PGP public key will go here]
 [Generate with: gpg --gen-key]
-[Export with: gpg --armor --export security@lifedoc.example.com]
+[Export with: gpg --armor --export security@swasthyasaathi.example.com]
 -----END PGP PUBLIC KEY BLOCK-----
 ```
 
@@ -890,13 +890,13 @@ _No vulnerabilities reported yet. Be the first to help secure LifeDoc and protec
 **Document Version**: 1.0  
 **Last Updated**: January 11, 2026  
 **Next Review**: July 11, 2026  
-**Maintained By**: LifeDoc Security Team
+**Maintained By**: SwasthyaSaathi Security Team
 
 ---
 
 ## Acknowledgments
 
-Thank you for helping keep LifeDoc secure and protecting patient health information. Healthcare technology security is critical to patient safety and trust.
+Thank you for helping keep SwasthyaSaathi secure and protecting patient health information. Healthcare technology security is critical to patient safety and trust.
 
 **Every report matters. Every bug found is a potential breach prevented. Every researcher is a healthcare hero.** 🔒🏥
 

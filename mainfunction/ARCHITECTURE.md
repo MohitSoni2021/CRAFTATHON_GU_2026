@@ -1,4 +1,4 @@
-# Architecture - LifeDoc
+# Architecture - SwasthyaSaathi
 
 > Technical architecture covering backend, frontend, authentication, AI services, and storage strategies
 
@@ -976,11 +976,11 @@ module.exports = upload;
 
 | Category | Cloudinary Folder | Max Size | Allowed Types |
 |----------|-------------------|----------|---------------|
-| Lab Reports | `lifedoc/lab-reports/` | 10MB | PDF, JPG, PNG |
-| Prescriptions | `lifedoc/prescriptions/` | 10MB | JPG, PNG |
-| Doctor Reports | `lifedoc/doctor-reports/` | 10MB | PDF, JPG, PNG |
-| Profile Pictures | `lifedoc/profiles/` | 5MB | JPG, PNG |
-| Verification Docs | `lifedoc/verifications/` | 10MB | PDF |
+| Lab Reports | `swasthyasaathi/lab-reports/` | 10MB | PDF, JPG, PNG |
+| Prescriptions | `swasthyasaathi/prescriptions/` | 10MB | JPG, PNG |
+| Doctor Reports | `swasthyasaathi/doctor-reports/` | 10MB | PDF, JPG, PNG |
+| Profile Pictures | `swasthyasaathi/profiles/` | 5MB | JPG, PNG |
+| Verification Docs | `swasthyasaathi/verifications/` | 10MB | PDF |
 
 ---
 
@@ -988,11 +988,11 @@ module.exports = upload;
 
 ### AI Services Integration
 
-LifeDoc integrates two primary AI services:
+SwasthyaSaathi integrates two primary AI services:
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                           LIFEDOC APPLICATION                                │
+│                           SWASTHYASAATHI APPLICATION                                │
 ├─────────────────────────────────────────────────────────────────────────────┤
 │  Express Backend  │  MongoDB  │  Cloudinary  │  Email  │  SMS               │
 └─────────────────────────────────────────────────────────────────────────────┘
@@ -1433,12 +1433,12 @@ OPENFDA_API_URL=https://api.fda.gov/drug
 NEWS_API_KEY=your-news-api-key
 
 # Frontend URL
-CLIENT_URL=https://lifedoc.vercel.app
+CLIENT_URL=https://swasthyasaathi.vercel.app
 ```
 
 ```bash
 # Frontend (.env.local)
-NEXT_PUBLIC_API_URL=https://api.lifedoc.app/api
+NEXT_PUBLIC_API_URL=https://api.swasthyasaathi.app/api
 NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=your-cloud-name
 ```
 
@@ -1629,5 +1629,5 @@ This architecture provides:
 
 **Document Version:** 1.0  
 **Last Updated:** January 11, 2026  
-**Author:** LifeDoc Development Team  
+**Author:** SwasthyaSaathi Development Team  
 **Status:** ✅ Production Ready

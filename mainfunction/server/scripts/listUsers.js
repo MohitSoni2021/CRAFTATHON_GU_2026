@@ -6,7 +6,7 @@ dotenv.config({ path: './.env' });
 
 const listUsers = async () => {
     try {
-        await mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost:27017/lifedoc");
+        await mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost:27017/swasthyasaathi");
         console.log("Connected to MongoDB");
 
         const users = await User.find({}, 'name email type');

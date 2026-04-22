@@ -27,7 +27,7 @@ exports.createCheckoutSession = async (req, res) => {
                     price_data: {
                         currency: 'usd',
                         product_data: {
-                            name: 'LifeDoc Premium',
+                            name: 'SwasthyaSaathi Premium',
                             description: 'Unlimited AI Consultations & Advanced Health Analytics',
                         },
                         unit_amount: 999, // $9.99/month

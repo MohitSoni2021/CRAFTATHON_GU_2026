@@ -14,9 +14,12 @@
     "multer": "^2.0.2",
     "node-cron": "^4.2.1",
     "nodemailer": "^7.0.12",
+    "openapi-to-postmanv2": "^4.24.0",
     "openai": "^6.15.0",
     "rss-parser": "^3.13.0",
     "stripe": "^20.1.2",
+    "swagger-autogen": "^2.23.7",
+    "swagger-ui-express": "^5.0.1",
     "twilio": "^5.11.2"
   },
   "name": "server",

@@ -1,8 +1,8 @@
 # ANALYTICS
-## LifeDoc - Personal Health Management Platform
+## SwasthyaSaathi - Personal Health Management Platform
 
-This document presents a comprehensive market and ecosystem analysis of LifeDoc, covering problem context, stakeholder pain points, existing systems, competitive landscape, and strategic positioning.
-The intent is to demonstrate problem relevance, awareness of existing solutions, and the specific healthcare accessibility gap LifeDoc addresses through AI-powered personal health management.
+This document presents a comprehensive market and ecosystem analysis of SwasthyaSaathi, covering problem context, stakeholder pain points, existing systems, competitive landscape, and strategic positioning.
+The intent is to demonstrate problem relevance, awareness of existing solutions, and the specific healthcare accessibility gap SwasthyaSaathi addresses through AI-powered personal health management.
 
 ---
 
@@ -26,7 +26,7 @@ graph TD
     T5["Delayed doctor consultations"]
     T6["No preventive health tracking"]
     
-    LifeDoc["LIFEDOC SOLUTION - Integrated"]
+    SwasthyaSaathi["SWASTHYASAATHI SOLUTION - Integrated"]
     L1["Digital health diary with AI summaries"]
     L2["Centralized medical records"]
     L3["Smart appointment booking system"]
@@ -38,7 +38,7 @@ graph TD
     Result2["Better Health Management"]
     
     Problem --> Traditional
-    Problem --> LifeDoc
+    Problem --> SwasthyaSaathi
     
     Traditional --> T1
     Traditional --> T2
@@ -47,15 +47,15 @@ graph TD
     Traditional --> T5
     Traditional --> T6
     
-    LifeDoc --> L1
-    LifeDoc --> L2
-    LifeDoc --> L3
-    LifeDoc --> L4
-    LifeDoc --> L5
-    LifeDoc --> L6
+    SwasthyaSaathi --> L1
+    SwasthyaSaathi --> L2
+    SwasthyaSaathi --> L3
+    SwasthyaSaathi --> L4
+    SwasthyaSaathi --> L5
+    SwasthyaSaathi --> L6
     
     Traditional -.-> Result1
-    LifeDoc --> Result2
+    SwasthyaSaathi --> Result2
 ```
 
 Common real-world conditions include:
@@ -187,7 +187,7 @@ graph TD
 
 ```mermaid
 graph TD
-    LifeDoc["LIFEDOC - Comprehensive Solution"]
+    SwasthyaSaathi["SWASTHYASAATHI - Comprehensive Solution"]
     LD1["Personal Health Diary"]
     LD2["Family Health Management"]
     LD3["AI Health Assistant 24/7"]
@@ -221,14 +221,14 @@ graph TD
     T3["No Health Tracking"]
     T4["High Consultation Fees"]
     
-    LifeDoc --> LD1
-    LifeDoc --> LD2
-    LifeDoc --> LD3
-    LifeDoc --> LD4
-    LifeDoc --> LD5
-    LifeDoc --> LD6
-    LifeDoc --> LD7
-    LifeDoc --> LD8
+    SwasthyaSaathi --> LD1
+    SwasthyaSaathi --> LD2
+    SwasthyaSaathi --> LD3
+    SwasthyaSaathi --> LD4
+    SwasthyaSaathi --> LD5
+    SwasthyaSaathi --> LD6
+    SwasthyaSaathi --> LD7
+    SwasthyaSaathi --> LD8
     
     Apple --> A1
     Apple --> A2
@@ -253,7 +253,7 @@ graph TD
 
 ### Competitive Feature Matrix
 
-| Aspect | Apple Health | Practo | MyChart/Epic | Teladoc | **LifeDoc** |
+| Aspect | Apple Health | Practo | MyChart/Epic | Teladoc | **SwasthyaSaathi** |
 |--------|--------------|--------|--------------|---------|-------------|
 | **Personal Health Diary** | ❌ None | ❌ None | ❌ None | ❌ None | ✅ **AI-Powered** |
 | **Family Health Management** | ❌ None | ❌ Limited | ❌ None | ❌ None | ✅ **Multi-Role** |
@@ -276,7 +276,7 @@ graph TD
 
 | Platform | Feature Breadth | User Control | Positioning |
 |----------|-----------------|--------------|-------------|
-| **LifeDoc** | ⭐⭐⭐⭐⭐ (85%) | ⭐⭐⭐⭐⭐ (90%) | **Comprehensive & User-Centric** |
+| **SwasthyaSaathi** | ⭐⭐⭐⭐⭐ (85%) | ⭐⭐⭐⭐⭐ (90%) | **Comprehensive & User-Centric** |
 | **Apple Health** | ⭐⭐⭐ (50%) | ⭐⭐⭐⭐ (75%) | User-Centric but Limited |
 | **MyChart/Epic** | ⭐⭐⭐⭐ (70%) | ⭐⭐ (30%) | Feature-Rich but Locked-In |
 | **Practo** | ⭐⭐⭐ (60%) | ⭐⭐⭐ (50%) | Moderate Offerings |
@@ -286,11 +286,11 @@ graph TD
 
 ---
 
-## 4. Market Gaps & LifeDoc Positioning
+## 4. Market Gaps & SwasthyaSaathi Positioning
 
 Across the current healthcare app ecosystem, common gaps exist that prevent comprehensive personal health management:
 
-### Identified Gaps vs. LifeDoc Solutions
+### Identified Gaps vs. SwasthyaSaathi Solutions
 
 ```mermaid
 graph LR
@@ -304,7 +304,7 @@ graph LR
     G8["Gap: Communication inefficient"] --> S8["Solution: Integrated consultation platform"]
 ```
 
-These gaps represent the **unmet market need** that LifeDoc directly addresses through:
+These gaps represent the **unmet market need** that SwasthyaSaathi directly addresses through:
 
 1. **Comprehensive Integration** - All health management in one platform
 2. **AI-First Design** - 24/7 AI consultation reduces doctor dependency for minor queries
@@ -443,7 +443,7 @@ graph TD
 
 ---
 
-## 6. LifeDoc Unique Value Proposition
+## 6. SwasthyaSaathi Unique Value Proposition
 
 ### Core Differentiators
 
@@ -536,11 +536,11 @@ graph LR
 
 ## 7. Competitive Advantages
 
-### LifeDoc vs. Competitors - Deep Dive
+### SwasthyaSaathi vs. Competitors - Deep Dive
 
 ```mermaid
 graph TD
-    Advantages["LIFEDOC COMPETITIVE ADVANTAGES"]
+    Advantages["SWASTHYASAATHI COMPETITIVE ADVANTAGES"]
     A1["AI-First Architecture"]
     A2["Family-Centric Design"]
     A3["Cross-Provider Interoperability"]
@@ -588,7 +588,7 @@ graph TD
 
 #### Advantage 1: AI-First Architecture
 **Unlike competitors** that bolt on AI as an afterthought:
-- LifeDoc built on AI from day one (Gemini + GPT-4)
+- SwasthyaSaathi built on AI from day one (Gemini + GPT-4)
 - AI consultation is core feature, not add-on
 - Multi-model approach (Gemini for speed, GPT-4 for accuracy)
 - Custom medical knowledge base trained on health queries
@@ -609,7 +609,7 @@ graph TD
 **Competitive Edge**:
 - Most apps are individual-only
 - No competitor has family role hierarchy
-- LifeDoc's family graph database is proprietary
+- SwasthyaSaathi's family graph database is proprietary
 
 #### Advantage 3: Cross-Provider Interoperability
 **Patient-controlled medical records**:
@@ -621,7 +621,7 @@ graph TD
 **Competitive Edge**:
 - MyChart: Single hospital system only
 - Epic: Provider lock-in
-- LifeDoc: True interoperability
+- SwasthyaSaathi: True interoperability
 
 #### Advantage 4: Comprehensive All-in-One Platform
 **No need for multiple apps**:
@@ -877,7 +877,7 @@ graph TD
 
 ```mermaid
 graph TD
-    Core["LIFEDOC PLATFORM"]
+    Core["SWASTHYASAATHI PLATFORM"]
     
     Healthcare["HEALTHCARE PARTNERS"]
     H1["Hospitals - EHR Integration"]
@@ -937,7 +937,7 @@ graph TD
 2. **Diagnostic Labs** (Thyrocare, Dr. Lal PathLabs)
    - API for automatic lab report import
    - Pre-filled patient info for bookings
-   - LifeDoc users get 10% discount
+   - SwasthyaSaathi users get 10% discount
 
 3. **Wearable Devices** (Fitbit, Apple Watch, Samsung Health)
    - Sync vitals automatically (steps, heart rate, sleep)
@@ -945,7 +945,7 @@ graph TD
    - Premium feature: Advanced analytics
 
 4. **Health Insurance** (HDFC Ergo, Star Health)
-   - Claim submission via LifeDoc
+   - Claim submission via SwasthyaSaathi
    - Digital health records for claims
    - Wellness rewards for premium users
 
@@ -1046,7 +1046,7 @@ graph LR
 
 ### Measurable Social Impact Goals (5 Years)
 
-| Impact Metric | Current Baseline | LifeDoc Target | Methodology |
+| Impact Metric | Current Baseline | SwasthyaSaathi Target | Methodology |
 |---------------|------------------|----------------|-------------|
 | **Healthcare Access** | 40% with regular care | 80% with digital care | User surveys + usage data |
 | **Preventive Care Adoption** | 20% tracking vitals | 70% tracking regularly | Feature usage analytics |
@@ -1058,7 +1058,7 @@ graph LR
 
 ### United Nations SDG Alignment
 
-LifeDoc directly contributes to **UN Sustainable Development Goal 3**: Good Health and Well-Being
+SwasthyaSaathi directly contributes to **UN Sustainable Development Goal 3**: Good Health and Well-Being
 
 **Specific targets addressed:**
 - 3.4: Reduce premature mortality from non-communicable diseases
@@ -1107,16 +1107,16 @@ graph TD
 | **One Medical** | Amazon | $3.9B | 767K members | 2023 |
 | **Flatiron Health** | Roche | $1.9B | 265 cancer clinics | 2018 |
 
-**LifeDoc's positioning**: With 10M users and comprehensive health platform, valuation of $2-5B realistic by Year 5-7.
+**SwasthyaSaathi's positioning**: With 10M users and comprehensive health platform, valuation of $2-5B realistic by Year 5-7.
 
 ### Long-Term Vision (10 Years)
 
-**LifeDoc becomes the global operating system for personal health:**
+**SwasthyaSaathi becomes the global operating system for personal health:**
 
-1. **Global Health Passport** - Your LifeDoc ID works at any hospital worldwide
+1. **Global Health Passport** - Your SwasthyaSaathi ID works at any hospital worldwide
 2. **AI Health Copilot** - Personal AI doctor that knows your entire health history
 3. **Preventive Medicine Leader** - 90% of users practice preventive care
-4. **Family Health Hub** - Every family manages health together on LifeDoc
+4. **Family Health Hub** - Every family manages health together on SwasthyaSaathi
 5. **Healthcare Cost Reduction** - Save users $100B+ annually through efficiency
 6. **Data for Research** - Anonymized data advances medical research (with consent)
 
@@ -1135,7 +1135,7 @@ From an analytical standpoint:
 - Family health coordination is manual
 - Preventive care adoption is low (20%)
 
-✅ **LifeDoc's Positioning is Strong**:
+✅ **SwasthyaSaathi's Positioning is Strong**:
 - Comprehensive all-in-one platform (rare in market)
 - AI-first design with dual models (Gemini + GPT-4)
 - Family-centric approach (unique differentiator)
@@ -1172,7 +1172,7 @@ From an analytical standpoint:
 
 ### Final Analysis
 
-**LifeDoc is not just another health app.**
+**SwasthyaSaathi is not just another health app.**
 
 It addresses a fundamental healthcare coordination challenge:
 
@@ -1188,7 +1188,7 @@ By combining:
 - **Preventive tracking** (vitals, medication)
 - **Emergency SOS** (life-saving)
 
-LifeDoc fills a structural gap in personal health management.
+SwasthyaSaathi fills a structural gap in personal health management.
 
 The system is:
 - Realistic (proven tech stack)
@@ -1197,7 +1197,7 @@ The system is:
 - Defensible (network effects + AI moat)
 - Impactful (improves health outcomes)
 
-**LifeDoc's value lies in organizing health interactions under patient control, not replacing doctors.**
+**SwasthyaSaathi's value lies in organizing health interactions under patient control, not replacing doctors.**
 
 ---
 
@@ -1238,16 +1238,16 @@ The system is:
 **Document Version**: 1.0  
 **Last Updated**: January 11, 2026  
 **Next Review**: April 11, 2026  
-**Prepared By**: LifeDoc Strategic Analysis Team
+**Prepared By**: SwasthyaSaathi Strategic Analysis Team
 
 ---
 
 ## Contact
 
 For strategic partnership or investor inquiries:
-- **Email**: strategy@lifedoc.example.com
+- **Email**: strategy@swasthyasaathi.example.com
 - **Investor Deck**: Available upon request
-- **Website**: https://lifedoc.example.com
+- **Website**: https://swasthyasaathi.example.com
 
 ---
 

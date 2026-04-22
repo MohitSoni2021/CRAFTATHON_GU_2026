@@ -2,7 +2,7 @@
 
 ## 1. System Architecture (DFD Level 1)
 
-This high-level data flow diagram illustrates how users interact with the Lifedoc ecosystem and how data moves between the Client, Server, Database, and AI Services.
+This high-level data flow diagram illustrates how users interact with the SwasthyaSaathi ecosystem and how data moves between the Client, Server, Database, and AI Services.
 
 ```mermaid
 graph TD
@@ -26,7 +26,7 @@ graph TD
 
 ## 2. Authentication Flow
 
-Lifedoc uses a custom OTP-based authentication system to ensure security without requiring complex passwords.
+SwasthyaSaathi uses a custom OTP-based authentication system to ensure security without requiring complex passwords.
 
 ```mermaid
 sequenceDiagram

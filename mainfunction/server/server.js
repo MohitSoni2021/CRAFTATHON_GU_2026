@@ -41,9 +41,21 @@ app.use(compression()); // Enable Gzip/Brotli compression
 
 // Connect to MongoDB
 if (require.main === module) {
-  mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost:27017/lifedoc")
+  mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost:27017/swasthyasaathi")
     .then(() => console.log("Connected to MongoDB"))
     .catch((err) => console.error("Could not connect to MongoDB", err));
+}
+
+// Swagger Documentation
+const swaggerUi = require('swagger-ui-express');
+const fs = require('fs');
+
+try {
+  const swaggerDocument = JSON.parse(fs.readFileSync('./swagger-output.json', 'utf8'));
+  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+  app.get('/api-docs.json', (req, res) => res.json(swaggerDocument));
+} catch (error) {
+  console.log('Swagger JSON not found. Please run "node swagger.js" to generate it.');
 }
 
 // Routes

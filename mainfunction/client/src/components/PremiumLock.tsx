@@ -9,7 +9,7 @@ interface PremiumLockProps {
     description?: string;
 }
 
-export default function PremiumLock({ children, title = "Premium Feature", description = "Unlock this feature with LifeDoc Premium" }: PremiumLockProps) {
+export default function PremiumLock({ children, title = "Premium Feature", description = "Unlock this feature with SwasthyaSaathi Premium" }: PremiumLockProps) {
     const { user } = useSelector((state: RootState) => state.auth);
     const isPremium = user?.subscription?.plan === 'premium' && user?.subscription?.status === 'active';
 

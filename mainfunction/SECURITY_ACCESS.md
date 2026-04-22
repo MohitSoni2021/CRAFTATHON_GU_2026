@@ -1,4 +1,4 @@
-# Security & Access Control - LifeDoc
+# Security & Access Control - SwasthyaSaathi
 
 > Role-based access control matrix with HIPAA-compliant justifications for healthcare data operations
 
@@ -6,7 +6,7 @@
 
 ## Overview
 
-LifeDoc implements a **Role-Based Access Control (RBAC)** model with **family-based data isolation** to ensure Protected Health Information (PHI) privacy. The system enforces strict authorization rules aligned with HIPAA technical safeguards and patient consent requirements.
+SwasthyaSaathi implements a **Role-Based Access Control (RBAC)** model with **family-based data isolation** to ensure Protected Health Information (PHI) privacy. The system enforces strict authorization rules aligned with HIPAA technical safeguards and patient consent requirements.
 
 ---
 
@@ -556,7 +556,7 @@ USER/DOCTOR → CREATE_REQUEST → PENDING
 // Meeting link generation:
 {
   meetingId: "uuid-v4",
-  meetingLink: "https://lifedoc.com/meet/encrypted-token",
+  meetingLink: "https://swasthyasaathi.com/meet/encrypted-token",
   expiresAt: meetingStartTime + 2 hours,
   participants: [patientId, doctorId],
   encryption: "end-to-end", // WebRTC DTLS-SRTP
@@ -1118,7 +1118,7 @@ router.get(
 
 ## Conclusion
 
-LifeDoc's access control model ensures:
+SwasthyaSaathi's access control model ensures:
 
 1. **Patient Autonomy** - Users control their health data
 2. **Family Privacy** - Consent-based sharing with family members
@@ -1136,16 +1136,16 @@ LifeDoc's access control model ensures:
 **Document Version**: 1.0  
 **Last Updated**: January 11, 2026  
 **Next Review**: July 11, 2026  
-**Maintained By**: LifeDoc Security Team
+**Maintained By**: SwasthyaSaathi Security Team
 
 ---
 
 ## Contact
 
 For access control questions or security concerns:
-- **Email**: security@lifedoc.example.com
+- **Email**: security@swasthyasaathi.example.com
 - **Documentation**: See [SECURITY.md](SECURITY.md) for general security policy
-- **Support**: support@lifedoc.example.com
+- **Support**: support@swasthyasaathi.example.com
 
 ---
 

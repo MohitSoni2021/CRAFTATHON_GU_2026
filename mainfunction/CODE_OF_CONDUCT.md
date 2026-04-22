@@ -2,7 +2,7 @@
 
 ## Our Pledge
 
-We as members, contributors, and maintainers of LifeDoc pledge to make participation in our project and community a harassment-free experience for everyone, regardless of age, body size, disability, ethnicity, gender identity and expression, level of experience, education, socio-economic status, nationality, personal appearance, race, religion, or sexual identity and orientation.
+We as members, contributors, and maintainers of SwasthyaSaathi pledge to make participation in our project and community a harassment-free experience for everyone, regardless of age, body size, disability, ethnicity, gender identity and expression, level of experience, education, socio-economic status, nationality, personal appearance, race, religion, or sexual identity and orientation.
 
 We are committed to providing a welcoming, inclusive, and professional environment where diverse perspectives are valued and respected, especially given the sensitive nature of healthcare technology.
 
@@ -19,7 +19,7 @@ Examples of behavior that contributes to a positive environment:
 - **Be Constructive**: Provide helpful feedback and accept it gracefully
 - **Show Empathy**: Consider others' health situations and perspectives
 - **Give Credit**: Acknowledge others' contributions and research
-- **Stay Focused**: Keep discussions relevant to LifeDoc's mission
+- **Stay Focused**: Keep discussions relevant to SwasthyaSaathi's mission
 - **Protect Privacy**: Never share real patient data or personal health information
 
 ### Unacceptable Behavior
@@ -40,7 +40,7 @@ Examples of unacceptable behavior:
 
 ## Project-Specific Guidelines
 
-Given that LifeDoc is a healthcare management platform dealing with sensitive health data:
+Given that SwasthyaSaathi is a healthcare management platform dealing with sensitive health data:
 
 ### Healthcare Privacy & Ethics
 
@@ -200,11 +200,11 @@ This Code of Conduct applies in all project spaces, including:
 - **GitHub**: Repository, issues, pull requests, discussions, releases
 - **Communication**: Email, Discord, Slack, chat platforms
 - **Events**: Meetups, conferences, workshops (virtual or in-person)
-- **Social Media**: When representing LifeDoc publicly
+- **Social Media**: When representing SwasthyaSaathi publicly
 - **Development**: Code reviews, documentation, testing
 - **Support**: User support channels and forums
 
-The Code also applies when representing LifeDoc in other communities.
+The Code also applies when representing SwasthyaSaathi in other communities.
 
 ## Healthcare Software Ethics
 
@@ -288,21 +288,21 @@ Contact maintainers if you're a healthcare professional interested in advisory r
 
 ## Acknowledgments
 
-Thank you for helping make LifeDoc a welcoming, inclusive, professional, and ethical community. Together, we're building technology that can improve healthcare delivery, patient outcomes, and the overall health management experience.
+Thank you for helping make SwasthyaSaathi a welcoming, inclusive, professional, and ethical community. Together, we're building technology that can improve healthcare delivery, patient outcomes, and the overall health management experience.
 
-Your commitment to these values helps ensure that LifeDoc remains a safe, trusted, and effective platform for everyone involved in healthcare - patients, families, doctors, and developers alike.
+Your commitment to these values helps ensure that SwasthyaSaathi remains a safe, trusted, and effective platform for everyone involved in healthcare - patients, families, doctors, and developers alike.
 
 ## Emergency Contacts
 
 ### For Security Vulnerabilities
 - Use GitHub Security Advisories (preferred)
-- Email: [security@lifedoc.example.com - to be added]
+- Email: [security@swasthyasaathi.example.com - to be added]
 
 ### For Privacy Concerns
-- Email: [privacy@lifedoc.example.com - to be added]
+- Email: [privacy@swasthyasaathi.example.com - to be added]
 
 ### For General Code of Conduct Issues
-- Email: [conduct@lifedoc.example.com - to be added]
+- Email: [conduct@swasthyasaathi.example.com - to be added]
 - GitHub: @[maintainer-username]
 
 ---
@@ -311,7 +311,7 @@ Your commitment to these values helps ensure that LifeDoc remains a safe, truste
 **Last Updated**: January 11, 2026  
 **Next Review**: July 11, 2026
 
-By participating in this project, you agree to abide by this Code of Conduct and contribute to making LifeDoc a positive, professional, and ethical healthcare technology community.
+By participating in this project, you agree to abide by this Code of Conduct and contribute to making SwasthyaSaathi a positive, professional, and ethical healthcare technology community.
 
 ---
 

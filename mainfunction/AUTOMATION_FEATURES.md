@@ -1,4 +1,4 @@
-# Automation Features - LifeDoc
+# Automation Features - SwasthyaSaathi
 
 > Automated workflows, scheduled jobs, intelligent triggers, and background processes for proactive health management
 
@@ -17,7 +17,7 @@
 
 ## Overview
 
-LifeDoc implements intelligent automation to reduce manual intervention, ensure timely health monitoring, and provide proactive care management. The automation system handles critical health alerts, scheduled reminders, background data processing, and intelligent notifications.
+SwasthyaSaathi implements intelligent automation to reduce manual intervention, ensure timely health monitoring, and provide proactive care management. The automation system handles critical health alerts, scheduled reminders, background data processing, and intelligent notifications.
 
 ### Automation Categories
 
@@ -1371,7 +1371,7 @@ graph TB
 
 **Workflow:**
 ```
-User: "Hey LifeDoc, my blood pressure is 130 over 85"
+User: "Hey SwasthyaSaathi, my blood pressure is 130 over 85"
        ↓
 Speech-to-Text (Whisper API)
        ↓
@@ -1398,7 +1398,7 @@ Response: "Blood pressure recorded. Would you like to see trends?"
 
 ## Conclusion
 
-LifeDoc's automation system transforms reactive healthcare into **proactive health management**. By automating routine tasks, enabling intelligent monitoring, and providing timely interventions, the platform ensures users spend less time managing their health data and more time focusing on their wellbeing.
+SwasthyaSaathi's automation system transforms reactive healthcare into **proactive health management**. By automating routine tasks, enabling intelligent monitoring, and providing timely interventions, the platform ensures users spend less time managing their health data and more time focusing on their wellbeing.
 
 ### Key Automation Highlights
 
@@ -1429,5 +1429,5 @@ LifeDoc's automation system transforms reactive healthcare into **proactive heal
 
 **Document Version:** 1.0  
 **Last Updated:** January 11, 2026  
-**Author:** LifeDoc Development Team  
+**Author:** SwasthyaSaathi Development Team  
 **Status:** ✅ Production Features + 🔄 Roadmap

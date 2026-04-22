@@ -11,7 +11,7 @@ const transporter = nodemailer.createTransport({
 // Base send email function
 const sendEmail = async (to, subject, html) => {
     const mailOptions = {
-        from: '"LifeDoc System" <noreply@lifedoc.com>',
+        from: '"SwasthyaSaathi System" <noreply@swasthyasaathi.com>',
         to,
         subject,
         html
@@ -33,7 +33,7 @@ exports.sendVerificationStatus = async (doctorEmail, status, feedback) => {
     let html = "";
 
     if (status === 'approved') {
-        subject = "🎉 Doctor Verification Approved - LifeDoc";
+        subject = "🎉 Doctor Verification Approved - SwasthyaSaathi";
         html = `
             <div style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
                 <h2 style="color: #16a34a;">Congratulations! You are Verified.</h2>

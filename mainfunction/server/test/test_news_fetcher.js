@@ -8,7 +8,7 @@ dotenv.config();
 const runTest = async () => {
     try {
         console.log('Connecting to MongoDB...');
-        await mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost:27017/lifedoc");
+        await mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost:27017/swasthyasaathi");
         console.log('Connected.');
 
         console.log('Running fetchHealthNews()...');

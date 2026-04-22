@@ -25,7 +25,7 @@ router.post('/', upload.single('image'), async (req, res) => {
         const streamUpload = (buffer) => {
             return new Promise((resolve, reject) => {
                 const stream = cloudinary.uploader.upload_stream(
-                    { folder: 'lifedoc_prescriptions' },
+                    { folder: 'swasthyasaathi_prescriptions' },
                     (error, result) => {
                         if (result) {
                             console.log('[DEBUG] Cloudinary Upload Success:', result.secure_url);
