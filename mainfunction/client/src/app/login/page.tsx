@@ -67,7 +67,7 @@ export default function Login() {
       <div className="absolute top-0 left-0 right-0 p-6 flex justify-between items-center">
         <div className="flex items-center gap-2">
           <div className="text-2xl font-bold text-gray-900">Swasthya</div>
-          <div className="text-2xl font-bold text-emerald-600">Saathi</div>
+          <div className="text-2xl font-bold text-primary">Saathi</div>
         </div>
         <button className="text-gray-600 hover:text-gray-900 text-sm font-medium">
           EN ▼
@@ -88,7 +88,7 @@ export default function Login() {
             </p>
 
             {error && (
-              <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+              <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl">
                 <p className="text-red-600 text-sm">{error}</p>
               </div>
             )}
@@ -100,7 +100,7 @@ export default function Login() {
                 placeholder="Your email address"
                 value={formData.email}
                 onChange={handleChange}
-                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition text-gray-900 placeholder-gray-500"
+                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition text-gray-900 placeholder-gray-500"
                 required
               />
 
@@ -110,7 +110,7 @@ export default function Login() {
                 placeholder="Your password"
                 value={formData.password}
                 onChange={handleChange}
-                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition text-gray-900 placeholder-gray-500"
+                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition text-gray-900 placeholder-gray-500"
                 required
               />
 
@@ -130,7 +130,7 @@ export default function Login() {
 
                 <Link
                   href="/forgot-password"
-                  className="text-sm text-emerald-600 hover:text-emerald-700 font-medium"
+                  className="text-sm text-primary hover:text-primary-dim font-medium"
                 >
                   Forgot password?
                 </Link>
@@ -139,7 +139,7 @@ export default function Login() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-black hover:bg-gray-900 text-white font-semibold py-3 px-4 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed mt-6"
+                className="w-full bg-black hover:bg-gray-900 text-white font-semibold py-3 px-4 rounded-xl transition disabled:opacity-50 disabled:cursor-not-allowed mt-6"
               >
                 {loading ? 'Signing in...' : 'Sign In'}
               </button>
@@ -147,7 +147,7 @@ export default function Login() {
 
             <p className="text-center text-gray-600 text-sm mt-8">
               Don't have an account?{' '}
-              <Link href="/signup" className="text-emerald-600 hover:text-emerald-700 font-semibold">
+              <Link href="/signup" className="text-primary hover:text-primary-dim font-semibold">
                 Sign Up
               </Link>
             </p>
@@ -156,7 +156,7 @@ export default function Login() {
               Need help?{' '}
               <a
                 href="mailto:support@swasthyasaathi.com"
-                className="text-emerald-600 hover:text-emerald-700"
+                className="text-primary hover:text-primary-dim"
               >
                 support@swasthyasaathi.com
               </a>

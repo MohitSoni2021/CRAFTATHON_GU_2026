@@ -85,7 +85,7 @@
   }
 
   .btn-primary {
-    @apply px-8 py-4 text-white rounded-full font-bold transition-all duration-300 flex items-center justify-center;
+    @apply px-8 py-4 text-white rounded-xl font-bold transition-all duration-300 flex items-center justify-center;
     background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dim) 100%);
     box-shadow: 0 10px 25px -5px rgba(0, 105, 119, 0.3);
   }

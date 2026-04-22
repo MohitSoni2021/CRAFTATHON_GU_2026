@@ -85,11 +85,11 @@ export default function NewDashboard() {
 
             <div className="flex items-center gap-8">
               <div className="flex items-center gap-4 text-[#635888]/50">
-                <button className="p-2.5 hover:bg-surface-container-low rounded-full transition-colors relative">
+                <button className="p-2.5 hover:bg-surface-container-low rounded-xl transition-colors relative">
                   <FaBell />
-                  <span className="absolute top-2 right-2 w-1.5 h-1.5 bg-[#a83836] rounded-full"></span>
+                  <span className="absolute top-2 right-2 w-1.5 h-1.5 bg-[#a83836] rounded-xl"></span>
                 </button>
-                <button className="p-2.5 hover:bg-surface-container-low rounded-full transition-colors">
+                <button className="p-2.5 hover:bg-surface-container-low rounded-xl transition-colors">
                   <FaCommentAlt />
                 </button>
               </div>
@@ -103,7 +103,7 @@ export default function NewDashboard() {
                     ID: #{user?.id?.slice(-5) || "88219"}
                   </p>
                 </div>
-                <div className="w-12 h-12 rounded-full bg-gradient-primary flex items-center justify-center text-on-primary font-bold text-sm shadow-lg shadow-primary/20">
+                <div className="w-12 h-12 rounded-xl bg-gradient-primary flex items-center justify-center text-on-primary font-bold text-sm shadow-lg shadow-primary/20">
                   {user?.name?.[0] || <FaUserMd />}
                 </div>
               </div>
@@ -114,24 +114,24 @@ export default function NewDashboard() {
             {/* Top Cards Row */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
               {/* AI Voice Card */}
-              <div className="lg:col-span-2 bg-gradient-primary rounded-3xl p-12 text-on-primary relative overflow-hidden group shadow-ambient">
+              <div className="lg:col-span-2 bg-gradient-primary rounded-xl p-12 text-on-primary relative overflow-hidden group shadow-ambient">
                 <div className="absolute top-0 right-0 w-80 h-full opacity-10 pointer-events-none blur-3xl bg-white/20 transition-transform duration-1000"></div>
                 <div className="relative z-10 max-w-lg">
                   <h2 className="text-4xl font-bold font-jakarta mb-6 tracking-tight">AI Voice Consultation</h2>
                   <p className="text-on-primary/70 text-sm leading-relaxed mb-10 font-medium">
                     Describe your symptoms naturally. Our empathetic AI curator analyzes your history to provide immediate clinical context and personalized care.
                   </p>
-                  <Link href="/consultation" className="inline-flex items-center gap-3 bg-white text-primary px-8 py-4 rounded-full font-bold text-sm shadow-xl transition-transform">
+                  <Link href="/consultation" className="inline-flex items-center gap-3 bg-white text-primary px-8 py-4 rounded-xl font-bold text-sm shadow-xl transition-transform">
                     <FaMicrophone /> Start Voice Session
                   </Link>
                 </div>
               </div>
 
               {/* Daily Insight Card - Tertiary Accent */}
-              <div className="bg-[#635888]/5 rounded-3xl p-10 relative overflow-hidden flex flex-col justify-between group">
-                <div className="absolute -bottom-10 -right-10 w-48 h-48 bg-tertiary/10 rounded-full blur-3xl transition-transform duration-1000"></div>
+              <div className="bg-[#635888]/5 rounded-xl p-10 relative overflow-hidden flex flex-col justify-between group">
+                <div className="absolute -bottom-10 -right-10 w-48 h-48 bg-tertiary/10 rounded-xl blur-3xl transition-transform duration-1000"></div>
                 <div>
-                  <span className="bg-tertiary text-on-primary text-[10px] font-black px-4 py-1.5 rounded-full uppercase tracking-[0.2em]">Daily Insight</span>
+                  <span className="bg-tertiary text-on-primary text-[10px] font-black px-4 py-1.5 rounded-xl uppercase tracking-[0.2em]">Daily Insight</span>
                   <h3 className="text-2xl font-bold font-jakarta text-[#2c3436] mt-8 mb-4 leading-tight">Optimal Hydration</h3>
                   <p className="text-[#635888]/70 text-sm leading-relaxed font-medium">
                     Based on your glucose levels today, increasing alkaline water intake could help stabilize evening readings.
@@ -148,8 +148,8 @@ export default function NewDashboard() {
               <div className="lg:col-span-3 space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   {/* Secure Storage */}
-                  <div className="bg-surface-container-lowest p-8 rounded-3xl shadow-ambient transition-all duration-500 group">
-                    <div className="w-14 h-14 bg-primary/5 rounded-2xl flex items-center justify-center text-primary mb-8 transition-transform">
+                  <div className="bg-surface-container-lowest p-8 rounded-xl shadow-ambient transition-all duration-500 group">
+                    <div className="w-14 h-14 bg-primary/5 rounded-xl flex items-center justify-center text-primary mb-8 transition-transform">
                       <FaFileMedical className="text-2xl" />
                     </div>
                     <h4 className="text-lg font-bold text-[#2c3436] font-jakarta mb-2">Secure Storage</h4>
@@ -163,8 +163,8 @@ export default function NewDashboard() {
                   </div>
 
                   {/* Vital Trends */}
-                  <div className="bg-surface-container-lowest p-8 rounded-3xl shadow-ambient transition-all duration-500 group">
-                    <div className="w-14 h-14 bg-primary/5 rounded-2xl flex items-center justify-center text-primary mb-8 transition-transform">
+                  <div className="bg-surface-container-lowest p-8 rounded-xl shadow-ambient transition-all duration-500 group">
+                    <div className="w-14 h-14 bg-primary/5 rounded-xl flex items-center justify-center text-primary mb-8 transition-transform">
                       <FaChartLine className="text-2xl" />
                     </div>
                     <h4 className="text-lg font-bold text-[#2c3436] font-jakarta mb-2">Vital Trends</h4>
@@ -178,8 +178,8 @@ export default function NewDashboard() {
                   </div>
 
                   {/* Smart Insights */}
-                  <div className="bg-surface-container-lowest p-8 rounded-3xl shadow-ambient transition-all duration-500 group">
-                    <div className="w-14 h-14 bg-tertiary/5 rounded-2xl flex items-center justify-center text-tertiary mb-8 transition-transform">
+                  <div className="bg-surface-container-lowest p-8 rounded-xl shadow-ambient transition-all duration-500 group">
+                    <div className="w-14 h-14 bg-tertiary/5 rounded-xl flex items-center justify-center text-tertiary mb-8 transition-transform">
                       <FaBell className="text-2xl" />
                     </div>
                     <h4 className="text-lg font-bold text-[#2c3436] font-jakarta mb-2">Smart Insights</h4>
@@ -194,7 +194,7 @@ export default function NewDashboard() {
                 </div>
 
                 {/* Glucose Trends Chart */}
-                <div className="bg-surface-container-lowest rounded-3xl p-8 shadow-ambient">
+                <div className="bg-surface-container-lowest rounded-xl p-8 shadow-ambient">
                    <HealthTrendChart
                       title="Glucose Trends History"
                       data={glucoseData}
@@ -212,7 +212,7 @@ export default function NewDashboard() {
             </div>
 
             {/* Recent Activity Table */}
-            <div className="bg-surface-container-lowest rounded-3xl p-8 shadow-ambient overflow-hidden">
+            <div className="bg-surface-container-lowest rounded-xl p-8 shadow-ambient overflow-hidden">
               <div className="flex justify-between items-center mb-8">
                 <div>
                     <h3 className="text-2xl font-bold font-jakarta text-[#2c3436]">Recent Activity</h3>

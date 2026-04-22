@@ -41,7 +41,7 @@ export default function ForgotPassword() {
       <div className="absolute top-0 left-0 right-0 p-6 flex justify-between items-center">
         <div className="flex items-center gap-2">
           <div className="text-2xl font-bold text-gray-900">Swasthya</div>
-          <div className="text-2xl font-bold text-emerald-600">Saathi</div>
+          <div className="text-2xl font-bold text-primary">Saathi</div>
         </div>
         <button className="text-gray-600 hover:text-gray-900 text-sm font-medium">
           EN ▼
@@ -61,7 +61,7 @@ export default function ForgotPassword() {
             </p>
 
             {error && (
-              <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+              <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl">
                 <p className="text-red-600 text-sm text-center">{error}</p>
               </div>
             )}
@@ -74,7 +74,7 @@ export default function ForgotPassword() {
                   placeholder="Your email address"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition text-gray-900 placeholder-gray-500"
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition text-gray-900 placeholder-gray-500"
                   required
                 />
               </div>
@@ -83,7 +83,7 @@ export default function ForgotPassword() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-black hover:bg-gray-900 text-white font-semibold py-3 px-4 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed mt-6"
+                className="w-full bg-black hover:bg-gray-900 text-white font-semibold py-3 px-4 rounded-xl transition disabled:opacity-50 disabled:cursor-not-allowed mt-6"
               >
                 {loading ? 'Sending OTP...' : 'Send OTP'}
               </button>
@@ -92,20 +92,20 @@ export default function ForgotPassword() {
             {/* Back to Login Link */}
             <p className="text-center text-gray-600 text-sm mt-8">
               Remember your password?{' '}
-              <Link href="/login" className="text-emerald-600 hover:text-emerald-700 font-semibold">
+              <Link href="/login" className="text-primary hover:text-primary-dim font-semibold">
                 Sign In
               </Link>
             </p>
 
             {/* Footer */}
             <div className="text-center text-gray-500 text-xs mt-12">
-              <p>Need assistance? <a href="mailto:support@swasthyasaathi.com" className="text-emerald-600 hover:text-emerald-700">support@swasthyasaathi.com</a></p>
+              <p>Need assistance? <a href="mailto:support@swasthyasaathi.com" className="text-primary hover:text-primary-dim">support@swasthyasaathi.com</a></p>
             </div>
           </div>
         </div>
 
         {/* Right Side - Content (Hidden on mobile) */}
-        <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-emerald-400 to-emerald-600 flex-col items-center justify-center p-8 relative overflow-hidden">
+        <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-emerald-400 to-primary flex-col items-center justify-center p-8 relative overflow-hidden">
           {/* Decorative background */}
           <div className="absolute inset-0 opacity-10">
             <div className="absolute top-10 right-10 w-40 h-40 bg-white rounded-full blur-3xl"></div>

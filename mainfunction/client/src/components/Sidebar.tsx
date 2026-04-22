@@ -104,8 +104,8 @@ const Sidebar = ({ isOpen = false, onClose }: SidebarProps) => {
       >
         <div className="p-8">
           <h1 className="text-2xl font-black flex items-center space-x-2 text-gray-900 tracking-tighter">
-            <span className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white text-base">D</span>
-            <span>Docmetry</span>
+            <span className="w-8 h-8 bg-primary rounded-xl flex items-center justify-center text-white text-base">S</span>
+            <span className="text-xl">Swasthya<span className="text-primary">Saathi</span></span>
           </h1>
         </div>
 
@@ -165,7 +165,7 @@ const Sidebar = ({ isOpen = false, onClose }: SidebarProps) => {
           
           {user && (
             <div className="p-4 bg-gray-50 rounded-xl flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-white border border-gray-100 flex items-center justify-center overflow-hidden">
+              <div className="w-10 h-10 rounded-xl bg-white border border-gray-100 flex items-center justify-center overflow-hidden">
                 {user.profileImage ? (
                   <img src={user.profileImage} alt={user.name} className="w-full h-full object-cover" />
                 ) : (
