@@ -1,0 +1,162 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+@import "tailwindcss";
+
+@theme {
+  /* The Clinical Editorial Design Tokens */
+  --color-primary: #006977;
+  --color-primary-dim: #005c68;
+  --color-on-primary: #edfcff;
+  
+  --color-surface: #f8fafb;
+  --color-surface-container-low: #f0f4f6;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-high: #e3e9eb;
+  
+  --color-tertiary: #635888;
+  --color-outline-variant: rgba(172, 179, 182, 0.15);
+
+  /* Typography */
+  --font-jakarta: "Plus Jakarta Sans", sans-serif;
+  --font-manrope: "Plus Jakarta Sans", sans-serif;
+  --font-inter: "Plus Jakarta Sans", sans-serif;
+  --font-sans: "Plus Jakarta Sans", sans-serif;
+
+  /* Typography Scale */
+  --font-size-xs: 10px;
+  --font-size-sm: 12px;
+  --font-size-base: 14px;
+  --font-size-lg: 16px;
+  --font-size-xl: 18px;
+  --font-size-2xl: 20px;
+  --font-size-3xl: 24px;
+  --font-size-4xl: 28px;
+  --font-size-5xl: 32px;
+  --font-size-6xl: 36px;
+  --font-size-7xl: 42px;
+
+  --font-weight-heading: 700;
+  --font-weight-subheading: 600;
+  --font-weight-body: 400;
+  --font-weight-label: 500;
+
+  --line-height-tight: 1.2;
+  --line-height-snug: 1.3;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.6;
+}
+
+@layer base {
+  * {
+    @apply scroll-smooth;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  *::-webkit-scrollbar {
+    display: none;
+  }
+
+  body {
+    font-family: var(--font-jakarta);
+    font-size: var(--font-size-base);
+    background-color: var(--color-surface);
+    color: #2c3436;
+  }
+
+  h1, h2, h3, .font-display {
+    font-family: var(--font-jakarta);
+    letter-spacing: -0.02em;
+  }
+
+  h1 { font-size: var(--font-size-4xl); }
+  h2 { font-size: var(--font-size-3xl); }
+  h3 { font-size: var(--font-size-xl); }
+}
+
+@layer utilities {
+  .glass {
+    background-color: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--color-outline-variant);
+  }
+
+  .bg-gradient-primary {
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dim) 100%);
+  }
+
+  .btn-primary {
+    @apply px-8 py-4 text-white rounded-xl font-bold transition-all duration-300 flex items-center justify-center;
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dim) 100%);
+    box-shadow: 0 10px 25px -5px rgba(0, 105, 119, 0.3);
+  }
+
+  .btn-primary:hover {
+    @apply -translate-y-0.5;
+    box-shadow: 0 20px 40px -10px rgba(0, 105, 119, 0.4);
+  }
+
+  .card-editorial {
+    @apply bg-white rounded-xl transition-all duration-300;
+    /* Tonal layering: depth achieved by background shift, but we add ambient shadow for floating cards */
+  }
+
+  .shadow-ambient {
+    box-shadow: 0 24px 48px rgba(44, 52, 54, 0.06);
+  }
+
+  .ghost-border {
+    border: 1px solid var(--color-outline-variant);
+  }
+
+  .input-editorial {
+    @apply w-full px-4 py-3 rounded-xl bg-white border border-transparent transition-all;
+    border: 1px solid var(--color-outline-variant);
+  }
+
+  .input-editorial:focus {
+    @apply ring-4 ring-primary/10;
+    border-color: var(--color-primary);
+    outline: none;
+  }
+}
+
+/* Base body styles */
+/* Google Translate Shift Fix - SUPER AGGRESSIVE */
+body {
+  top: 0 !important;
+  position: static !important;
+  min-height: 100vh !important;
+  /* Ensure min-height matches view */
+  margin-top: 0 !important;
+}
+
+html {
+  top: 0 !important;
+  margin-top: 0 !important;
+}
+
+/* Hide Google Translate UI Elements Aggressively */
+.goog-te-banner-frame.skiptranslate,
+.goog-te-banner-frame,
+.skiptranslate,
+iframe[name="goog-te-banner-frame"],
+.goog-te-gadget-icon,
+#goog-gt-tt,
+.goog-tooltip,
+.goog-te-balloon-frame {
+  display: none !important;
+  visibility: hidden !important;
+  height: 0 !important;
+  width: 0 !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  z-index: -1000 !important;
+  position: absolute !important;
+  top: -9999px !important;
+}
+
+.goog-text-highlight {
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
