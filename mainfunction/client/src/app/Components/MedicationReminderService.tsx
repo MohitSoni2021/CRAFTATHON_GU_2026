@@ -11,6 +11,11 @@ interface Reminder {
   medicineImage?: string;
   dosage: string;
   times: string[];
+  takenLog?: Array<{
+    date: string | Date;
+    time: string;
+    status: string;
+  }>;
 }
 
 const MedicationReminderService = () => {
@@ -20,6 +25,7 @@ const MedicationReminderService = () => {
   const [dueTime, setDueTime] = useState<string>('');
   const [isTaken, setIsTaken] = useState(false);
   const [snoozedUntil, setSnoozedUntil] = useState<Record<string, number>>({});
+  const [dismissedReminders, setDismissedReminders] = useState<Record<string, number>>({});
 
   const fetchReminders = useCallback(async () => {
     try {
@@ -33,38 +39,78 @@ const MedicationReminderService = () => {
   useEffect(() => {
     if (isInitialized && isAuthenticated) {
       fetchReminders();
-      // Refresh list every 5 minutes
-      const interval = setInterval(fetchReminders, 5 * 60 * 1000);
-      return () => clearInterval(interval);
+      
+      // Listen for updates from other components (like adding a new medication)
+      const handleUpdate = () => fetchReminders();
+      window.addEventListener('medicationUpdated', handleUpdate);
+      
+      // Refresh list every minute for better sync
+      const interval = setInterval(fetchReminders, 60 * 1000);
+      
+      return () => {
+        window.removeEventListener('medicationUpdated', handleUpdate);
+        clearInterval(interval);
+      };
     }
   }, [fetchReminders, isAuthenticated, isInitialized]);
 
   useEffect(() => {
     const checkDueReminders = () => {
+      // Don't show if already showing one
+      if (dueReminder) return;
+
       const now = new Date();
-      const currentTime = now.toTimeString().slice(0, 5); // HH:mm
+      const currentTimeStr = now.toTimeString().slice(0, 5); // HH:mm
       const currentTimestamp = now.getTime();
+      const todayStr = now.toDateString(); // Simplified today check
 
       activeReminders.forEach(reminder => {
         reminder.times.forEach(time => {
           const reminderKey = `${reminder._id}-${time}`;
+          const [hours, minutes] = time.split(':').map(Number);
           
-          // Check if it's the exact time
-          if (time === currentTime) {
-            // Check if it was already handled or snoozed
-            const snoozeTime = snoozedUntil[reminderKey] || 0;
-            if (currentTimestamp > snoozeTime) {
-              setDueReminder(reminder);
-              setDueTime(time);
+          const reminderDate = new Date();
+          reminderDate.setHours(hours, minutes, 0, 0);
+          
+          const timeDiff = currentTimestamp - reminderDate.getTime();
+          const twoHoursInMs = 2 * 60 * 60 * 1000;
+
+          // Check if it's due:
+          // 1. Time has passed today (or is now)
+          // 2. Within a 2-hour window (don't show morning meds in evening)
+          if (timeDiff >= 0 && timeDiff < twoHoursInMs) {
+            
+            // 3. Not already taken today for this time slot
+            const isAlreadyTaken = reminder.takenLog?.some(log => {
+              const logDate = new Date(log.date).toDateString();
+              return logDate === todayStr && log.time === time && log.status === 'taken';
+            });
+
+            if (!isAlreadyTaken) {
+              // 4. Not currently snoozed
+              const snoozeTime = snoozedUntil[reminderKey] || 0;
+              
+              // 5. Not manually dismissed in this session (unless 30 mins passed)
+              const dismissTime = dismissedReminders[reminderKey] || 0;
+              const thirtyMinsInMs = 30 * 60 * 1000;
+
+              if (currentTimestamp > snoozeTime && currentTimestamp > (dismissTime + thirtyMinsInMs)) {
+                setDueReminder(reminder);
+                setDueTime(time);
+                setIsTaken(false); // Reset checkbox
+              }
             }
           }
         });
       });
     };
 
-    const timer = setInterval(checkDueReminders, 30000); // Check every 30 seconds
+    // Check every 10 seconds for better responsiveness
+    const timer = setInterval(checkDueReminders, 10000);
+    checkDueReminders(); // Run immediately on mount or when activeReminders change
+    
     return () => clearInterval(timer);
-  }, [activeReminders, snoozedUntil]);
+  }, [activeReminders, snoozedUntil, dismissedReminders, dueReminder]);
 
   const handleMarkTaken = async () => {
     if (!dueReminder) return;
@@ -73,9 +119,9 @@ const MedicationReminderService = () => {
         time: dueTime,
         status: 'taken'
       });
-      console.log(`${dueReminder.medicineName} marked as taken`);
       setDueReminder(null);
       setIsTaken(false);
+      fetchReminders(); // Refresh data immediately
     } catch (error) {
       alert('Failed to update medication status');
     }
@@ -95,26 +141,40 @@ const MedicationReminderService = () => {
     setDueReminder(null);
   };
 
+  const handleDismiss = () => {
+    if (!dueReminder) return;
+    const reminderKey = `${dueReminder._id}-${dueTime}`;
+    setDismissedReminders(prev => ({
+      ...prev,
+      [reminderKey]: Date.now()
+    }));
+    setDueReminder(null);
+  };
+
   if (!dueReminder) return null;
 
   return (
     <div className="fixed bottom-8 right-8 z-[100] animate-in fade-in slide-in-from-bottom-10 duration-500">
-      <div className="bg-white w-80 rounded-xl shadow-[0_32px_64px_-16px_rgba(0,105,119,0.25)] border-2 border-primary/10 overflow-hidden">
-        <div className="bg-gradient-primary p-6 text-white relative">
+      <div className="bg-white w-85 rounded-2xl shadow-[0_32px_64px_-16px_rgba(0,105,119,0.3)] border border-primary/10 overflow-hidden">
+        <div className="bg-gradient-to-br from-primary to-primary-dark p-6 text-white relative">
           <button 
-            onClick={() => setDueReminder(null)}
-            className="absolute top-4 right-4 p-1 hover:bg-white/20 rounded-full transition-all"
+            onClick={handleDismiss}
+            className="absolute top-4 right-4 p-2 hover:bg-white/20 rounded-xl transition-all"
           >
             <FaTimes className="w-4 h-4" />
           </button>
-          <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 bg-white/20 rounded-xl">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="p-2.5 bg-white/20 backdrop-blur-md rounded-xl">
               <FaBell className="w-5 h-5 text-white" />
             </div>
-            <span className="text-xs font-black uppercase tracking-widest opacity-80">Medication Due</span>
+            <span className="text-[10px] font-black uppercase tracking-[0.2em] opacity-80">Medication Reminder</span>
           </div>
-          <h2 className="text-xl font-black">{dueReminder.medicineName}</h2>
-          <p className="text-sm opacity-90 font-medium">{dueReminder.dosage} • {dueTime}</p>
+          <h2 className="text-2xl font-black leading-tight">{dueReminder.medicineName}</h2>
+          <p className="text-sm opacity-90 font-bold mt-1 flex items-center gap-2">
+            <span className="bg-white/20 px-2 py-0.5 rounded-md">{dueReminder.dosage}</span>
+            <span className="opacity-60">•</span>
+            <span>Due at {dueTime}</span>
+          </p>
         </div>
 
         <div className="p-6 space-y-4">

@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import api from '@/utils/api';
+import { useAppSelector } from '@/store/hooks';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import DashboardLayout from '@/components/DashboardLayout';
 import { FaPlus, FaBell, FaTrash, FaClock, FaCalendarAlt, FaCheckCircle, FaTimes } from 'react-icons/fa';
@@ -18,10 +19,11 @@ interface Reminder {
 }
 
 const MedicationRemindersPage = () => {
+  const { isAuthenticated, isInitialized } = useAppSelector((state) => state.auth);
   const [reminders, setReminders] = useState<Reminder[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
-  
+
   // Form state
   const [medicineName, setMedicineName] = useState('');
   const [medicineImage, setMedicineImage] = useState('');
@@ -31,8 +33,10 @@ const MedicationRemindersPage = () => {
   const [times, setTimes] = useState<string[]>(['08:00']);
 
   useEffect(() => {
-    fetchReminders();
-  }, []);
+    if (isInitialized && isAuthenticated) {
+      fetchReminders();
+    }
+  }, [isInitialized, isAuthenticated]);
 
   const fetchReminders = async () => {
     try {
@@ -84,6 +88,8 @@ const MedicationRemindersPage = () => {
       setIsModalOpen(false);
       resetForm();
       fetchReminders();
+      // Notify the global reminder service to refresh
+      window.dispatchEvent(new CustomEvent('medicationUpdated'));
     } catch (error: any) {
       alert(error.response?.data?.message || 'Failed to add reminder');
     }
@@ -104,6 +110,8 @@ const MedicationRemindersPage = () => {
       await api.delete(`/reminders/${id}`);
       alert('Reminder deleted');
       fetchReminders();
+      // Notify the global reminder service to refresh
+      window.dispatchEvent(new CustomEvent('medicationUpdated'));
     } catch (error) {
       alert('Failed to delete reminder');
     }
