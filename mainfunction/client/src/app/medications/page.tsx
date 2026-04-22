@@ -6,6 +6,8 @@ import { useAppSelector } from '@/store/hooks';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import DashboardLayout from '@/components/DashboardLayout';
 import { FaPlus, FaBell, FaTrash, FaClock, FaCalendarAlt, FaCheckCircle, FaTimes } from 'react-icons/fa';
+import MedicationsSkeleton from '@/components/dashboard/MedicationsSkeleton';
+
 
 interface Reminder {
   _id: string;
@@ -138,10 +140,9 @@ const MedicationRemindersPage = () => {
             </header>
 
         {loading ? (
-          <div className="flex justify-center items-center h-64">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-          </div>
+          <MedicationsSkeleton />
         ) : reminders.length === 0 ? (
+
           <div className="bg-white rounded-xl p-12 text-center shadow-ambient border border-outline-variant">
             <div className="bg-primary/5 w-20 h-20 rounded-xl flex items-center justify-center mx-auto mb-6">
               <FaBell className="text-primary w-10 h-10" />
