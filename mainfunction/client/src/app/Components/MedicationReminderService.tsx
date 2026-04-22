@@ -28,23 +28,22 @@ const MedicationReminderService = () => {
   const [dismissedReminders, setDismissedReminders] = useState<Record<string, number>>({});
 
   const fetchReminders = useCallback(async () => {
+    if (!isAuthenticated) return;
     try {
       const response = await api.get('/reminders');
       setActiveReminders(response.data);
     } catch (error) {
-      console.error('Error fetching reminders for service:', error);
+      console.error('Error fetching reminders:', error);
     }
-  }, []);
+  }, [isAuthenticated]);
 
   useEffect(() => {
     if (isInitialized && isAuthenticated) {
       fetchReminders();
       
-      // Listen for updates from other components (like adding a new medication)
       const handleUpdate = () => fetchReminders();
       window.addEventListener('medicationUpdated', handleUpdate);
       
-      // Refresh list every minute for better sync
       const interval = setInterval(fetchReminders, 60 * 1000);
       
       return () => {
@@ -55,62 +54,61 @@ const MedicationReminderService = () => {
   }, [fetchReminders, isAuthenticated, isInitialized]);
 
   useEffect(() => {
+    if (!isAuthenticated || !isInitialized) return;
+
     const checkDueReminders = () => {
-      // Don't show if already showing one
       if (dueReminder) return;
 
       const now = new Date();
-      const currentTimeStr = now.toTimeString().slice(0, 5); // HH:mm
       const currentTimestamp = now.getTime();
-      const todayStr = now.toDateString(); // Simplified today check
+      const todayDateStr = now.toDateString();
 
-      activeReminders.forEach(reminder => {
-        reminder.times.forEach(time => {
-          const reminderKey = `${reminder._id}-${time}`;
+      // Look through all medications
+      for (const reminder of activeReminders) {
+        if (!reminder.times || !Array.isArray(reminder.times)) continue;
+
+        for (const time of reminder.times) {
           const [hours, minutes] = time.split(':').map(Number);
-          
           const reminderDate = new Date();
           reminderDate.setHours(hours, minutes, 0, 0);
           
           const timeDiff = currentTimestamp - reminderDate.getTime();
           const twoHoursInMs = 2 * 60 * 60 * 1000;
 
-          // Check if it's due:
-          // 1. Time has passed today (or is now)
-          // 2. Within a 2-hour window (don't show morning meds in evening)
+          // If due now or in the last 2 hours
           if (timeDiff >= 0 && timeDiff < twoHoursInMs) {
+            const reminderKey = `${reminder._id}-${time}`;
             
-            // 3. Not already taken today for this time slot
-            const isAlreadyTaken = reminder.takenLog?.some(log => {
+            // Check if already taken today for this specific time
+            const isTaken = reminder.takenLog?.some(log => {
               const logDate = new Date(log.date).toDateString();
-              return logDate === todayStr && log.time === time && log.status === 'taken';
+              return logDate === todayDateStr && log.time === time && log.status === 'taken';
             });
 
-            if (!isAlreadyTaken) {
-              // 4. Not currently snoozed
-              const snoozeTime = snoozedUntil[reminderKey] || 0;
-              
-              // 5. Not manually dismissed in this session (unless 30 mins passed)
-              const dismissTime = dismissedReminders[reminderKey] || 0;
-              const thirtyMinsInMs = 30 * 60 * 1000;
+            if (isTaken) continue;
 
-              if (currentTimestamp > snoozeTime && currentTimestamp > (dismissTime + thirtyMinsInMs)) {
-                setDueReminder(reminder);
-                setDueTime(time);
-                setIsTaken(false); // Reset checkbox
-              }
+            // Check if snoozed or dismissed
+            const snoozeTime = snoozedUntil[reminderKey] || 0;
+            const dismissTime = dismissedReminders[reminderKey] || 0;
+            const thirtyMins = 30 * 60 * 1000;
+
+            if (currentTimestamp > snoozeTime && currentTimestamp > (dismissTime + thirtyMins)) {
+              setDueReminder(reminder);
+              setDueTime(time);
+              setIsTaken(false);
+              return; // Show one at a time
             }
           }
-        });
-      });
+        }
+      }
     };
 
-    // Check every 10 seconds for better responsiveness
-    const timer = setInterval(checkDueReminders, 10000);
-    checkDueReminders(); // Run immediately on mount or when activeReminders change
+    // Run every 5 seconds for snappy performance
+    const timer = setInterval(checkDueReminders, 5000);
+    checkDueReminders(); // Initial check
     
     return () => clearInterval(timer);
-  }, [activeReminders, snoozedUntil, dismissedReminders, dueReminder]);
+  }, [activeReminders, snoozedUntil, dismissedReminders, dueReminder, isAuthenticated, isInitialized]);
 
   const handleMarkTaken = async () => {
     if (!dueReminder) return;
