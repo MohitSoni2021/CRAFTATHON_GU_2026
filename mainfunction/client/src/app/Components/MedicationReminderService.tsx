@@ -27,6 +27,7 @@ const MedicationReminderService = () => {
   const [snoozedUntil, setSnoozedUntil] = useState<Record<string, number>>({});
   const [dismissedReminders, setDismissedReminders] = useState<Record<string, number>>({});
   const [notifiedReminders, setNotifiedReminders] = useState<Record<string, boolean>>({});
+  const audioRef = React.useRef<HTMLAudioElement | null>(null);
 
   const fetchReminders = useCallback(async () => {
     if (!isAuthenticated) return;
@@ -60,6 +61,28 @@ const MedicationReminderService = () => {
       };
     }
   }, []);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      audioRef.current = new Audio('/beep.mp3');
+      audioRef.current.loop = true;
+    }
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (dueReminder && audioRef.current) {
+      audioRef.current.play().catch(err => console.log('Audio autoplay blocked or failed:', err));
+    } else if (!dueReminder && audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+    }
+  }, [dueReminder]);
 
   useEffect(() => {
     if (isInitialized && isAuthenticated) {
