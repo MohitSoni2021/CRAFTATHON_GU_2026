@@ -26,6 +26,7 @@ const MedicationReminderService = () => {
   const [isTaken, setIsTaken] = useState(false);
   const [snoozedUntil, setSnoozedUntil] = useState<Record<string, number>>({});
   const [dismissedReminders, setDismissedReminders] = useState<Record<string, number>>({});
+  const [notifiedReminders, setNotifiedReminders] = useState<Record<string, boolean>>({});
 
   const fetchReminders = useCallback(async () => {
     if (!isAuthenticated) return;
@@ -36,6 +37,29 @@ const MedicationReminderService = () => {
       console.error('Error fetching reminders:', error);
     }
   }, [isAuthenticated]);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && 'Notification' in window) {
+      if (Notification.permission === 'default') {
+        Notification.requestPermission();
+      }
+    }
+  }, []);
+
+  const showDesktopNotification = useCallback((reminder: Reminder, time: string) => {
+    if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'granted') {
+      const notification = new Notification(`Medication Due: ${reminder.medicineName}`, {
+        body: `It's time for your ${reminder.dosage} dose (${time}).`,
+        icon: reminder.medicineImage || '/favicon.ico',
+        tag: `${reminder._id}-${time}`, // Prevent duplicate notifications for same slot
+      });
+
+      notification.onclick = () => {
+        window.focus();
+        notification.close();
+      };
+    }
+  }, []);
 
   useEffect(() => {
     if (isInitialized && isAuthenticated) {
@@ -93,6 +117,12 @@ const MedicationReminderService = () => {
             const thirtyMins = 30 * 60 * 1000;
 
             if (currentTimestamp > snoozeTime && currentTimestamp > (dismissTime + thirtyMins)) {
+              // Trigger desktop notification if not already shown for this window
+              if (!notifiedReminders[reminderKey]) {
+                showDesktopNotification(reminder, time);
+                setNotifiedReminders(prev => ({ ...prev, [reminderKey]: true }));
+              }
+
               setDueReminder(reminder);
               setDueTime(time);
               setIsTaken(false);
