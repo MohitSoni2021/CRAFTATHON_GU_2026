@@ -15,7 +15,9 @@ const familyRoutes = require("./routes/family");
 const savedPostRoutes = require("./routes/savedPosts");
 const shareRoutes = require("./routes/share");
 const medicineRoutes = require("./routes/medicines");
+const reminderRoutes = require("./routes/reminders");
 const { startCronJob } = require("./jobs/newsFetcher");
+const { startMedicationCron } = require("./jobs/medicationReminder");
 const compression = require("compression");
 const errorMiddleware = require("./middleware/errorMiddleware");
 
@@ -25,6 +27,7 @@ dotenv.config();
 // Start background jobs
 if (process.env.NODE_ENV !== 'test') {
   startCronJob();
+  startMedicationCron();
 }
 
 // Increase payload limit to 50mb
@@ -75,6 +78,7 @@ app.use("/api/family", familyRoutes);
 app.use("/api/saved-posts", savedPostRoutes);
 app.use("/api/share", shareRoutes);
 app.use("/api/medicines", medicineRoutes);
+app.use("/api/reminders", reminderRoutes);
 app.use("/api/admin", require("./routes/adminRoutes"));
 console.log("Loading SOS Routes...");
 app.use("/api/sos", require("./routes/sos")); // <--- SOS Feature

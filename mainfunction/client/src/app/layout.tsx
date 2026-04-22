@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { ReduxProvider } from "@/store/ReduxProvider";
 import ActionDock from "@/components/ActionDock";
+import MedicationReminderService from "./Components/MedicationReminderService";
 
 export const metadata: Metadata = {
   title: "SwasthyaSaathi - Your Health Documentation",
@@ -22,6 +23,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <ReduxProvider>
           {children}
           <ActionDock />
+          <MedicationReminderService />
         </ReduxProvider>
       </body>
     </html>

@@ -47,6 +47,7 @@ const Sidebar = ({ isOpen = false, onClose }: SidebarProps) => {
       { name: "AI Consultation", path: "/consultation", icon: FaMicrophone },
       { name: "My History", path: "/consultation/history", icon: FaHistory },
       { name: "Measurements", path: "/measurements", icon: FaHeartbeat },
+      { name: "Medicine Reminders", path: "/medications", icon: FaBell },
       { name: "Diary", path: "/diary", icon: FaBookMedical },
       { name: "Medical Info", path: "/medical-info", icon: FaBookMedical },
       { name: "Lab Reports", path: "/lab-reports", icon: FaFileMedical },

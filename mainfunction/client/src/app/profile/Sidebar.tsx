@@ -6,6 +6,7 @@ import {
   FaBolt,
   FaCrown,
   FaCog,
+  FaBell,
 } from "react-icons/fa";
 import Link from "next/link";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
@@ -77,6 +78,37 @@ export default function Sidebar({
               className="text-gray-300 group-hover:translate-x-1 transition-transform"
             />
           </button>
+        </div>
+      </div>
+
+      {/* Clinical Tools */}
+      <div className="card-editorial rounded-xl p-8 border border-outline-variant shadow-ambient">
+        <h3 className="text-base font-extrabold text-gray-900 mb-6 flex items-center gap-2">
+          <FaBell className="text-primary" /> Clinical Tools
+        </h3>
+        <div className="space-y-4">
+          <Link
+            href="/medications"
+            className="w-full flex items-center justify-between p-4 bg-surface-container-low hover:bg-primary/5 rounded-xl border border-outline-variant group transition-all"
+          >
+            <div className="flex items-center gap-4">
+              <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-primary shadow-sm border border-outline-variant group-hover:scale-110 transition-transform">
+                <FaBell size={14} />
+              </div>
+              <div className="text-left">
+                <p className="text-xs font-extrabold text-gray-900 uppercase tracking-widest">
+                  Medicine Reminders
+                </p>
+                <p className="text-[10px] text-gray-500 font-medium">
+                  Schedule & track doses
+                </p>
+              </div>
+            </div>
+            <FaChevronRight
+              size={10}
+              className="text-gray-300 group-hover:translate-x-1 transition-transform"
+            />
+          </Link>
         </div>
       </div>
 
