@@ -23,6 +23,8 @@ import Sidebar from "@/components/Sidebar";
 
 // Components
 import HealthTrendChart from "@/components/dashboard/HealthTrendChart";
+import HealthNewsWidget from "@/components/dashboard/HealthNewsWidget";
+import UpcomingAppointments from "@/components/dashboard/UpcomingAppointments";
 
 export default function NewDashboard() {
   const dispatch = useDispatch<AppDispatch>();

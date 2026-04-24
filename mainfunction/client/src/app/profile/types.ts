@@ -1,7 +1,7 @@
 export interface SOSContact {
   name: string;
   phone: string;
-  relationship: string;
+  relationship?: string;
   email?: string;
 }
 

@@ -4,7 +4,7 @@ import { ProtectedRoute } from '@/components/ProtectedRoute';
 import DashboardLayout from '@/components/DashboardLayout';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '@/store/store';
-import { createLabReport, analyzeLabReport } from '@/store/slices/labReportsSlice';
+import { createLabReport, analyzeLabReport, CreateLabReportData } from '@/store/slices/labReportsSlice';
 import { useRouter } from 'next/navigation';
 import { FaArrowLeft, FaCloudUploadAlt, FaFlask, FaMagic, FaCheckCircle, FaExclamationTriangle } from 'react-icons/fa';
 
@@ -127,14 +127,16 @@ export default function NewLabReportPage() {
         }
 
         try {
-            const resultAction = await dispatch(createLabReport({
+            const reportData: CreateLabReportData = {
                 userId: user.id,
                 reportDate: date,
                 testType: testType,
                 notes: notes,
                 fileUrl: fileUrl,
                 parsedResults: aiResponse || { results: results.filter(r => r.key) }
-            }));
+            };
+
+            const resultAction = await dispatch(createLabReport(reportData));
 
             if (createLabReport.fulfilled.match(resultAction)) {
                 router.push('/lab-reports');

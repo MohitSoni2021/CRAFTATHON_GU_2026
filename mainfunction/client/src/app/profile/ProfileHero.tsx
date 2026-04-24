@@ -24,7 +24,7 @@ export default function ProfileHero({
           <div className="w-40 h-40 bg-surface-container-low rounded-xl ring-4 ring-white/10 shadow-2xl flex items-center justify-center text-6xl font-bold text-primary overflow-hidden transition-transform duration-500 group-hover/avatar:scale-[1.02]">
             {user?.profileImage || user?.profile?.photoUrl ? (
               <img
-                src={user.profileImage || user.profile.photoUrl}
+                src={user?.profileImage || user?.profile?.photoUrl || ""}
                 alt="Profile"
                 className="w-full h-full object-cover"
               />
@@ -92,7 +92,7 @@ export default function ProfileHero({
                 Age
               </p>
               <p className="text-white font-bold">
-                {user?.age ? `${user.age} Y` : "--"}
+                {user?.age ? `${user?.age} Y` : "--"}
               </p>
             </div>
             <div className="bg-white/5 backdrop-blur-sm p-4 rounded-xl border border-white/5 hover:bg-white/10 transition-colors">
@@ -108,7 +108,7 @@ export default function ProfileHero({
                 Weight
               </p>
               <p className="text-white font-bold">
-                {user?.profile?.weight ? `${user.profile.weight}kg` : "--"}
+                {user?.profile?.weight ? `${user?.profile?.weight}kg` : "--"}
               </p>
             </div>
           </div>

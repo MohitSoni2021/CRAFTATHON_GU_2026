@@ -49,9 +49,18 @@ export const fetchLabReports = createAsyncThunk(
     }
 );
 
+export interface CreateLabReportData {
+    userId: string;
+    reportDate: string;
+    testType: string;
+    parsedResults?: any;
+    fileUrl?: string;
+    notes?: string;
+}
+
 export const createLabReport = createAsyncThunk(
     'labReports/create',
-    async (data: { reportDate: string; testType: string; parsedResults?: any; fileUrl?: string; notes?: string }, { rejectWithValue }) => {
+    async (data: CreateLabReportData, { rejectWithValue }) => {
         try {
             const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/lab-reports`, data, {
                 headers: getAuthHeader(),
