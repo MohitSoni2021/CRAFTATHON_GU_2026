@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 import OnboardingTour from "@/components/OnboardingTour";
-import { User } from "@/store/slices/authSlice"; // assuming this is the type, if not we'll use any or appropriate type. Let's not assume type if not sure.
+
 
 interface DashboardHeaderProps {
   user: any;

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Joyride, CallBackProps, STATUS, Step } from 'react-joyride';
+import { Joyride, STATUS, Step } from 'react-joyride';
 
 interface OnboardingTourProps {
     isNewUser: boolean;
@@ -38,7 +38,7 @@ export default function OnboardingTour({ isNewUser, userId }: OnboardingTourProp
         }
     };
 
-    const handleJoyrideCallback = (data: CallBackProps) => {
+    const handleJoyrideCallback = (data: any) => {
         const { status, type, step } = data;
         const finishedStatuses: string[] = [STATUS.FINISHED, STATUS.SKIPPED];
 
@@ -57,7 +57,7 @@ export default function OnboardingTour({ isNewUser, userId }: OnboardingTourProp
     };
 
     // Better TTS Hook
-    const handleStepChange = (data: CallBackProps) => {
+    const handleStepChange = (data: any) => {
         const { status, index, action, type, step } = data;
 
         if (type === 'step:after' && action === 'next') {
@@ -89,7 +89,7 @@ export default function OnboardingTour({ isNewUser, userId }: OnboardingTourProp
             placement: 'center',
             title: 'Welcome to SwasthyaSaathi! 👋',
             content: 'Let us take you through a quick tour of your new Health Companion. We will explain what each feature does.',
-            disableBeacon: true,
+            skipBeacon: true,
         },
         {
             target: '#sidebar-nav-ai-consultation',
@@ -152,16 +152,16 @@ export default function OnboardingTour({ isNewUser, userId }: OnboardingTourProp
             steps={steps}
             run={run}
             continuous
-            showSkipButton
-            showProgress
-            callback={handleStepChange}
+            onEvent={handleStepChange}
+            options={{
+                primaryColor: '#2B7A78',
+                textColor: '#333',
+                zIndex: 10000,
+                showProgress: true,
+                buttons: ['back', 'skip', 'primary'],
+            }}
             styles={{
-                options: {
-                    primaryColor: '#2B7A78',
-                    textColor: '#333',
-                    zIndex: 10000,
-                },
-                buttonNext: {
+                buttonPrimary: {
                     backgroundColor: '#2B7A78',
                     fontSize: '14px',
                     fontWeight: 'bold',

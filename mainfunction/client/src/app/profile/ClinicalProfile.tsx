@@ -60,8 +60,8 @@ export default function ClinicalProfile({ user, onEdit, onAIInsight }: ClinicalP
       <div className="p-6 bg-surface-container-low rounded-xl border border-outline-variant relative group/conditions">
         <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-4">Documented Chronic Conditions</p>
         <div className="flex flex-wrap gap-3">
-          {user?.profile?.chronicConditions && user.profile.chronicConditions.length > 0 ? (
-            user.profile.chronicConditions.map((condition, idx) => (
+          {user?.profile?.chronicConditions && user?.profile?.chronicConditions.length > 0 ? (
+            user?.profile?.chronicConditions.map((condition, idx) => (
               <span key={idx} className="bg-red-50 text-red-600 px-4 py-2 rounded-xl text-xs font-bold border border-red-100/50 flex items-center gap-2">
                 <span className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse"></span>
                 {condition}

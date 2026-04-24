@@ -3,7 +3,7 @@ import axios from 'axios';
 import { encrypt } from '@/utils/cryptoUtils';
 
 // Types
-interface User {
+export interface User {
   id: string;
   name: string;
   email: string;
@@ -38,6 +38,12 @@ interface User {
     aiConsultations: number;
     ocrScans: number;
     lastResetDate?: string;
+  };
+  availability?: {
+    days?: string[];
+    workingHours?: { start: string; end: string };
+    lunchBreak?: { start: string; end: string };
+    slotDuration?: number;
   };
 }
 

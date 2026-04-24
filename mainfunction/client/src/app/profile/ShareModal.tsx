@@ -1,7 +1,7 @@
 import React from 'react';
 import { FaShareAlt, FaTimes, FaCheck, FaQrcode } from 'react-icons/fa';
 import { QRCodeCanvas } from 'qrcode.react';
-import { User } from '../types';
+import { User } from './types';
 
 interface ShareModalProps {
   user: User | null;

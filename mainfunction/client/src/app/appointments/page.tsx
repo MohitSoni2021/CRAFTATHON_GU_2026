@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import DashboardLayout from '@/components/DashboardLayout';
 import axios from 'axios';
 import { useSelector } from 'react-redux';
@@ -21,7 +21,7 @@ interface Appointment {
     status: 'Scheduled' | 'Completed' | 'Cancelled';
 }
 
-const AppointmentsPage = () => {
+const AppointmentsPageContent = () => {
     const { user, token } = useSelector((state: RootState) => state.auth);
     const [appointments, setAppointments] = useState<Appointment[]>([]);
     const [loading, setLoading] = useState(true);
@@ -214,6 +214,14 @@ const AppointmentsPage = () => {
                 )}
             </div>
         </DashboardLayout >
+    );
+};
+
+const AppointmentsPage = () => {
+    return (
+        <Suspense fallback={<AppointmentsSkeleton />}>
+            <AppointmentsPageContent />
+        </Suspense>
     );
 };
 
